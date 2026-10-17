@@ -94,6 +94,30 @@ The PRF extension lets a passkey derive a secret that can encrypt other data, su
 - [Bitwarden: PRF, WebAuthn and passkeys](https://bitwarden.com/blog/prf-webauthn-and-its-role-in-passkeys/)
 - [A caution against using PRF to encrypt data](https://lilting.ch/en/articles/passkeys-prf-extension-encryption-risk)
 
+## Undo and history
+
+### Inkscape's undo stack
+
+Inkscape undoes at the level of its XML tree, which makes it directly relevant to XTXP:
+
+- **An action is a transaction.** Every change to the document's XML is recorded as an event (node added, removed or reordered; attribute or content changed). `DocumentUndo::done()` closes the open transaction and pushes its event log onto the undo stack as one step, with a description for the Undo History dialog.
+- **Undo and redo replay logs.** Undo reverses a step's XML events; redo replays them forward.
+- **Small steps can merge.** `DocumentUndo::maybeDone()` takes a key. If it matches the previous action's key, the new events are folded into the top step, so winding a spin button becomes one undo. Drags write to the XML only on release, so a drag is one step too.
+- **History is linear.** Any new action clears the redo stack. Undo a few steps, then edit, and the undone work is gone.
+- **Observers can watch commits.** An `UndoStackObserver` is told about each new step, undo and redo.
+
+**What XTXP takes from it:**
+
+- **The capture point for the Inkscape fork.** Hooking the transaction commit turns each Inkscape action into one batch of XTXP operations, already grouped the way a user thinks of their edits ([The Inkscape fork](/build/inkscape-fork/)).
+- **What branches fix.** Where Inkscape clears redo, XTXP forks: undoing and then editing starts a [branch](/spec/branches/#undo-in-practice), and the undone work stays reachable.
+
+- [`document-undo.cpp` (Inkscape source, Bazaar era)](https://bazaar.launchpad.net/~inkscape.dev/inkscape/trunk/view/15731/src/document-undo.cpp)
+- [Inkscape wiki: Architectural overview](https://wiki.inkscape.org/wiki/Architectural_overview)
+
+### Undo in shared documents
+
+Yjs and Yrs have an undo manager that can be scoped to the local user's own changes: it undoes them by applying inverse operations, and leaves collaborators' edits alone. That is the model for an individual's Ctrl+Z in a shared XTXP document, as distinct from branching the document's history.
+
 ## Addressing and branching
 
 ### Git

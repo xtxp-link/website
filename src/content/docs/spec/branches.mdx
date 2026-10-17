@@ -18,7 +18,18 @@ A **branch** is a fork of a document's history at a point given by a state vecto
 
 A branch is identified by its **parent branch** plus the **state vector at the fork**.
 
-**Prior art:** cheap branches, merges as replays and an authoritative upstream all come from git ([prior art](/discussion/prior-art/#git)). Access to branches is covered in [Identity and access](/spec/identity/#access-is-granted-by-key).
+**Prior art:** cheap branches, merges as replays and an authoritative upstream all come from git ([prior art](/discussion/prior-art/#git)). The undo side builds on Inkscape's transaction-based undo stack ([prior art](/discussion/prior-art/#inkscapes-undo-stack)). Access to branches is covered in [Identity and access](/spec/identity/#access-is-granted-by-key).
+
+## Undo in practice
+
+<span class="status status--draft">draft</span>
+
+Two kinds of undo meet here:
+
+- **Personal undo (Ctrl+Z)** reverses *your own* recent actions with inverse operations, leaving collaborators' edits alone. One step is one action, grouped the way [Inkscape groups an action into a transaction](/discussion/prior-art/#inkscapes-undo-stack), including merging small repeated steps such as a drag or a spin button.
+- **History undo** goes back to an earlier state of the whole document. That's a branch from an earlier state vector.
+
+Where they differ from Inkscape: in Inkscape, undoing and then making a new edit clears the redo stack, and the undone work is lost. In XTXP, the undone work is still in the document's history, so it can be reached again through a branch from before the undo.
 
 ## Trackers
 
@@ -57,3 +68,4 @@ On Yrs: a **fork** is a new document seeded with the parent's state at the fork'
 - How long abandoned branches stay loaded before they're only kept in storage.
 - Permissions: who may fork, who may merge into which branch.
 - Whether a merge records itself as an operation, so it can be undone by branching from before it.
+- Exactly how personal undo groups operations, and how far back it reaches once collaborators have built on your changes.
