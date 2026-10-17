@@ -29,7 +29,7 @@ Pages mark each point as <span class="status status--decided">decided</span>, <s
     The specification every node obeys. **The Math** defines how concurrent edits merge. **The Wire** defines how they travel.
   </Card>
   <Card title="Xmesh: the engine" icon="setting">
-    The CRDT engine that resolves concurrent edits on an XML tree. A C++20 reference implementation, plus a pure Elixir port held to the same test vectors.
+    The CRDT engine that resolves concurrent edits on an XML tree. A pure, hexagonal C++20 core: no I/O, no clocks, no threads. Everything else is an adapter around it.
   </Card>
   <Card title="MUPPET: the executor" icon="pencil">
     Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns every view: the canvas, spatial chat and comments, onion skin and redline.

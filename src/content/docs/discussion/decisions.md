@@ -15,7 +15,7 @@ The room server is a **relay**: it orders and archives operations, and it may be
 
 A plain HTML browser drives a **server-side MUPPET**, which turns form POSTs into real CRDT operations and acts for that one user. Because it can be one of the user's own devices, end-to-end encrypted rooms stay possible.
 
-## 3. Elixir: a pure core as well as C++
+## 3. Elixir: a pure core as well as C++ (superseded by 10)
 
 A **pure Elixir Xmesh** powers trackers and server-side MUPPETs. **C++ is the reference implementation.** Cross-language property tests are the contract between them, owned by the principal from day one.
 
@@ -53,6 +53,14 @@ There is no separate application layer. The vector canvas and the spatial chat a
 Every document, native or an ordinary website, is addressed as `xtxp.link/{host}/{path}@{ref}`. There is no proxy marker: a website is a document whose upstream peer is the origin, and `@origin` is that peer's branch (chosen over `@live`, which suggested streaming rather than authority). The last `@` always starts the ref, and generated links always carry one. A first path segment without a dot is a gateway keyword. See [Addressing](/spec/addressing/).
 
 *Replaced:* a `/@/` proxy marker (briefly adopted the same day) and a `?at=` placeholder for state vectors.
+
+## 10. One core: pure, hexagonal C++
+
+**Xmesh is a single pure C++20 core** for now: no I/O, no clocks, no threads, with every integration as an adapter (Inkscape, Wasm, a server process, the test harness). Erlang trackers and the server-side MUPPET drive it through Ports.
+
+The **pure Elixir port is deferred to a later spike**, to be justified by measurement: in particular, the cost of Ports at scale (one OS process per branch, versus thousands of cheap Erlang processes). The vector suite stays language-agnostic so the spike can be held to it.
+
+*Replaced:* decision 3, a pure Elixir core alongside C++ from day one.
 
 ## Naming
 

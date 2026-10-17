@@ -34,6 +34,8 @@ Stock Conversations can't render a canvas. The answer affects the protocol now: 
 
 ## Engine
 
+- **Port topology:** trackers drive the C++ core through Ports. One OS process per branch is simple but costs megabytes each; a shared pool of core processes, each holding many branches, scales further. Which one first?
+- **Elixir port spike:** what measurement would justify it, and when to run it.
 - **Identity:** mapping CRDT client IDs to JIDs and devices, and whether operations are signed.
 - **Garbage collection:** when tombstones can be dropped if the relay may be blind and no server sees every peer.
 - **Canonical form:** the exact XML canonicalisation used before hashing.

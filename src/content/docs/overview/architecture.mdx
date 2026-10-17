@@ -10,11 +10,22 @@ import Diagram from '../../../components/Diagram.astro';
 | Part | Role | Status |
 | --- | --- | --- |
 | **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, cycle-free moves. *The Wire*: stanza framing, handshakes, branch routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
-| **Xmesh** | The engine. Resolves concurrent patch streams. C++20 is the reference implementation, and a pure Elixir port is held to the same vectors. | <span class="status status--decided">decided</span> |
+| **Xmesh** | The engine. Resolves concurrent patch streams. A pure, hexagonal C++20 core, the only implementation for now. A pure Elixir port is deferred to a later spike. | <span class="status status--decided">decided</span> |
 | **MUPPET** | Multi User Progressive Patch Execution Tree: client-side Xmesh, and the application layer. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns every view: the vector canvas, spatial chat and comments, paused queues, onion skin and branch previews, none of which change document state. | <span class="status status--decided">decided</span> |
 | **Erlang Trackers** | The routing layer. One lightweight Erlang process per branch, holding that branch's history, hot keyframes and presence, and routing patches between nodes. | <span class="status status--decided">decided</span> |
 
-<Diagram name="02-components" alt="Component diagram: Xmesh C++ and Elixir implement the Math; MUPPET adapters for Inkscape, Wasm and server embed Xmesh and share the canvas, chat and comment views; branch trackers use the Elixir core and store hot keyframes and a cold ledger." />
+<Diagram name="02-components" alt="Component diagram: the pure C++ Xmesh core implements the Math; MUPPET adapters for Inkscape, Wasm and server embed Xmesh and share the canvas, chat and comment views; branch trackers drive the C++ core through a Port and store hot keyframes and a cold ledger; the Elixir port is shown as deferred." />
+
+## A pure, hexagonal core
+
+Xmesh is the hexagon's centre: pure state transformations, with no networking, no file access, no clocks and no threads. Everything that touches the world is an adapter around it:
+
+- **Inkscape:** the core linked into the fork
+- **Browser:** the core compiled to Wasm
+- **Server:** the core as a standalone process, which the server-side MUPPET uses and Erlang trackers drive through a Port
+- **Tests:** the core driven directly by the vector harness
+
+Keeping the core pure is what lets one C++ codebase serve every one of these.
 
 ## The split that matters
 

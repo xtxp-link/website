@@ -8,8 +8,8 @@ package "XTXP — the specification" as spec {
 }
 
 package "Xmesh — the engine" as engine {
-  component "Xmesh C++20\n<<reference implementation>>" as xcpp
-  component "Xmesh Elixir\n<<pure port>>" as xex
+  component "Xmesh C++20\n<<pure hexagonal core>>" as xcpp
+  component "Xmesh Elixir\n<<deferred: later spike>>" as xex #line.dashed
 }
 
 package "MUPPET — the executor (client-side Xmesh)" as muppet {
@@ -26,21 +26,21 @@ package "Erlang Trackers — routing layer" as trk {
 }
 
 xcpp ..|> math
-xex ..|> math
+xex ..|> math : later
 mink --> xcpp : embeds
 mwasm --> xcpp : embeds (Wasm build)
-msrv --> xex : embeds
+msrv --> xcpp : embeds
 mink ..> wire
 mwasm ..> wire
 msrv ..> wire
 branch ..> wire
-branch --> xex : resolves branch state
+branch --> xcpp : via Port
 branch --> hot
 branch --> cold
 
 note bottom of engine
-  The cross-language vector suite
-  is the contract between the
-  C++ and Elixir implementations.
+  Pure core: no I/O, no clocks, no threads.
+  Every integration is an adapter. The vector
+  suite would hold a later Elixir port to it.
 end note
 @enduml

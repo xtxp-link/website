@@ -22,7 +22,7 @@ Owns everything that crosses a boundary:
 | --- | --- |
 | **C++20 core + Wasm** | The Xmesh reference implementation and its Wasm build |
 | **Inkscape fork** | The MUPPET adapter inside Inkscape, and keeping the fork current |
-| **Elixir / BEAM** | The pure Elixir Xmesh port, the trackers, and the server-side MUPPET |
+| **Elixir / BEAM** | The trackers, the XMPP integration, and hosting the C++ core through Ports. The pure Elixir Xmesh port is a later spike. |
 | **XMPP** | Rooms, archive, stream management, the patch envelope and namespaces |
 | **Web clients** | The Wasm MUPPET and the no-JS HTML client |
 

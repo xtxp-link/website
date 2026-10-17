@@ -24,7 +24,7 @@ Each server-side branch is held by its own lightweight Erlang **process** (a tra
 
 A tracker:
 
-- runs the pure Elixir Xmesh core to hold its branch's state
+- holds its branch's state in the C++ Xmesh core, driven through a Port (one OS process per branch, or a shared pool: [open](/discussion/open-questions/))
 - appends operations to the branch **ledger**, flushed to cold storage
 - keeps a **keyframe** in hot memory, so new clients load instantly
 - routes the branch's operations to its subscribers

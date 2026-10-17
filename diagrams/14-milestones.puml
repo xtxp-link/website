@@ -4,7 +4,7 @@ title Milestones
 
 left to right direction
 
-rectangle "**M1**\nHeadless convergence\n\n2× C++ CLI peers +\n1 Elixir peer in a MUC,\nreplaying vectors over\nreal XMPP with resumption" as m1
+rectangle "**M1**\nHeadless convergence\n\n2× C++ CLI peers +\nan Erlang tracker in a MUC,\nreplaying vectors over\nreal XMPP with resumption" as m1
 rectangle "**M2**\nInkscape + no-JS\n\nInkscape fork MUPPET +\nserver MUPPET serving\nplain HTML" as m2
 rectangle "**M3**\nInkscape + Wasm\n\nbrowser MUPPET\n(Wasm polyfill)" as m3
 rectangle "**M4**\nInkscape + Conversations\n\nmobile XMPP users\n(scope: open question 7)" as m4

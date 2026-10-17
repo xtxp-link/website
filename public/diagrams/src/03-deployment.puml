@@ -25,7 +25,7 @@ cloud "Edge (Cloudflare or similar)" {
 }
 
 node "App server" {
-  component "Server MUPPET\n(Elixir Xmesh)" as m3
+  component "Server MUPPET\n(C++ Xmesh)" as m3
 }
 
 node "BEAM cluster" {
@@ -33,6 +33,7 @@ node "BEAM cluster" {
   component "Tracker: main" as t0
   component "Tracker: branch b1" as t1
   component "Tracker: branch b2" as t2
+  component "Xmesh core processes\n(C++, via Ports)" as core
   database "Keyframes (hot)" as hot
   database "Ledger (cold)" as cold
 }
@@ -46,6 +47,9 @@ phone --> xs : XMPP
 xs --> t0
 xs --> t1
 xs --> t2
+t0 --> core
+t1 --> core
+t2 --> core
 t0 --> hot
 t0 --> cold
 

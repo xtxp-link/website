@@ -1,6 +1,6 @@
 ---
 title: Verification
-description: Behaviour first. One suite of feature files and JSON test vectors, checked against C++, Elixir and an independent Yrs oracle.
+description: Behaviour first. One suite of feature files and JSON test vectors, checked against the C++ core and an independent Yrs oracle, with room for an Elixir port later.
 ---
 
 import Diagram from '../../../components/Diagram.astro';
@@ -12,21 +12,21 @@ No implementation code gets written until its behaviour is defined. The source o
 - **Gherkin `.feature` files** describing behaviour in plain language
 - **JSON test vectors** generated from them: an initial state, plus per-client operation streams delivered late and out of order
 
-## One suite, three implementations
+## One suite, every implementation
 
-<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the C++ harness, the Elixir harness and a Yrs oracle, and SHA-256 hashes of canonical XML are compared; for M1 the same vectors are replayed by two C++ CLI peers and an Elixir peer through a real XMPP room." />
+<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the C++ harness and a Yrs oracle (an Elixir harness is deferred), and SHA-256 hashes of canonical XML are compared; for M1 the same vectors are replayed by C++ CLI peers and an Erlang tracker through a real XMPP room." />
 
 | Harness | Why it exists |
 | --- | --- |
 | **C++ Xmesh (Catch2)** | The reference implementation. |
-| **Elixir Xmesh (ExUnit)** | The pure port used by trackers and server MUPPETs. The vector suite is the contract between the C++ and Elixir implementations. |
+| **Elixir Xmesh (ExUnit)** | *Deferred.* If the Elixir port spike goes ahead, the same vectors become the contract it must meet. |
 | **Yrs oracle** | Yrs (the Rust port of Yjs) implements YATA and is widely used. Replaying the non-move subset through it checks our YATA independently. It has no tree move, hence the subset. |
 
 The pass condition is identical **SHA-256 hashes of the canonical XML** across every harness.
 
 ## The fuzzer
 
-The first task from the original handover, re-scoped to feed all three harnesses. It generates:
+The first task from the original handover, re-scoped to feed every harness. It generates:
 
 - an initial SVG (a root `<svg>` with one `<g>` layer)
 - randomised operations from several clients: inserting paths, updating attributes, moving nodes, adding comments
@@ -36,4 +36,4 @@ Moves are tagged so the Yrs harness can skip them.
 
 ## Over a real network
 
-[Milestone M1](/build/milestones/) runs the same vectors through two C++ CLI peers and one Elixir peer in an XMPP room, including dropped connections and stream resumption. Convergence then holds over a real, unreliable network, not just in a test process.
+[Milestone M1](/build/milestones/) runs the same vectors through two C++ CLI peers and an Erlang tracker (driving the C++ core through a Port) in an XMPP room, including dropped connections and stream resumption. Convergence then holds over a real, unreliable network, not just in a test process.

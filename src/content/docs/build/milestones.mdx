@@ -11,7 +11,7 @@ import Diagram from '../../../components/Diagram.astro';
 
 ## M1 — Headless convergence
 
-Two C++ CLI peers and one Elixir peer join an XMPP room and replay the fuzzer's vectors over real XMPP, with stream resumption. There is no UI. This proves convergence across languages and over a patchy network before anyone draws anything.
+Two C++ CLI peers and an Erlang tracker (driving the C++ core through a Port) join an XMPP room and replay the fuzzer's vectors over real XMPP, with stream resumption. There is no UI. This proves convergence over a patchy network, and the BEAM-to-core boundary, before anyone draws anything.
 
 ## M2 — Inkscape plus no-JS
 

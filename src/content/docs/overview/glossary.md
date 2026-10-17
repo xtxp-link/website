@@ -49,7 +49,7 @@ description: Terms used across the XTXP specification.
 : For live web branching, the origin website treated as a peer. Its "edits" are the differences between successive fetches.
 
 **Xmesh**
-: The CRDT engine. C++20 reference implementation, plus a pure Elixir port.
+: The CRDT engine: a pure, hexagonal C++20 core. A pure Elixir port is deferred to a later spike.
 
 **XTXP**
 : XML to XML Protocol. The specification: The Math and The Wire.

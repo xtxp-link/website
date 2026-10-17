@@ -1,6 +1,6 @@
 @startuml 13-verification
 !include _style.iuml
-title Verification: one vector suite, three implementations
+title Verification: one vector suite, every implementation
 
 artifact "Gherkin .feature files" as feat
 component "Fuzzer" as fuzz
@@ -8,7 +8,7 @@ artifact "JSON test vectors\n(initial state + shuffled\nper-client op streams)" 
 
 package "Harnesses" {
   component "C++ Xmesh\n(Catch2)" as cpp
-  component "Elixir Xmesh\n(ExUnit)" as ex
+  component "Elixir Xmesh\n(ExUnit, deferred)" as ex #line.dashed
   component "Yrs oracle\n(non-move subset)" as yrs
 }
 
@@ -17,16 +17,16 @@ rectangle "Compare SHA-256 of\ncanonical XML" as cmp
 feat --> fuzz : behaviours to cover
 fuzz --> vec
 vec --> cpp
-vec --> ex
+vec ..> ex : later
 vec --> yrs
 cpp --> cmp
-ex --> cmp
+ex ..> cmp
 yrs --> cmp
 
 package "M1: same vectors over a real network" {
   component "C++ CLI peer 1" as p1
   component "C++ CLI peer 2" as p2
-  component "Elixir peer" as p3
+  component "Erlang tracker\n(C++ core via Port)" as p3
   queue "XMPP MUC room\n(with stream resumption)" as room
 }
 vec --> p1
