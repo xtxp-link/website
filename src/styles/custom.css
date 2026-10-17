@@ -12,11 +12,18 @@
   padding: 1rem;
   background: var(--sl-color-bg);
 }
-/* Natural size, so text stays readable; wide diagrams scroll sideways. */
+/* Fit the column; the whole figure is a link to the full-size SVG (no JS). */
+.xtxp-diagram__img {
+  cursor: zoom-in;
+}
 .xtxp-diagram__img img {
-  max-width: none;
+  max-width: 100%;
   height: auto;
   margin-inline: auto;
+}
+.xtxp-diagram__img:hover,
+.xtxp-diagram__img:focus-visible {
+  border-color: var(--sl-color-accent);
 }
 .xtxp-diagram__img--light {
   display: none;
