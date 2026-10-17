@@ -24,11 +24,11 @@ Stock Conversations can't render a canvas. The answer affects the protocol now: 
 
 ## Wire and addressing
 
-- **Ref names:** whether `@main` or `@latest` names the shared branch. (`@origin` was chosen over `@live`, `@upstream` and `@web` for the website's authoritative version.)
+- **Ref names:** whether `@main` or `@latest` names the shared branch.
 - **State vectors in URLs:** a compact, readable way to write one after `@`.
 - **Native or website?** How the gateway tells that `{host}` is an XTXP node rather than an ordinary site, for example a `/.well-known/` file or a DNS record.
 - **`xtxp://` binding:** does it name the WebSocket binding directly, or resolve to it through the gateway?
-- **Message encoding:** the binary format of operations and the framing of each wire message.
+- **Message framing:** how XTXP's own messages (identity, grants) sit alongside the Yjs sync messages and Yrs updates.
 - **XMPP bridge envelope:** namespace, transit-safe encoding and fallback body for chat clients (from M4).
 - **Media types:** reuse `application/xml-patch+xml` for patches; register a vendor type for the stream.
 - **How the XMPP bridge is built:** for example as a component plugged into an existing XMPP server, speaking XTXP to a tracker.

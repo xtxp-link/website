@@ -67,6 +67,3 @@ Every binding runs over TLS. A branch can also be end-to-end encrypted, so that 
 - Whether `xtxp://` names the WebSocket binding directly, or resolves to it through the gateway.
 - How the XMPP bridge is built: for example as a component plugged into an existing XMPP server, speaking XTXP to a tracker.
 
-<Aside type="note" title="Changed">
-Earlier drafts ran everything over XMPP rooms, with XMPP addresses as identity. That added XML wrapping and room fan-out to every operation, and mixed up identity with email-like addresses. XMPP is now a bridge, and identity is a public key. See decisions [11](/discussion/decisions/#11-transport-websocket-first-xmpp-as-a-bridge) and [12](/discussion/decisions/#12-identity-is-a-public-key-access-is-granted-by-key).
-</Aside>

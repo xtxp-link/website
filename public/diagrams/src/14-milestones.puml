@@ -12,7 +12,7 @@ rectangle "**M4**\nInkscape + Conversations\n\nmobile and chat users\nvia the XM
 
 card "xtxp.link gateway\n(placement: open question 9)" as gw
 
-card "Roadmap\nledger, keyframes,\nhistory limits,\nnative C++ spike,\nElixir/BEAM if scale needs it,\nsigned hash chains" as rm
+card "Roadmap\nledger, keyframes,\nhistory limits,\nnative C++ spike,\nsigned hash chains" as rm
 
 m0 --> m1
 m1 --> m2

@@ -73,10 +73,6 @@ Moving an element changes its parent. If Alice moves group A into group B while 
 
 The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements this algorithm on Yrs. Adopting it or writing our own layer is [open](/discussion/open-questions/#engine).
 
-<Aside type="note" title="Changed">
-Earlier drafts used Kleppmann et al.'s move algorithm, which undoes and replays operations in timestamp order. Wallace's approach gives the same guarantees, convergence and no cycles, using only ordinary map writes, which suits Yrs.
-</Aside>
-
 ## Clocks and state vectors
 
 - Every operation is stamped with an **ID**: the client that made it, plus that client's own counter.
@@ -86,7 +82,7 @@ Earlier drafts used Kleppmann et al.'s move algorithm, which undoes and replays 
 Yrs provides all three. A state vector also names a point in history, which is how [branches](/spec/branches/) are identified.
 
 <Aside type="note" title="Terminology">
-The component notes said "Lamport vector clock". Those are two different things: per-client counters stamp operations, and state vectors describe what a peer has seen.
+Per-client counters stamp operations, and state vectors describe what a peer has seen. Neither is a vector clock in the usual sense.
 </Aside>
 
 ## The patch language

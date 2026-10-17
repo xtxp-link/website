@@ -3,7 +3,6 @@ title: Verification
 description: Behaviour first. One suite of feature files and JSON test vectors, checked against Xmesh on Yrs, and the contract any later rewrite must meet.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
 import Diagram from '../../../components/Diagram.astro';
 
 <span class="status status--decided">decided</span>
@@ -28,9 +27,6 @@ The pass conditions are **invariants**, checked on every run:
 - **No cycles:** the materialised tree is always a tree.
 - **Idempotence:** delivering an operation twice changes nothing.
 
-<Aside type="note" title="Changed">
-Yrs was going to be an independent oracle for our own C++ engine. Now that Xmesh is built on Yrs, the oracle role falls to the invariants, and the vectors become the contract any rewrite must meet. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer).
-</Aside>
 
 ## The fuzzer
 

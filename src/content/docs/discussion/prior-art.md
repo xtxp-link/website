@@ -38,17 +38,16 @@ An XMPP extension for synchronising XML documents between clients. Worth reviewi
 
 YATA orders concurrent insertions in a sequence. Yjs implements it, including XML element and fragment types, and Yrs is its Rust port. **Xmesh v1 is built on Yrs** ([decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer)). Neither has a native tree move, which is what Xmesh adds.
 
-Yrs already reaches every place XTXP runs: `yffi` exposes it to C, and it compiles to Wasm. Xmesh follows the same patterns for its own bindings. (`y_ex` exposes Yrs to Elixir too, which mattered while trackers were planned in Elixir.)
+Yrs already reaches every place XTXP runs: `yffi` exposes it to C, and it compiles to Wasm. Xmesh follows the same patterns for its own bindings.
 
 - Nicolaescu et al., *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types* (GROUP 2016)
 - [`yffi` (C bindings for Yrs)](https://docs.rs/crate/yffi/latest)
-- [`y_ex` (Elixir bindings for Yrs)](https://preview.hex.pm/preview/y_ex/0.7.0)
 
 ### Cycle-safe tree moves
 
 **Evan Wallace's mutable tree hierarchy** gives each node a map of every parent it has had, with counters; the highest counter wins, and nodes caught in a cycle are reattached deterministically when the tree is read. It needs only ordinary map writes, so it fits Yrs. The basis for [moves in Xmesh](/spec/math/#moves-without-cycles). The **`yrs_tree`** crate implements it on Yrs.
 
-**Kleppmann, Mulligan, Gomes and Beresford**, *A highly-available move operation for replicated trees* (IEEE TPDS, 2021), solves the same problem by undoing and replaying operations in timestamp order. It was Xmesh's first choice, before the move to Yrs.
+**Kleppmann, Mulligan, Gomes and Beresford**, *A highly-available move operation for replicated trees* (IEEE TPDS, 2021), solves the same problem by undoing and replaying operations in timestamp order.
 
 Loro's write-up compares movable-tree approaches.
 
@@ -58,7 +57,7 @@ Loro's write-up compares movable-tree approaches.
 
 ### Loro
 
-A Rust CRDT library with a native movable tree. It was considered as an engine. Xmesh went with Yrs instead, for the larger Yjs ecosystem and Yrs's existing C and Elixir bindings.
+A Rust CRDT library with a native movable tree. Xmesh builds on Yrs instead, for the larger Yjs ecosystem and Yrs's existing C bindings.
 
 ## Sync protocols
 
