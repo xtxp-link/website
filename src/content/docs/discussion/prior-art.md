@@ -17,10 +17,15 @@ A 2004 project to turn Inkscape into a shared whiteboard. It sent changes to Ink
 
 Bob Jamison, who wrote Pedro (the XMPP library Inkboard used), later said he had misconceptions about XMPP as an XML transport. He had ideas for carrying an XML fragment without damaging it in transit, and favoured decoupling the XMPP agent from Inkscape.
 
+**Its code is a starting point** for the Inkscape adapter: see [Start from Inkboard's code](/build/inkscape-fork/#start-from-inkboards-code).
+
 **Lessons, and where they show up:** keep the transport outside Inkscape's internals ([The Inkscape fork](/build/inkscape-fork/)); don't let XML payloads depend on XMPP framing ([The Wire](/spec/wire/#the-xmpp-bridge)); don't let a fork rot.
 
 - [Inkscape wiki: WhiteBoard](https://wiki.inkscape.org/wiki/WhiteBoard)
 - [Inkboard design document](https://inkboard.sourceforge.net/docs/DesignDocument.html)
+- [Inkboard software manual (PDF)](https://inkboard.sourceforge.net/docs/SoftwareManual.pdf)
+- [Initial commit of Inkboard code (inkscape-devel, 2005)](https://lists.inkscape.org/hyperkitty/list/inkscape-devel@lists.inkscape.org/thread/PBKG5RKK2ZBMRBHLEKMRQB63CZTQFZZZ/)
+- [Inkscape 0.46 source, with `src/jabber_whiteboard` and `src/pedro` (Bazaar)](https://bazaar.launchpad.net/~inkscape.dev/inkscape/RELEASE_0_46_BRANCH/files/13676/src)
 - [Bob Jamison on Pedro 2 (inkscape-devel)](https://lists.inkscape.org/hyperkitty/list/inkscape-devel@lists.inkscape.org/message/HZWTNWGKNNPT5WX72ZQXRJQKQ3LBPOHQ)
 
 ### XEP-0284: Shared XML Editing (SXE)
