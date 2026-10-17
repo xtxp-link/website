@@ -5,7 +5,7 @@ description: A y-sweet review, then M1 headless convergence, M2 Inkscape plus no
 
 import Diagram from '../../../components/Diagram.astro';
 
-<span class="status status--decided">decided</span>
+<span class="status status--decided">decided</span> in shape, <span class="status status--draft">draft</span> in detail
 
 <Diagram name="14-milestones" alt="Milestones M1 to M4 in sequence, with the xtxp.link gateway as a candidate to fold into M2." />
 
@@ -20,11 +20,11 @@ import Diagram from '../../../components/Diagram.astro';
 - **Hosting:** it can run as a binary or as Wasm on Cloudflare's edge, which bears on the [hosting question](/discussion/open-questions/#engine).
 - **Health:** licence, maintenance activity, and how easily it can be extended without forking.
 
-The outcome decides whether hosting extends y-sweet, borrow from it, or start fresh.
+The outcome decides whether hosting extends y-sweet, borrows from it, or starts fresh.
 
 ## M1 — Headless convergence
 
-Two CLI peers (Rust, embedding Xmesh) connect over WebSocket to a headless MUPPET hosting the branch and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network and the identity handshake before anyone draws anything.
+Three CLI peers (Rust, embedding Xmesh), one of them a late joiner that loads the full state, connect over WebSocket to a headless MUPPET hosting the branch and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network and the identity handshake before anyone draws anything.
 
 ## M2 — Inkscape plus no-JS
 

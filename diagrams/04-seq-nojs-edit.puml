@@ -8,8 +8,8 @@ participant "Server MUPPET\n(acts for this user)" as sm
 participant "Host\n(branch main)" as t
 participant "Inkscape\nMUPPET" as ink
 
-b -> gw : POST /host/doc (form fields)
-gw -> sm : edit intent for user@domain
+b -> gw : POST /host/doc@main (form fields)
+gw -> sm : edit intent for this user's key
 sm -> sm : Xmesh: turn intent into\nCRDT op(s), apply locally
 sm -> t : XTXP op (WebSocket)
 t -> t : admit, record
@@ -17,8 +17,8 @@ t -> ink : fan out op
 ink -> ink : Xmesh integrate,\nupdate canvas
 t --> sm : echo (acknowledged)
 sm --> gw : rendered HTML, new ETag
-gw --> b : 303 See Other → GET /host/doc
-b -> gw : GET /host/doc
+gw --> b : 303 See Other → GET /host/doc@main
+b -> gw : GET /host/doc@main
 gw --> b : 200 HTML (ETag: v42)
 
 == passive viewing ==

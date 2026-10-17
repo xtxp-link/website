@@ -14,7 +14,7 @@ Owns everything that crosses a boundary:
 - CRDT semantics (The Math)
 - the wire protocol (The Wire), and identity and access
 - the BDD feature files and JSON vector suite
-- cross-language property tests, from day one
+- property tests against the vector suite, from day one
 
 ## Experts
 

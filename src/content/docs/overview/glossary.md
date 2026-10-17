@@ -13,7 +13,7 @@ description: Terms used across the XTXP specification.
 : A way of carrying XTXP: WebSocket, HTTP, or the XMPP bridge.
 
 **Branch**
-: A fork of a document's history at a given state vector, identified by where it lives: `{host}/{path}@{name}`. Undo, proposed edits, previews and paused queues are all branches. Each branch lives on exactly one host.
+: A line of a document's history, identified by where it lives: `{host}/{path}@{name}`. It records its parent's address and the point where it was forked. History undo, proposed edits, previews and paused queues are all branches. Each branch lives on exactly one host.
 
 **CRDT**
 : Conflict-free replicated data type. A data structure whose concurrent updates can be applied in any order and still converge to the same state.
@@ -31,7 +31,7 @@ description: Terms used across the XTXP specification.
 : A MUPPET hosting branches: it admits operations to its own branches against their grants, routes them and stores them, usually headless on a server.
 
 **Immortal parent**
-: An XML element node that is never replaced, only updated. Attributes live in a map and children in an array inside it, so concurrent edits to one element never orphan each other.
+: An element node that is never replaced, only updated. Its attributes live in a map, and its children point to it through their own parent maps, so concurrent edits to one element never orphan each other.
 
 **Keyframe**
 : *Roadmap.* A compacted snapshot of a branch, tuned for instant loading. Until then, a branch's full state encoded as one Yrs update does the job.
@@ -40,7 +40,7 @@ description: Terms used across the XTXP specification.
 : *Roadmap.* A chronological log of a branch's patches in cold storage. Until then, branches persist the usual Yjs way: append updates, then compact.
 
 **MUPPET**
-: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh, and the application layer: it owns all views, including the vector canvas and spatial chat and comments.
+: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh and the application layer: it owns all views, including the vector canvas and spatial chat and comments. Run headless, a MUPPET hosts branches.
 
 **Onion skin**
 : A translucent overlay of another state (a branch, a paused queue, a peer's in-flight edits) drawn over the current one.

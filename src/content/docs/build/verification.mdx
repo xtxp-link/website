@@ -5,7 +5,7 @@ description: Behaviour first. One suite of feature files and JSON test vectors, 
 
 import Diagram from '../../../components/Diagram.astro';
 
-<span class="status status--decided">decided</span>
+<span class="status status--decided">decided</span> in shape, <span class="status status--draft">draft</span> in detail (canonicalisation is still open)
 
 No implementation code gets written until its behaviour is defined. The source of truth is:
 
@@ -38,4 +38,4 @@ The first task from the original handover, re-scoped to feed every harness. It g
 
 ## Over a real network
 
-[Milestone M1](/build/milestones/) runs the same vectors through two CLI peers and a headless MUPPET hosting the branch, all embedding Xmesh, over WebSocket, including dropped connections and reconnect sync. Convergence then holds over a real, unreliable network, not just in a test process.
+[Milestone M1](/build/milestones/) runs the same vectors through three CLI peers (one a late joiner) and a headless MUPPET hosting the branch, all embedding Xmesh, over WebSocket, including dropped connections and reconnect sync. Convergence then holds over a real, unreliable network, not just in a test process.

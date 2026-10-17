@@ -1,6 +1,6 @@
 @startuml 07-seq-branch
 !include _style.iuml
-title Branch as undo history: fork, preview, merge
+title Branches: fork, preview, merge
 
 actor "Author" as au
 participant "Author's\nMUPPET" as am
@@ -27,9 +27,10 @@ main -> main : fan out to all peers
 b1 -> b1 : stays as history
 
 note over main, b1
-  A branch is identified by its parent
-  plus the state vector at the fork.
-  Undo, proposals and previews are
+  A branch is identified by its address.
+  It records its parent and the point
+  where it was forked. Going back in
+  history, proposals and previews are
   the same mechanism.
 end note
 @enduml

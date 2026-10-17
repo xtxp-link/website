@@ -105,15 +105,18 @@ vectors/              generated and hand-written JSON vectors
 
 ## 7. Open points to settle at the start
 
-From the [open questions](https://xtxp.link/discussion/open-questions/) page, the ones that block M1 or M2:
+From the [open questions](https://xtxp.link/discussion/open-questions/) page:
 
 - Adopt `yrs_tree`, or write our own move layer on Wallace's algorithm.
-- The canonical XML form used for hashing.
 - How XTXP's own messages are framed alongside the Yjs sync messages.
-- `@main` or `@latest` as the default branch name.
 - Hosting: a self-hosted binary or Durable Objects (from the y-sweet review).
 
-Everything else on that page can wait until after M2.
+From the spec review (`handover/review-decisions.md`, section A for M1 and B for M2), *pending review*:
+
+- **M1:** snapshots rather than state vectors to name points in history (A1); refusing whole client IDs, with previews in separate documents (A2); a fresh client ID per branch per session (A3); the move algorithm as numbered pseudocode (A4); tree schema details, including position on the edge, deletion, text nodes and namespaces (A5); canonical form v0 (A6); one wire format (A7); handshake domain separation (A8); the smallest M1 (A9).
+- **M2:** the Inkscape adapter contract (B1); the no-JS editing model (B2); SVG sanitising, CSP, a separate content origin and CSRF (B3); device keys for no-JS users (B4); native documents only at the gateway (B5).
+
+Everything else can wait until after M2.
 
 ## 8. Out of scope for the MVP
 
@@ -121,7 +124,7 @@ Ledger and keyframes, the XMPP bridge, live web branching and the xtxp.link gate
 
 ## 9. Pending decisions
 
-A spec review was run on 2026-10-18. Its report and the decisions it raises are in `handover/review-decisions.md` in this repository. David will decide those before work starts; update this handover and the spec with his answers.
+A spec review was run on 2026-10-18 by an independent Opus agent (Fable was intended but needed usage credits; it can be re-run on Fable later). The full report is `handover/spec-review.md` and the decisions it raises are in `handover/review-decisions.md` in this repository. David will decide those before work starts; update this handover and the spec with his answers.
 
 ## 10. Repositories and access
 

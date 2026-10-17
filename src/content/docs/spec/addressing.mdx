@@ -62,7 +62,7 @@ xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 
 `@origin` means unedited. Any other ref means a branch that may contain other people's edits, and the page frame says so, with links to `@origin` and to the original site. The ref travels with every shared link, so a reader can tell what they're looking at before they click. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
 
-<Diagram name="11-seq-negotiation" alt="Sequence: a client requests a document from xtxp.link; the gateway asks the directory which node hosts it; with Accept application/xtxp+xml it opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client. The ref after the last @ picks live, a branch or a state vector." />
+<Diagram name="11-seq-negotiation" alt="Sequence: a client requests a document from xtxp.link; the gateway asks the directory which node hosts it; with Accept application/xtxp+xml it opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client. The ref after the last @ picks @origin, @main, another branch or a state vector." />
 
 ### Content negotiation
 

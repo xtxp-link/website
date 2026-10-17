@@ -79,7 +79,7 @@ The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements 
 - Every peer keeps a **state vector**: for each client, the highest counter it has integrated.
 - Two peers sync by exchanging state vectors. Each sends the operations the other is missing.
 
-Yrs provides all three. A state vector also names a point in history, which is how [branches](/spec/branches/) are identified.
+Yrs provides all three. A state vector also describes how far a peer has got, which is how a [branch](/spec/branches/) records where it was forked. (Branches themselves are identified by their address.)
 
 <Aside type="note" title="Terminology">
 Per-client counters stamp operations, and state vectors describe what a peer has seen. Neither is a vector clock in the usual sense.

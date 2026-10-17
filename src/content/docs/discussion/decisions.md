@@ -7,7 +7,7 @@ The decisions currently in force. Numbers stay stable so links keep working.
 
 ## 1. Relays and peers
 
-**Hosting MUPPETs** relay: they admit, order and pass on operations, and they may be blind to content. **Peers** run the CRDT engine.
+**Hosting MUPPETs** admit, route and store operations. Every MUPPET, hosting or not, runs the same engine.
 
 
 ## 2. The no-JS client is a puppet
@@ -26,7 +26,7 @@ A y-sweet review → M1 headless convergence → M2 Inkscape plus no-JS → M3 I
 
 - **MUPPET is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are MUPPET views, wherever a MUPPET runs.
 - **XTXP is node to node.**
-- **A branch is held by the MUPPETs that host it**, and a branch is a fork of the undo history.
+- **A branch is hosted by exactly one MUPPET**; any number of MUPPETs may hold copies. A branch is a fork of the document's history.
 - **Server-side rendering is a server-side MUPPET.** Hosts hold branches; every MUPPET executes, and those with a user render.
 
 
