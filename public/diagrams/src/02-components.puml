@@ -16,16 +16,13 @@ package "MUPPET — the executor (client-side Xmesh)" as muppet {
   component "Inkscape adapter\n<<C++, in the fork>>" as mink
   component "Browser adapter\n<<Wasm>>" as mwasm
   component "Server MUPPET\n<<renders HTML/SVG for no-JS>>" as msrv
+  component "Canvas, spatial chat\nand comments\n<<views, shared by all adapters>>" as mviews
 }
 
 package "Erlang Trackers — routing layer" as trk {
   component "Branch process\n(one per branch)" as branch
   database "Hot keyframes" as hot
   database "Cold ledger\n(chronological patches)" as cold
-}
-
-package "Convector — application" as app {
-  component "Vector canvas +\nspatial comments" as conv
 }
 
 xcpp ..|> math
@@ -40,7 +37,6 @@ branch ..> wire
 branch --> xex : resolves branch state
 branch --> hot
 branch --> cold
-conv --> muppet : built on
 
 note bottom of engine
   The cross-language vector suite

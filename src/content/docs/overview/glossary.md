@@ -6,9 +6,6 @@ description: Terms used across the XTXP specification.
 **Branch**
 : A fork of a document's history at a given state vector. Undo, proposed edits and previews are all branches. Each server-side branch is held by one tracker process.
 
-**Convector**
-: The first application on XTXP: a collaborative vector canvas with spatial chat and comments.
-
 **CRDT**
 : Conflict-free replicated data type. A data structure whose concurrent updates can be applied in any order and still converge to the same state.
 
@@ -28,7 +25,7 @@ description: Terms used across the XTXP specification.
 : The chronological log of patches for a branch, flushed to cold storage. It makes undo branchable and unbounded.
 
 **MUPPET**
-: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh, and the owner of all views.
+: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh, and the application layer: it owns all views, including the vector canvas and spatial chat and comments. (This absorbed what was earlier called Convector.)
 
 **Onion skin**
 : A translucent overlay of another state (a branch, a paused queue, a peer's in-flight edits) drawn over the current one.

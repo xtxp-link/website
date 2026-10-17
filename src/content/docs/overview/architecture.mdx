@@ -11,11 +11,10 @@ import Diagram from '../../../components/Diagram.astro';
 | --- | --- | --- |
 | **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, cycle-free moves. *The Wire*: stanza framing, handshakes, branch routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
 | **Xmesh** | The engine. Resolves concurrent patch streams. C++20 is the reference implementation, and a pure Elixir port is held to the same vectors. | <span class="status status--decided">decided</span> |
-| **MUPPET** | Multi User Progressive Patch Execution Tree: client-side Xmesh. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns ephemeral views (paused queues, onion skin, branch previews) without changing document state. | <span class="status status--decided">decided</span> |
+| **MUPPET** | Multi User Progressive Patch Execution Tree: client-side Xmesh, and the application layer. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns every view: the vector canvas, spatial chat and comments, paused queues, onion skin and branch previews, none of which change document state. | <span class="status status--decided">decided</span> |
 | **Erlang Trackers** | The routing layer. One lightweight Erlang process per branch, holding that branch's history, hot keyframes and presence, and routing patches between nodes. | <span class="status status--decided">decided</span> |
-| **Convector** | The first application: a vector canvas with spatial chat and comments, following the Conversations model. | <span class="status status--decided">decided</span> |
 
-<Diagram name="02-components" alt="Component diagram: Xmesh C++ and Elixir implement the Math; MUPPET adapters for Inkscape, Wasm and server embed Xmesh; branch trackers use the Elixir core and store hot keyframes and a cold ledger; Convector is built on MUPPET." />
+<Diagram name="02-components" alt="Component diagram: Xmesh C++ and Elixir implement the Math; MUPPET adapters for Inkscape, Wasm and server embed Xmesh and share the canvas, chat and comment views; branch trackers use the Elixir core and store hot keyframes and a cold ledger." />
 
 ## The split that matters
 

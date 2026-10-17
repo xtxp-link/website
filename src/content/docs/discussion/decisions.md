@@ -42,10 +42,16 @@ M1 headless convergence → M2 Inkscape plus no-JS → M3 Inkscape plus Wasm →
 
 *Replaced:* an earlier description in which Xmesh resolved state centrally and broadcast a "finalised canonical state".
 
+## 8. Convector is subsumed into MUPPET
+
+There is no separate application layer. The vector canvas and the spatial chat and comments are MUPPET views, provided wherever a MUPPET runs (Inkscape, Wasm, server).
+
+*Replaced:* Convector as a named application built on top of MUPPET.
+
 ## Naming
 
-- **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor, **Erlang Trackers** for the routing layer, **Convector** for the vector application.
-- Name checks so far: *Xmesh* collides with Thinkbox XMesh, a commercial mesh-caching plugin for VFX tools. *Convector* was a Hyperledger smart-contract framework, archived in 2022. *Muppet* is a Henson/Disney trademark: fine for an internal component, riskier on anything public-facing. No direct clash was found for *XTXP*.
+- **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor and application layer, **Erlang Trackers** for the routing layer.
+- Name checks so far: *Xmesh* collides with Thinkbox XMesh, a commercial mesh-caching plugin for VFX tools. *Muppet* is a Henson/Disney trademark: fine for an internal component, riskier on anything public-facing. No direct clash was found for *XTXP*.
 
 ## Corrections carried forward
 

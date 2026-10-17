@@ -5,7 +5,7 @@ description: A short introduction to the XML to XML Protocol and the problem it 
 
 XTXP (XML to XML Protocol) lets many people edit the same XML document at the same time, on different software, over unreliable networks. Anyone can branch the document's history, preview a branch over the original, and merge it back.
 
-The first document type is **SVG**, so the first application is a shared vector canvas. That application is called **Convector**: vector graphics plus spatial chat and comments. The engine is not SVG-specific, though. Any XML tree works, and an HTML page parsed into a tree is close enough, which is what makes [live web branching](/spec/web-overlay/) possible.
+The first document type is **SVG**, so the first application is a shared vector canvas with spatial chat and comments, following the Conversations model. It isn't a separate layer: the canvas, chat and comments are views that [MUPPET](/overview/architecture/) provides wherever it runs. The engine is not SVG-specific, though. Any XML tree works, and an HTML page parsed into a tree is close enough, which is what makes [live web branching](/spec/web-overlay/) possible.
 
 ## The problem
 
