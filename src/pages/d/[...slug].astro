@@ -1,0 +1,180 @@
+---
+/**
+ * Full-screen viewer for one diagram, with no JavaScript.
+ *   /d/{name}/        follows the reader's system colour scheme
+ *   /d/{name}/light/  light variant
+ *   /d/{name}/dark/   dark variant
+ * Fits the screen by default; "Actual size" uses :target to switch to natural size.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+
+export function getStaticPaths() {
+  const dir = path.resolve('diagrams');
+  const names = fs
+    .readdirSync(dir)
+    .filter((f) => /^\d\d-.+\.puml$/.test(f))
+    .map((f) => f.replace(/\.puml$/, ''));
+  return names.flatMap((name) => {
+    const src = fs.readFileSync(path.join(dir, `${name}.puml`), 'utf8');
+    const title = (src.match(/^title\s+(.+)$/m)?.[1] ?? name).trim();
+    return [undefined, 'light', 'dark'].map((theme) => ({
+      params: { slug: theme ? `${name}/${theme}` : name },
+      props: { name, title, theme },
+    }));
+  });
+}
+
+const { name, title, theme } = Astro.props as { name: string; title: string; theme?: 'light' | 'dark' };
+const light = `/diagrams/light/${name}.svg`;
+const dark = `/diagrams/dark/${name}.svg`;
+const source = `/diagrams/src/${name}.puml`;
+---
+
+<!doctype html>
+<html lang="en" data-theme={theme ?? 'auto'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · XTXP</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        --bg: #fbfcfc;
+        --fg: #1d2330;
+        --muted: #5c6577;
+        --line: #d9dde3;
+        --accent: #1565c0;
+        color-scheme: light;
+      }
+      :root[data-theme='dark'] {
+        --bg: #17181c;
+        --fg: #e4e6eb;
+        --muted: #9aa3b2;
+        --line: #2b2f37;
+        --accent: #8fb4ff;
+        color-scheme: dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root[data-theme='auto'] {
+          --bg: #17181c;
+          --fg: #e4e6eb;
+          --muted: #9aa3b2;
+          --line: #2b2f37;
+          --accent: #8fb4ff;
+          color-scheme: dark;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 15px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      a {
+        color: var(--accent);
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1.25rem;
+        min-height: 3.25rem;
+        padding: 0.5rem 1rem;
+        background: var(--bg);
+        border-bottom: 1px solid var(--line);
+      }
+      h1 {
+        flex: 1 1 16rem;
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1rem;
+        font-size: 0.9rem;
+      }
+      /* Fit to screen: the image fills whatever space the header leaves, scaled to fit. */
+      body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+      }
+      main {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 1rem;
+      }
+      main picture {
+        display: block;
+        height: 100%;
+      }
+      body:has(main:target) {
+        height: auto;
+      }
+      main img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      /* Actual size, when #actual is the URL fragment. */
+      main:target {
+        overflow: auto;
+      }
+      main:target picture {
+        height: auto;
+      }
+      main:target img {
+        width: auto;
+        height: auto;
+        max-width: none;
+        margin-inline: auto;
+      }
+      .to-fit {
+        display: none;
+      }
+      body:has(main:target) .to-fit {
+        display: inline;
+      }
+      body:has(main:target) .to-actual {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="/discussion/diagrams/">← All diagrams</a>
+      <h1>{title}</h1>
+      <nav>
+        <a class="to-actual" href="#actual">Actual size</a>
+        <a class="to-fit" href="#">Fit to screen</a>
+        {theme !== 'light' && <a href={`/d/${name}/light/`}>Light</a>}
+        {theme !== 'dark' && <a href={`/d/${name}/dark/`}>Dark</a>}
+        <a href={source}>PlantUML source</a>
+      </nav>
+    </header>
+    <main id="actual">
+      {
+        theme ? (
+          <img src={theme === 'dark' ? dark : light} alt={title} />
+        ) : (
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset={dark} />
+            <img src={light} alt={title} />
+          </picture>
+        )
+      }
+    </main>
+  </body>
+</html>

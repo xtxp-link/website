@@ -2,8 +2,8 @@
 /**
  * A PlantUML diagram rendered to SVG by scripts/render-diagrams.sh.
  * Ships both a light and a dark variant and lets CSS pick, so it needs no JavaScript.
- * The diagram fits the column; selecting it follows a plain link to the full-size SVG
- * in the matching theme, so every diagram is addressable on its own.
+ * The diagram fits the column; selecting it follows a plain link to its viewer page
+ * (/d/{name}/{theme}/) in the matching theme, so every diagram is addressable on its own.
  */
 interface Props {
   name: string; // file name without extension, e.g. "07-seq-branch"
@@ -15,16 +15,16 @@ const base = '/diagrams';
 ---
 
 <figure class="xtxp-diagram">
-  <a href={`${base}/light/${name}.svg`} class="xtxp-diagram__img xtxp-diagram__img--light">
+  <a href={`/d/${name}/light/`} class="xtxp-diagram__img xtxp-diagram__img--light">
     <img src={`${base}/light/${name}.svg`} alt={alt} loading="lazy" decoding="async" />
   </a>
-  <a href={`${base}/dark/${name}.svg`} class="xtxp-diagram__img xtxp-diagram__img--dark">
+  <a href={`/d/${name}/dark/`} class="xtxp-diagram__img xtxp-diagram__img--dark">
     <img src={`${base}/dark/${name}.svg`} alt={alt} loading="lazy" decoding="async" />
   </a>
   <figcaption>
     {caption && <span>{caption}</span>}
     <span class="xtxp-diagram__links">
-      <span>Select the diagram for full size</span>
+      <span>Select the diagram to view it full screen</span>
       <a href={`${base}/src/${name}.puml`}>PlantUML source</a>
     </span>
   </figcaption>
