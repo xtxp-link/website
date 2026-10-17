@@ -1,0 +1,38 @@
+---
+// Site title: the small logo. Still until hovered or focused, then it plays the reverse-and-rebuild once.
+// Moving away lets it finish, so it always lands on the full logo.
+import Logo from './Logo.astro';
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a href={siteTitleHref} class="site-title xtxp-title sl-flex">
+  <Logo mode="title" />
+  <span class="sr-only" translate="no">{siteTitle}</span>
+</a>
+
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLElement>('.xtxp-title').forEach((link) => {
+      const logo = link.querySelector('.xtxp-logo');
+      if (!logo) return;
+      const start = () => logo.classList.add('xtxp-logo--run');
+      link.addEventListener('pointerenter', start);
+      link.addEventListener('focus', start);
+      logo.addEventListener('animationend', (e) => {
+        if ((e as AnimationEvent).animationName === 'xl-p') logo.classList.remove('xtxp-logo--run');
+      });
+    });
+  }
+</script>
+
+<style>
+  .xtxp-title {
+    align-items: center;
+    min-width: 0;
+  }
+  .xtxp-title :global(.xtxp-logo) {
+    height: 1.55rem;
+    width: auto;
+    overflow: visible;
+  }
+</style>

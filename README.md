@@ -11,6 +11,9 @@ scripts/               render-diagrams.sh
 src/content/docs/      The pages (Markdown / MDX)
 src/components/        Diagram.astro: picks the light or dark SVG with CSS, no JS
 src/styles/custom.css  Theme tweaks
+src/brand/logo.mjs     The logo: geometry, animation timeline, standalone SVG builders
+src/components/        Logo.astro, Hero.astro (logo as the H1), SiteTitle.astro (small logo, plays on hover)
+public/brand/          Logo files: still and animated, light / dark / auto / on blue, plus favicon
 wrangler.jsonc         Cloudflare Workers static-assets config
 ```
 
@@ -20,6 +23,21 @@ wrangler.jsonc         Cloudflare Workers static-assets config
 npm install
 npm run dev          # local preview at http://localhost:4321
 ```
+
+### Logo
+
+The logo is generated from `src/brand/logo.mjs`. To change the shape, colours or animation timing, edit it and run:
+
+```sh
+npm run logo         # rewrites public/favicon.svg, public/brand/*.svg and src/styles/logo.generated.css
+```
+
+Commit the output. The mark is x + x p, where the + is a t with no tail. The animation builds it up from a lone +, holds the full logo, then plays the build in reverse and repeats.
+
+- `public/brand/logo.svg`, `logo-animated.svg`: follow the viewer's light/dark setting.
+- `logo-light.svg`, `logo-dark.svg` (and `-animated-` variants): fixed colours for a known background.
+- `logo-on-blue.svg`, `logo-animated-on-blue.svg`: white on the brand blue.
+- On the site the logo is inline and uses Starlight's theme colours, so light and dark mode need no extra files. The hero shows it as the H1 and loops. The header copy sits still and plays once on hover or focus; moving away lets it finish on the full logo. With reduced motion, or no JavaScript, it stays still.
 
 ### Diagrams
 
