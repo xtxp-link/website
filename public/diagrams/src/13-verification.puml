@@ -1,0 +1,45 @@
+@startuml 13-verification
+!include _style.iuml
+title Verification: one vector suite, three implementations
+
+artifact "Gherkin .feature files" as feat
+component "Fuzzer" as fuzz
+artifact "JSON test vectors\n(initial state + shuffled\nper-client op streams)" as vec
+
+package "Harnesses" {
+  component "C++ Xmesh\n(Catch2)" as cpp
+  component "Elixir Xmesh\n(ExUnit)" as ex
+  component "Yrs oracle\n(non-move subset)" as yrs
+}
+
+rectangle "Compare SHA-256 of\ncanonical XML" as cmp
+
+feat --> fuzz : behaviours to cover
+fuzz --> vec
+vec --> cpp
+vec --> ex
+vec --> yrs
+cpp --> cmp
+ex --> cmp
+yrs --> cmp
+
+package "M1: same vectors over a real network" {
+  component "C++ CLI peer 1" as p1
+  component "C++ CLI peer 2" as p2
+  component "Elixir peer" as p3
+  queue "XMPP MUC room\n(with stream resumption)" as room
+}
+vec --> p1
+vec --> p2
+vec --> p3
+p1 --> room
+p2 --> room
+p3 --> room
+room --> cmp : final states
+
+note right of yrs
+  Yrs implements YATA and is battle-tested,
+  so it checks our YATA independently.
+  It has no tree move, hence the subset.
+end note
+@enduml

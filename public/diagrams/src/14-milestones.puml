@@ -1,0 +1,18 @@
+@startuml 14-milestones
+!include _style.iuml
+title Milestones
+
+left to right direction
+
+rectangle "**M1**\nHeadless convergence\n\n2× C++ CLI peers +\n1 Elixir peer in a MUC,\nreplaying vectors over\nreal XMPP with resumption" as m1
+rectangle "**M2**\nInkscape + no-JS\n\nInkscape fork MUPPET +\nserver MUPPET serving\nplain HTML" as m2
+rectangle "**M3**\nInkscape + Wasm\n\nbrowser MUPPET\n(Wasm polyfill)" as m3
+rectangle "**M4**\nInkscape + Conversations\n\nmobile XMPP users\n(scope: open question 7)" as m4
+
+card "xtxp.link gateway\n(placement: open question 9)" as gw
+
+m1 --> m2
+m2 --> m3
+m3 --> m4
+gw ..> m2 : candidate:\nfold into M2
+@enduml

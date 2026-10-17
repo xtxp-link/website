@@ -1,0 +1,65 @@
+---
+title: Addressing and the gateway
+description: The xtxp:// URI scheme and the xtxp.link HTTP gateway, with content negotiation, deep links and short links.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../components/Diagram.astro';
+
+<span class="status status--draft">draft</span>
+
+## `xtxp://` — the native scheme
+
+```
+xtxp://{host}/{path}
+```
+
+Used by native desktop clients, terminal interfaces and automated nodes exchanging raw patch streams. Whether it resolves to an XMPP room or to its own socket binding is [still open](/discussion/open-questions/).
+
+## `https://xtxp.link/` — the web gateway
+
+```
+https://xtxp.link/{host}/{path}
+```
+
+A universal HTTP bridge and directory. It exposes any XTXP document to an ordinary browser and routes requests to whichever node hosts it.
+
+### Two kinds of path
+
+| Path | Meaning |
+| --- | --- |
+| `https://xtxp.link/{host}/{path}` | A **native XTXP document** hosted by the node at `{host}`. |
+| `https://xtxp.link/@/{domain}/{path}` | A **proxied overlay** of an ordinary website. The `/@/` segment tells the reader the page is a copy of `{domain}` being branched, not something `{domain}` published. See [Live web branching](/spec/web-overlay/). |
+
+Putting the proxy marker in the URL itself means a link is honest before anyone clicks it. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
+
+<Diagram name="11-seq-negotiation" alt="Sequence: a client requests a document from xtxp.link; the gateway asks the directory which node hosts it; with Accept application/xtxp+xml it opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client; a deep link with a vector returns the document as it was at that point." />
+
+### Content negotiation
+
+| Request | Response |
+| --- | --- |
+| `Accept: application/xtxp+xml` | The raw CRDT patch stream, for automated nodes. |
+| `Accept: text/html` | The current state rendered as HTML, with forms that POST edits. Served by a server-side MUPPET. |
+| A person who wants their native client | A plain link to `xtxp://{host}/{path}`. |
+
+<Aside type="caution" title="Native hand-off">
+The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp://`. A server can't tell whether a protocol handler is installed, and a refresh to a missing handler fails silently. A visible link always works, and it needs no JavaScript.
+</Aside>
+
+### The no-JS edit loop
+
+<Diagram name="04-seq-nojs-edit" alt="Sequence: the browser POSTs a form; the gateway hands it to the server MUPPET, which makes CRDT ops and sends them to the tracker; the tracker fans them out to Inkscape; the browser is redirected and GETs the new HTML; later meta-refresh polls get 304 Not Modified unless someone edited." />
+
+### Deep links and short links
+
+- **Vector snapshots**: a link can name a document *at* a specific state vector, so a historical state can be shared exactly. The syntax is <span class="status status--open">open</span>; diagrams use `?at={state vector}` as a placeholder, because `@` now marks proxied paths.
+- **Node resolution**: the gateway routes a session to the federated node currently hosting a document.
+- **Short links**: short, low-density URLs that make easily scanned QR codes, for bridging paper and screens.
+
+## Media types
+
+<span class="status status--open">open</span>
+
+- Patch documents can reuse `application/xml-patch+xml` (RFC 7351).
+- A stream type for XTXP itself would eventually need registering, probably as `application/vnd.xtxp+xml`, rather than the bare `application/xtxp+xml` used in the sketches.

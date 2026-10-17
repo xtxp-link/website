@@ -1,0 +1,23 @@
+{
+  "name": "xtxp-link",
+  "version": "0.1.0",
+  "description": "xtxp.link: the XTXP draft specification site (Astro Starlight + PlantUML)",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "diagrams": "bash scripts/render-diagrams.sh",
+    "deploy": "astro build && wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.6",
+    "astro": "^7.4.0",
+    "sharp": "^0.35.5",
+    "starlight-theme-galaxy": "^1.0.0"
+  },
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "wrangler": "^4.151.1"
+  }
+}

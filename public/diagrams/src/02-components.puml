@@ -1,0 +1,50 @@
+@startuml 02-components
+!include _style.iuml
+title Components and the contract between them
+
+package "XTXP — the specification" as spec {
+  interface "The Math\n(CRDT rules, clocks,\npatch structures)" as math
+  interface "The Wire\n(stanza framing, handshakes,\nbranch routing)" as wire
+}
+
+package "Xmesh — the engine" as engine {
+  component "Xmesh C++20\n<<reference implementation>>" as xcpp
+  component "Xmesh Elixir\n<<pure port>>" as xex
+}
+
+package "MUPPET — the executor (client-side Xmesh)" as muppet {
+  component "Inkscape adapter\n<<C++, in the fork>>" as mink
+  component "Browser adapter\n<<Wasm>>" as mwasm
+  component "Server MUPPET\n<<renders HTML/SVG for no-JS>>" as msrv
+}
+
+package "Erlang Trackers — routing layer" as trk {
+  component "Branch process\n(one per branch)" as branch
+  database "Hot keyframes" as hot
+  database "Cold ledger\n(chronological patches)" as cold
+}
+
+package "Convector — application" as app {
+  component "Vector canvas +\nspatial comments" as conv
+}
+
+xcpp ..|> math
+xex ..|> math
+mink --> xcpp : embeds
+mwasm --> xcpp : embeds (Wasm build)
+msrv --> xex : embeds
+mink ..> wire
+mwasm ..> wire
+msrv ..> wire
+branch ..> wire
+branch --> xex : resolves branch state
+branch --> hot
+branch --> cold
+conv --> muppet : built on
+
+note bottom of engine
+  The cross-language vector suite
+  is the contract between the
+  C++ and Elixir implementations.
+end note
+@enduml

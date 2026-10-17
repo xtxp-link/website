@@ -1,0 +1,35 @@
+@startuml 07-seq-branch
+!include _style.iuml
+title Branch as undo history: fork, preview, merge
+
+actor "Author" as au
+participant "Author's\nMUPPET" as am
+participant "Tracker\nmain" as main
+participant "Tracker\nbranch b1" as b1
+participant "Server MUPPET\n(views)" as sm
+actor "Reviewer" as rv
+
+au -> am : propose an edit\n(or undo to an earlier point)
+am -> main : fork at state vector SV
+main -> b1 ** : spawn process\nparent=main, fork=SV
+b1 --> am : branch b1 ready
+am -> b1 : XTXP ops on b1
+rv -> sm : view b1
+sm -> b1 : branch state
+sm -> main : parent state
+sm --> rv : onion skin (b1 over main)\nand redline (who changed what)
+rv -> sm : accept
+sm -> main : merge b1
+main -> b1 : request ops since SV
+b1 --> main : ops
+main -> main : replay into main\n(ops commute: mechanical)
+main -> main : fan out to all peers
+b1 -> b1 : stays in ledger as history
+
+note over main, b1
+  A branch is identified by its parent
+  plus the state vector at the fork.
+  Undo, proposals and previews are
+  the same mechanism.
+end note
+@enduml

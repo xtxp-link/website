@@ -1,0 +1,27 @@
+@startuml 06-seq-mobile-resume
+!include _style.iuml
+title Patchy mobile link: resume, catch up, sleep, wake
+
+participant "Mobile peer" as m
+participant "XMPP server" as s
+
+m -> s : enable stream management (XEP-0198)
+s --> m : enabled, resumable id=r1
+...
+m -> s : client state inactive (XEP-0352)
+note right : app backgrounded; server holds\nnon-urgent traffic
+...
+s -> m : push wake-up (XEP-0357)
+...
+m -x s : network drops
+...
+alt session still resumable
+  m -> s : resume id=r1, h=118 (last stanza handled)
+  s --> m : resumed; resend stanzas after 118
+else session expired
+  m -> s : new session, join room
+  m -> s : MAM query after last archived id (XEP-0313)
+  s --> m : missed XTXP ops, in order
+end
+m -> m : Xmesh integrate missed ops
+@enduml

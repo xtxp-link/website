@@ -1,0 +1,46 @@
+---
+title: Branches and history
+description: Branches as forks of the undo history, held by one Erlang process each, and merged by replaying operations.
+---
+
+import Diagram from '../../../components/Diagram.astro';
+
+<span class="status status--decided">decided</span> in principle, <span class="status status--draft">draft</span> in detail.
+
+## One mechanism for undo, proposals and previews
+
+A **branch** is a fork of a document's history at a point given by a state vector. That one idea covers several features:
+
+- **Undo** branches from an earlier point, so history is never thrown away.
+- **A proposed edit** is a branch that hasn't been merged yet.
+- **A preview** draws a branch over its parent.
+- **Infinite, branchable undo** falls out of keeping every branch's operations in the ledger.
+
+A branch is identified by its **parent branch** plus the **state vector at the fork**.
+
+## Trackers
+
+Each server-side branch is held by its own lightweight Erlang **process** (a tracker). The BEAM makes these cheap enough to spawn one per proposed edit or undo fork, and isolated enough that a crashed branch can't take its siblings down.
+
+A tracker:
+
+- runs the pure Elixir Xmesh core to hold its branch's state
+- appends operations to the branch **ledger**, flushed to cold storage
+- keeps a **keyframe** in hot memory, so new clients load instantly
+- routes the branch's operations to its subscribers
+
+## Fork, preview, merge
+
+<Diagram name="07-seq-branch" alt="Sequence: an author forks main at a state vector, a tracker process for the branch is spawned, the author sends ops to it, a reviewer views onion skin and redline rendered by the server MUPPET, accepts, and main replays the branch ops and fans them out." />
+
+**Merging is mechanical.** CRDT operations commute, so merging a branch means replaying its operations into the parent. Nobody has to resolve conflicts by hand, and the **redline** is exactly the set of operations being replayed, grouped by author.
+
+## Lifecycle
+
+<Diagram name="08-state-branch" alt="State machine: Forked, Active, Paused, Proposed, Merged and Abandoned, with merged and abandoned branches kept in the ledger." />
+
+## Still open
+
+- How long abandoned branches stay hot before only the ledger keeps them.
+- Permissions: who may fork, who may merge into which branch.
+- Whether a merge records itself as an operation, so it can be undone by branching from before it.

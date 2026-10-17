@@ -1,0 +1,30 @@
+---
+title: Milestones
+description: M1 headless convergence, M2 Inkscape plus no-JS, M3 Inkscape plus Wasm, M4 Inkscape plus Conversations.
+---
+
+import Diagram from '../../../components/Diagram.astro';
+
+<span class="status status--decided">decided</span>
+
+<Diagram name="14-milestones" alt="Milestones M1 to M4 in sequence, with the xtxp.link gateway as a candidate to fold into M2." />
+
+## M1 — Headless convergence
+
+Two C++ CLI peers and one Elixir peer join an XMPP room and replay the fuzzer's vectors over real XMPP, with stream resumption. There is no UI. This proves convergence across languages and over a patchy network before anyone draws anything.
+
+## M2 — Inkscape plus no-JS
+
+The Inkscape fork, running a C++ MUPPET, and a plain HTML browser served by a server-side MUPPET edit the same drawing. This is the first demo a person can see, and it tests the north star directly.
+
+## M3 — Inkscape plus Wasm
+
+A Wasm MUPPET in the browser joins as a full peer.
+
+## M4 — Inkscape plus Conversations
+
+Mobile XMPP users take part. What a stock Conversations user gets is [open question 7](/discussion/open-questions/#q7-what-does-a-conversations-user-get-in-m4).
+
+## Where the gateway fits
+
+The xtxp.link gateway and live web branching don't have a milestone yet. See [open question 9](/discussion/open-questions/#q9-where-does-the-web-gateway-sit-in-the-milestones). Folding it into M2 is a strong candidate, since the no-JS path of M2 *is* the gateway.

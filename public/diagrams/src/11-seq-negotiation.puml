@@ -1,0 +1,35 @@
+@startuml 11-seq-negotiation
+!include _style.iuml
+title xtxp.link content negotiation
+
+participant "Client" as c
+participant "xtxp.link\ngateway" as gw
+participant "Directory" as dir
+participant "Hosting node" as node
+
+c -> gw : GET https://xtxp.link/{host}/{path}
+gw -> dir : who hosts {host}/{path}?
+dir --> gw : node + branch + latest vector
+
+alt Accept: application/xtxp+xml
+  gw -> node : open patch stream
+  gw --> c : raw XTXP patch stream
+else Accept: text/html
+  gw --> c : rendered current state as HTML\n+ forms that POST edits\n+ link "open in native client" → xtxp://{host}/{path}
+end
+
+note over gw
+  A server cannot tell whether an xtxp:// handler
+  is installed, and a meta refresh to a missing
+  handler fails silently, so the hand-off is a link.
+end note
+
+== deep link (syntax open) ==
+c -> gw : GET /{host}/{path}?at={state vector}
+gw --> c : the document exactly as it was at that vector
+
+note over c, node
+  /{host}/{path} is a native XTXP document hosted at {host}.
+  /@/{domain}/{path} is a proxied overlay of an ordinary website.
+end note
+@enduml

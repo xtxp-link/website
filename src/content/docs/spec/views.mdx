@@ -1,0 +1,45 @@
+---
+title: 'Views: onion skin and redline'
+description: Seeing edits before they merge. Onion skin, redline, paused queues and branch previews, all owned by MUPPET.
+---
+
+<span class="status status--decided">decided</span> as a requirement, <span class="status status--draft">draft</span> in detail.
+
+Collaborators need to see edits **before they merge**. Neither the original design handover nor most CRDT libraries cover this, so it is a core requirement here.
+
+## The views
+
+**Onion skin**
+: A translucent overlay of another state drawn over the current one: a branch over its parent, a paused queue over the live document, or a peer's in-flight edits.
+
+**Redline**
+: A per-author tracked-changes view. For a branch, it is the set of operations that a merge would replay, coloured by who made them.
+
+**Paused queue**
+: Local edits a MUPPET holds back from the wire. They show as a translucent preview until released.
+
+**Branch preview**
+: Any branch rendered on its own or over its parent, for review before merging.
+
+## Who renders them
+
+All views belong to **MUPPET**. They are ephemeral changes to the displayed tree and never touch document state.
+
+That holds wherever a MUPPET runs:
+
+- **in Inkscape**, the views draw on the canvas
+- **in the browser via Wasm**, they draw in the page
+- **on the server for a no-JS browser**, they are rendered as plain SVG layers and HTML
+
+Because server-side rendering is just a server-side MUPPET, the no-JS view and the native view come from the same code.
+
+## What the engine must provide
+
+- **Authorship on every operation**, kept after merging, so a redline can say who changed what.
+- **A state per branch**, so a preview has something to overlay.
+- **Cheap diffs between two states**, so a redline can be computed on demand.
+
+## Still open
+
+- Should the onion skin show *live* in-flight edits from other people, explicit *suggestions* that need accepting (like tracked changes in a word processor), or both?
+- How redline colours map to authors in a room with many participants.

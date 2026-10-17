@@ -1,0 +1,32 @@
+@startuml 12-seq-web-overlay
+!include _style.iuml
+title Live web branching: genesis, overlay, upstream as a peer
+
+actor "Browser" as b
+participant "xtxp.link\ngateway" as gw
+participant "Server MUPPET" as sm
+participant "Tracker\nupstream + main" as t
+participant "Origin site" as o
+
+b -> gw : GET /@/en.wikipedia.org/wiki/Browser\n("/@/" marks a proxied origin)
+gw -> t : document exists?
+t --> gw : no
+gw -> o : GET /wiki/Browser\n(no cookies, no credentials)
+o --> gw : HTML
+gw -> sm : genesis(HTML)
+sm -> sm : HTML5 parse → tree,\nassign stable node IDs
+sm -> t : vector 0 (upstream snapshot)
+sm --> gw : rendered page
+gw --> b : page with links and forms rewritten to\nstay in xtxp.link, origin forms disabled,\nvisible "edited overlay" frame
+
+b -> gw : POST edit
+gw -> sm : edit intent
+sm -> t : XTXP ops on overlay branch
+
+== later: origin page changes ==
+gw -> o : re-fetch
+o --> gw : new HTML
+gw -> sm : diff against last upstream snapshot
+sm -> t : ops authored by the "upstream" peer
+t -> t : overlay branches merge upstream\nlike any other peer's edits
+@enduml

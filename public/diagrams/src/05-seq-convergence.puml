@@ -1,0 +1,31 @@
+@startuml 05-seq-convergence
+!include _style.iuml
+title Two native peers edit concurrently and converge
+
+participant "MUPPET A\n(client 1)" as a
+participant "XMPP MUC\nroom" as muc
+participant "Tracker\n(branch main)" as t
+participant "MUPPET B\n(client 2)" as b
+
+note over a, b : Both start from the same state vector {1:7, 2:4}
+
+par concurrent edits
+  a -> a : set @fill="blue" on circle c1\nop (1,8)
+  a -> muc : op (1,8)
+else
+  b -> b : insert path p9 after c1\nop (2,5)
+  b -> muc : op (2,5)
+end
+
+muc -> t : archive both (MAM)
+muc -> b : op (1,8)
+b -> b : integrate (1,8)
+muc -> a : op (2,5)
+a -> a : integrate (2,5)
+
+note over a, b
+  Both now at {1:8, 2:5}.
+  Ops commute, so delivery order does not matter:
+  the canonical XML (and its SHA-256) is identical.
+end note
+@enduml

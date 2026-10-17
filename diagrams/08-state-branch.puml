@@ -1,0 +1,27 @@
+@startuml 08-state-branch
+!include _style.iuml
+title Branch lifecycle (draft)
+
+[*] --> Forked : fork(parent, SV)
+Forked --> Active : first op
+Active --> Active : ops
+Active --> Paused : author pauses queue
+Paused --> Active : resume
+Active --> Proposed : ask for review
+Proposed --> Active : changes requested
+Proposed --> Merged : accept → replay into parent
+Proposed --> Abandoned : reject
+Active --> Abandoned : discard
+Merged --> [*]
+Abandoned --> [*]
+
+Proposed : onion skin and redline\nrendered for reviewers
+Merged : ops remain in the ledger,\nso the branch is still history
+Abandoned : kept in the ledger;\ncan be re-forked later
+
+note right of Paused
+  Paused queues are local to a MUPPET:
+  edits are held back from the wire
+  but shown as a translucent preview.
+end note
+@enduml

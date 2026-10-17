@@ -1,0 +1,36 @@
+---
+title: Architecture
+description: The named parts of XTXP, how they relate, and where each one runs.
+---
+
+import Diagram from '../../../components/Diagram.astro';
+
+## The parts
+
+| Part | Role | Status |
+| --- | --- | --- |
+| **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, cycle-free moves. *The Wire*: stanza framing, handshakes, branch routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
+| **Xmesh** | The engine. Resolves concurrent patch streams. C++20 is the reference implementation, and a pure Elixir port is held to the same vectors. | <span class="status status--decided">decided</span> |
+| **MUPPET** | Multi User Progressive Patch Execution Tree: client-side Xmesh. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns ephemeral views (paused queues, onion skin, branch previews) without changing document state. | <span class="status status--decided">decided</span> |
+| **Erlang Trackers** | The routing layer. One lightweight Erlang process per branch, holding that branch's history, hot keyframes and presence, and routing patches between nodes. | <span class="status status--decided">decided</span> |
+| **Convector** | The first application: a vector canvas with spatial chat and comments, following the Conversations model. | <span class="status status--decided">decided</span> |
+
+<Diagram name="02-components" alt="Component diagram: Xmesh C++ and Elixir implement the Math; MUPPET adapters for Inkscape, Wasm and server embed Xmesh; branch trackers use the Elixir core and store hot keyframes and a cold ledger; Convector is built on MUPPET." />
+
+## The split that matters
+
+There is **no central authority**. "Canonical state" means the state every peer converges to, not a state a server announces.
+
+- **MUPPETs execute and render.** Every client runs Xmesh, so desktop clients work offline and merge on reconnect. A MUPPET can run in three places: the Inkscape fork, the browser (Wasm), and the server, on behalf of a browser with no JavaScript.
+- **Trackers hold history.** Each branch is a process with its own ledger and keyframes. Trackers serve new clients a recent keyframe instead of replaying the whole history.
+- **XTXP is node to node.** It connects MUPPET to MUPPET, MUPPET to tracker, and tracker to tracker. It is not a client–server API.
+
+Because rendering is just a MUPPET running somewhere, the no-JS view and the Inkscape view come from the same code and can't drift apart.
+
+<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a C++ MUPPET, a Wasm MUPPET in a browser, a phone XMPP client and an app-server MUPPET all connect over XMPP to a BEAM cluster hosting the XMPP server and per-branch trackers with hot keyframes and a cold ledger; a no-JS browser reaches the server MUPPET through the xtxp.link edge gateway." />
+
+## Transport
+
+XTXP rides on **XMPP**. Each document session is a multi-user chat room (XEP-0045): presence shows who is in the drawing, and message stanzas carry patches. The archive (XEP-0313) gives late joiners and reconnecting phones an ordered log. See [The Wire](/spec/wire/).
+
+ejabberd and MongooseIM are both written in Erlang, so trackers could run inside the same BEAM cluster as the XMPP server. That choice is [still open](/discussion/open-questions/).

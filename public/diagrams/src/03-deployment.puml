@@ -1,0 +1,57 @@
+@startuml 03-deployment
+!include _style.iuml
+title Deployment: where each piece runs
+
+node "Desktop" {
+  component "Inkscape fork" as ink
+  component "MUPPET\n(C++ Xmesh)" as m1
+  ink - m1
+}
+
+node "Browser A — no JS" {
+  artifact "Plain HTML\nforms + links" as html
+}
+
+node "Browser B" {
+  component "MUPPET\n(Wasm Xmesh)" as m2
+}
+
+node "Phone" {
+  component "XMPP client\n(Conversations-style)" as phone
+}
+
+cloud "Edge (Cloudflare or similar)" {
+  component "xtxp.link gateway\ncontent negotiation" as gw
+}
+
+node "App server" {
+  component "Server MUPPET\n(Elixir Xmesh)" as m3
+}
+
+node "BEAM cluster" {
+  component "XMPP server\n(MUC, MAM, stream mgmt)" as xs
+  component "Tracker: main" as t0
+  component "Tracker: branch b1" as t1
+  component "Tracker: branch b2" as t2
+  database "Keyframes (hot)" as hot
+  database "Ledger (cold)" as cold
+}
+
+html --> gw : HTTPS
+gw --> m3
+m1 --> xs : XMPP (TLS)
+m2 --> xs : XMPP over WebSocket
+m3 --> xs : XMPP
+phone --> xs : XMPP
+xs --> t0
+xs --> t1
+xs --> t2
+t0 --> hot
+t0 --> cold
+
+note bottom of xs
+  ejabberd and MongooseIM are Erlang XMPP servers,
+  so trackers could live inside the same BEAM.
+  Undecided — see open questions.
+end note
+@enduml

@@ -1,0 +1,47 @@
+---
+title: XTXP
+description: The XML to XML Protocol. A draft specification for collaborative, branchable editing of XML documents, from Inkscape to a browser with no JavaScript.
+template: splash
+hero:
+  tagline: The XML to XML Protocol. Many people editing one XML document at once, with branchable history, from a native desktop app down to a browser with JavaScript switched off.
+  actions:
+    - text: What is XTXP?
+      link: /overview/what-is-xtxp/
+      icon: right-arrow
+    - text: Open questions
+      link: /discussion/open-questions/
+      variant: minimal
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+import Diagram from '../../components/Diagram.astro';
+
+<Aside type="caution" title="Draft, under discussion">
+This site exists so the design can be argued about in public. Nothing here is final.
+Pages mark each point as <span class="status status--decided">decided</span>, <span class="status status--draft">draft</span> or <span class="status status--open">open</span>.
+</Aside>
+
+## Four named parts
+
+<CardGrid>
+  <Card title="XTXP: the protocol" icon="document">
+    The specification every node obeys. **The Math** defines how concurrent edits merge. **The Wire** defines how they travel.
+  </Card>
+  <Card title="Xmesh: the engine" icon="setting">
+    The CRDT engine that resolves concurrent edits on an XML tree. A C++20 reference implementation, plus a pure Elixir port held to the same test vectors.
+  </Card>
+  <Card title="MUPPET: the executor" icon="pencil">
+    Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns all views.
+  </Card>
+  <Card title="Erlang Trackers: the routing layer" icon="random">
+    One lightweight Erlang process per document branch. Trackers hold history, keyframes and presence, and route patches between nodes.
+  </Card>
+</CardGrid>
+
+<Diagram name="01-context" alt="System context: designers, browser users with and without JavaScript, and mobile users connect to a mesh of peers and trackers through XMPP and the xtxp.link gateway." />
+
+## Where to start
+
+- [**North star**](/overview/north-star/) explains why a browser with no JavaScript is the design target, and where the idea comes from.
+- [**Architecture**](/overview/architecture/) shows how the parts fit together.
+- [**Open questions**](/discussion/open-questions/) is the list of things to argue about next.

@@ -1,0 +1,35 @@
+---
+title: 'North star: the web without JS'
+description: Why a browser with JavaScript switched off is the design target, and where the idea comes from.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+<span class="status status--decided">decided</span>
+
+**Real web without JavaScript.** The no-JS HTML client is the point of the design, not a fallback. Plain forms, links and HTTP caching make a browser a full participant in a collaborative session. A server-side MUPPET does the CRDT work on that browser's behalf.
+
+Richer clients (Inkscape, a Wasm MUPPET in the browser, mobile XMPP clients) are peers on the same mesh. They get more, but they don't get *different* documents.
+
+## The test
+
+Every design decision gets checked against one question:
+
+> Does this still work with no JS?
+
+Some consequences:
+
+- Edits from a plain browser arrive as **form POSTs**, followed by a redirect and a GET, so refresh and the back button behave.
+- Passive viewing uses **`<meta http-equiv="refresh">`** with **ETag / `If-None-Match`**, so an unchanged document costs a `304 Not Modified`.
+- **Onion skin, redline and branch previews** are rendered on the server as SVG layers. To a browser they are just images and markup.
+- The hand-off to a native client is a **plain link** to `xtxp://`, not a script that probes for a protocol handler.
+
+## Roots
+
+<Aside>
+Around 2005, David Campey wrote an experimental JEP (Jabber Enhancement Proposal, the name for XMPP extensions before the 2006 rename to XEP) for message and document updates over XMPP, with the aim of replacing HTTP.
+</Aside>
+
+XTXP is that idea's second run. This time HTTP stays: it's the no-JS edge every browser already speaks. XMPP becomes the document backbone underneath it, carrying patches between nodes with identity, presence and archives built in.
+
+The original JEP text hasn't been located yet. It isn't in the XSF's `xeps` repository, whose history starts with the October 2006 import, so the 2005 standards mailing list archives are the next place to look.

@@ -1,0 +1,63 @@
+@startuml 09-class-model
+!include _style.iuml
+title Core data model (starting point, not final)
+
+hide empty methods
+
+class ID <<value>> {
+  client : uint32
+  clock : uint32
+}
+
+class YataNode {
+  id : ID
+  left_origin : ID
+  right_origin : ID
+  parent : ID
+  content : NodeContent
+  deleted : bool  ' tombstone
+}
+
+abstract class NodeContent <<variant>>
+class TextPayload {
+  data : string
+}
+class MapPayload {
+  keys : map<string, ID>
+}
+class ArrayPayload {
+  head : ID
+  tail : ID
+}
+
+class StateVector {
+  clocks : map<client, clock>
+}
+
+class Branch {
+  id : BranchId
+  parent : BranchId
+  fork_at : StateVector
+}
+
+class Author {
+  jid : JID
+  device : string
+}
+
+YataNode --> ID
+YataNode *-- NodeContent
+NodeContent <|-- TextPayload
+NodeContent <|-- MapPayload
+NodeContent <|-- ArrayPayload
+Branch --> StateVector
+ID ..> Author : client maps to\na JID + device (open)
+
+note right of MapPayload
+  "Immortal parents": an XML element
+  holds a map of attributes and an
+  array of children. Changing @fill
+  updates the map; the element keeps
+  its ID, so concurrent edits never orphan.
+end note
+@enduml

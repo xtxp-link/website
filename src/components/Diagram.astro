@@ -1,0 +1,29 @@
+---
+/**
+ * A PlantUML diagram rendered to SVG by scripts/render-diagrams.sh.
+ * Ships both a light and a dark variant and lets CSS pick, so it needs no JavaScript.
+ */
+interface Props {
+  name: string; // file name without extension, e.g. "07-seq-branch"
+  alt: string;
+  caption?: string;
+}
+const { name, alt, caption } = Astro.props;
+const base = '/diagrams';
+---
+
+<figure class="xtxp-diagram">
+  <a href={`${base}/light/${name}.svg`} class="xtxp-diagram__img xtxp-diagram__img--light">
+    <img src={`${base}/light/${name}.svg`} alt={alt} loading="lazy" decoding="async" />
+  </a>
+  <a href={`${base}/dark/${name}.svg`} class="xtxp-diagram__img xtxp-diagram__img--dark">
+    <img src={`${base}/dark/${name}.svg`} alt={alt} loading="lazy" decoding="async" />
+  </a>
+  <figcaption>
+    {caption && <span>{caption}</span>}
+    <span class="xtxp-diagram__links">
+      <a href={`${base}/light/${name}.svg`}>Full size</a>
+      <a href={`${base}/src/${name}.puml`}>PlantUML source</a>
+    </span>
+  </figcaption>
+</figure>

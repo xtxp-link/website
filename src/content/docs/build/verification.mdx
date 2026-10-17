@@ -1,0 +1,39 @@
+---
+title: Verification
+description: Behaviour first. One suite of feature files and JSON test vectors, checked against C++, Elixir and an independent Yrs oracle.
+---
+
+import Diagram from '../../../components/Diagram.astro';
+
+<span class="status status--decided">decided</span>
+
+No implementation code gets written until its behaviour is defined. The source of truth is:
+
+- **Gherkin `.feature` files** describing behaviour in plain language
+- **JSON test vectors** generated from them: an initial state, plus per-client operation streams delivered late and out of order
+
+## One suite, three implementations
+
+<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the C++ harness, the Elixir harness and a Yrs oracle, and SHA-256 hashes of canonical XML are compared; for M1 the same vectors are replayed by two C++ CLI peers and an Elixir peer through a real XMPP room." />
+
+| Harness | Why it exists |
+| --- | --- |
+| **C++ Xmesh (Catch2)** | The reference implementation. |
+| **Elixir Xmesh (ExUnit)** | The pure port used by trackers and server MUPPETs. The vector suite is the contract between the C++ and Elixir implementations. |
+| **Yrs oracle** | Yrs (the Rust port of Yjs) implements YATA and is widely used. Replaying the non-move subset through it checks our YATA independently. It has no tree move, hence the subset. |
+
+The pass condition is identical **SHA-256 hashes of the canonical XML** across every harness.
+
+## The fuzzer
+
+The first task from the original handover, re-scoped to feed all three harnesses. It generates:
+
+- an initial SVG (a root `<svg>` with one `<g>` layer)
+- randomised operations from several clients: inserting paths, updating attributes, moving nodes, adding comments
+- one chronological stream per client, plus heavily delayed and shuffled delivery orders
+
+Moves are tagged so the Yrs harness can skip them.
+
+## Over a real network
+
+[Milestone M1](/build/milestones/) runs the same vectors through two C++ CLI peers and one Elixir peer in an XMPP room, including dropped connections and stream resumption. Convergence then holds over a real, unreliable network, not just in a test process.

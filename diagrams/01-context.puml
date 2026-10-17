@@ -1,0 +1,34 @@
+@startuml 01-context
+!include _style.iuml
+title System context: who talks to the XTXP mesh
+
+left to right direction
+
+actor "Designer\n(Inkscape fork)" as designer
+actor "Browser user\n(no JavaScript)" as nojs
+actor "Browser user\n(Wasm client)" as wasm
+actor "Mobile user\n(XMPP client)" as mobile
+
+rectangle "XTXP mesh" as mesh {
+  component "Peers running\nMUPPET + Xmesh" as peers
+  component "Erlang Trackers\n(one process per branch)" as trackers
+}
+
+rectangle "xtxp.link\nHTTP gateway" as gateway
+cloud "XMPP federation\n(any server, JID identity)" as xmpp
+rectangle "Origin websites\n(e.g. en.wikipedia.org)" as origin
+
+designer --> peers : edits SVG natively
+wasm --> peers : edits in browser
+nojs --> gateway : HTML forms,\nlinks, HTTP caching
+mobile --> xmpp : chat, comments
+gateway --> peers : server-side MUPPET\nacts for the user
+peers --> xmpp : XTXP over XMPP
+xmpp --> trackers : rooms, archive
+gateway ..> origin : genesis fetch\n(no cookies forwarded)
+
+note bottom of gateway
+  North star: the no-JS browser
+  is a full participant, not a fallback.
+end note
+@enduml

@@ -1,0 +1,96 @@
+---
+title: The Math
+description: How Xmesh merges concurrent edits to an XML tree. YATA ordering, immortal parents, safe tree moves, clocks and the patch language.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../components/Diagram.astro';
+
+<span class="status status--draft">draft</span>
+
+The Math half of XTXP defines what every implementation of Xmesh must compute. Implementations are free in *how* they compute it. They must agree on *what* comes out, down to the [SHA-256 of the canonical XML](/build/verification/).
+
+## Requirements
+
+1. **Convergence.** Peers that have seen the same set of operations hold the same document, whatever order those operations arrived in.
+2. **Intent preservation.** An attribute change and a concurrent child insertion on the same element both survive.
+3. **No cycles.** Concurrent moves can never make an element its own ancestor.
+4. **No central authority.** Merging needs no server to decide order.
+
+## Data model
+
+<Diagram name="09-class-model" alt="Class diagram: an ID is a client and a clock; a YataNode has an id, left and right origins, a parent, content and a tombstone flag; content is a text, map or array payload; a Branch has a parent and a fork state vector; a client ID maps to an author JID and device." />
+
+The starting point (from the original design handover, not final):
+
+```cpp
+struct ID { uint32_t client; uint32_t clock; };
+
+struct TextPayload  { std::string data; };
+struct MapPayload   { std::unordered_map<std::string, ID> keys; };
+struct ArrayPayload { ID head; ID tail; };
+
+using NodeContent = std::variant<TextPayload, MapPayload, ArrayPayload>;
+
+struct YataNode {
+  ID id;
+  ID left_origin;
+  ID right_origin;
+  ID parent;
+  NodeContent content;
+  bool deleted;  // tombstone
+};
+```
+
+## Ordering: YATA
+
+Siblings form a sequence. Concurrent insertions at the same position are ordered with **YATA** (Yet Another Transformation Approach). Each node remembers the neighbours it was inserted between (`left_origin`, `right_origin`), and ties are broken deterministically by client ID. Deleted nodes become **tombstones** so later insertions can still find their origins.
+
+YATA avoids carrying a full causal history on every operation. It is the algorithm behind Yjs, and its Rust port Yrs serves as an [independent oracle](/build/verification/) for our implementation.
+
+## Immortal parents
+
+An XML element is never replaced, only updated:
+
+- its **attributes** live in a map (`@fill`, `@d`, `@transform` …), last-writer-wins per key
+- its **children** live in a YATA array
+
+Setting `@fill="blue"` updates one map entry. The `<circle>` keeps its ID, so a concurrent edit to the same circle still has something to land on. Replacing whole nodes would orphan concurrent edits; immortal parents prevent that.
+
+## Moves without cycles
+
+Moving an element changes its parent. If Alice moves group A into group B while Bob moves B into A, a naive merge creates a cycle. Xmesh follows Kleppmann et al.'s replicated tree move algorithm:
+
+<Diagram name="10-activity-move" alt="Activity: on receiving a move with timestamp t, undo newer ops if needed; if the node equals the new parent or is its ancestor, record a no-op, otherwise set the parent; redo undone ops in timestamp order, re-checking each move." />
+
+Every replica applies moves in the same timestamp order and skips a move that would close a cycle, so every replica skips the same move.
+
+<Aside type="note" title="Correction to the original handover">
+The handover said the algorithm "rejects the older intent". That isn't how it works: moves are applied in timestamp order, and the one skipped is whichever would close a cycle *given the moves before it*.
+</Aside>
+
+## Clocks and state vectors
+
+- Every operation is stamped with an **ID**: the client that made it, plus that client's own counter (a Lamport-style clock).
+- Every peer keeps a **state vector**: for each client, the highest counter it has integrated.
+- Two peers sync by exchanging state vectors. Each sends the operations the other is missing.
+
+A state vector also names a point in history, which is how [branches](/spec/branches/) are identified.
+
+<Aside type="note" title="Terminology">
+The component notes said "Lamport vector clock". Those are two different things. Xmesh uses per-client Lamport-style counters for IDs, and state vectors to describe what a peer has seen.
+</Aside>
+
+## The patch language
+
+UI actions are expressed as **XML Patch** operations (RFC 5261: `add`, `replace`, `remove`, addressed by XPath) before they reach the engine. Xmesh translates each patch into CRDT operations that refer to node IDs, not positions, because XPath positions shift under concurrent edits.
+
+RFC 7351 registers the `application/xml-patch+xml` media type for these documents. The patch operations themselves are defined in RFC 5261.
+
+## Still open
+
+- How tombstones are garbage-collected when no single server sees every peer (epochs, keyframes, or both).
+- The exact canonicalisation used before hashing (for example W3C Canonical XML).
+- How client IDs map to XMPP identities (JID plus device), and whether operations are signed.
+
+See [open questions](/discussion/open-questions/).

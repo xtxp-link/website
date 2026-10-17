@@ -1,0 +1,26 @@
+@startuml 10-activity-move
+!include _style.iuml
+title Applying a tree move safely (after Kleppmann et al.)
+
+start
+:receive move(t, node, new_parent);
+if (t older than the latest applied op?) then (yes)
+  :undo applied ops newer than t;
+else (no)
+endif
+if (node == new_parent\nor node is an ancestor of new_parent?) then (would create a cycle)
+  :record the move as a no-op;
+else (safe)
+  :set node.parent = new_parent;
+endif
+:redo the undone ops in timestamp order,\nre-checking each move the same way;
+stop
+
+note right
+  Every replica applies moves in the same
+  timestamp order, so every replica skips
+  the same moves. The move skipped is the
+  one that would close the cycle given the
+  earlier ones, not "the older intent".
+end note
+@enduml

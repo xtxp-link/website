@@ -1,0 +1,67 @@
+/* Site-specific additions on top of the Galaxy theme. */
+
+/* Diagrams: show the variant that matches the theme. Dark is Starlight's default. */
+.xtxp-diagram {
+  margin-block: 1.5rem;
+}
+.xtxp-diagram__img {
+  display: block;
+  overflow-x: auto;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: var(--sl-color-bg);
+}
+/* Natural size, so text stays readable; wide diagrams scroll sideways. */
+.xtxp-diagram__img img {
+  max-width: none;
+  height: auto;
+  margin-inline: auto;
+}
+.xtxp-diagram__img--light {
+  display: none;
+}
+:root[data-theme='light'] .xtxp-diagram__img--light {
+  display: block;
+}
+:root[data-theme='light'] .xtxp-diagram__img--dark {
+  display: none;
+}
+.xtxp-diagram figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}
+
+.xtxp-diagram__links {
+  display: inline-flex;
+  gap: 1rem;
+  margin-inline-start: auto;
+}
+
+/* Status chips used inline in prose. */
+.status {
+  display: inline-block;
+  padding: 0 0.45em;
+  border-radius: 0.3em;
+  font-size: 0.8em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: 0.1em;
+}
+.status--decided {
+  background: var(--sl-color-green-low);
+  color: var(--sl-color-green-high);
+}
+.status--open {
+  background: var(--sl-color-orange-low);
+  color: var(--sl-color-orange-high);
+}
+.status--draft {
+  background: var(--sl-color-blue-low);
+  color: var(--sl-color-blue-high);
+}

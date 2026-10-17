@@ -1,0 +1,203 @@
+' Shared look for every XTXP diagram.
+' Rendered twice: once as-is (light) and once with -DDARK=1 (dark).
+!ifdef DARK
+!$fg = "#e4e6eb"
+!$muted = "#9aa3b2"
+!$line = "#8f9aab"
+!$box = "#232832"
+!$box2 = "#2b3240"
+!$border = "#5b6577"
+!$accent = "#6cb8ff"
+!$accentBox = "#1d3550"
+!$warm = "#f2b45c"
+!$warmBox = "#4a3519"
+!$noteBox = "#2f2a1c"
+!else
+!$fg = "#1d2330"
+!$muted = "#5c6577"
+!$line = "#5c6577"
+!$box = "#f6f7f9"
+!$box2 = "#eceff4"
+!$border = "#9aa3b2"
+!$accent = "#1565c0"
+!$accentBox = "#e3f0fc"
+!$warm = "#b26a00"
+!$warmBox = "#fff1dc"
+!$noteBox = "#fffbea"
+!endif
+
+<style>
+root {
+  FontColor $fg
+  LineColor $line
+}
+actor {
+  FontColor $fg
+  LineColor $fg
+  BackgroundColor $box
+}
+node {
+  FontColor $fg
+}
+cloud {
+  FontColor $fg
+}
+package {
+  FontColor $fg
+}
+frame {
+  FontColor $fg
+}
+participant {
+  FontColor $fg
+}
+</style>
+
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam defaultFontName "Helvetica"
+skinparam defaultFontSize 13
+skinparam defaultFontColor $fg
+skinparam ArrowColor $line
+skinparam ArrowFontColor $muted
+skinparam ArrowFontSize 12
+skinparam ArrowThickness 1.2
+skinparam TitleFontColor $fg
+skinparam TitleBorderThickness 0
+skinparam TitleBorderColor transparent
+skinparam TitleFontSize 16
+skinparam LegendBackgroundColor $box
+skinparam LegendBorderColor $border
+skinparam LegendFontColor $fg
+skinparam HyperlinkColor $accent
+
+skinparam note {
+  BackgroundColor $noteBox
+  BorderColor $border
+  FontColor $fg
+}
+skinparam rectangle {
+  BackgroundColor $box
+  BorderColor $border
+  FontColor $fg
+  StereotypeFontColor $muted
+}
+skinparam component {
+  BackgroundColor $accentBox
+  BorderColor $accent
+  FontColor $fg
+  StereotypeFontColor $muted
+}
+skinparam interface {
+  BackgroundColor $box
+  BorderColor $accent
+}
+skinparam node {
+  BackgroundColor $box
+  BorderColor $border
+  FontColor $fg
+  StereotypeFontColor $muted
+}
+skinparam package {
+  BackgroundColor transparent
+  BorderColor $border
+  FontColor $fg
+  StereotypeFontColor $muted
+}
+skinparam database {
+  BackgroundColor $box2
+  BorderColor $border
+  FontColor $fg
+}
+skinparam queue {
+  BackgroundColor $box2
+  BorderColor $border
+  FontColor $fg
+}
+skinparam artifact {
+  BackgroundColor $box2
+  BorderColor $border
+  FontColor $fg
+}
+skinparam cloud {
+  BackgroundColor $box
+  BorderColor $border
+  FontColor $fg
+}
+skinparam actor {
+  BackgroundColor $box
+  BorderColor $fg
+  FontColor $fg
+}
+skinparam frame {
+  BackgroundColor transparent
+  BorderColor $border
+  FontColor $fg
+}
+skinparam card {
+  BackgroundColor $warmBox
+  BorderColor $warm
+  FontColor $fg
+}
+
+skinparam sequence {
+  ParticipantBackgroundColor $box
+  ParticipantBorderColor $border
+  ParticipantFontColor $fg
+  ActorBackgroundColor $box
+  ActorBorderColor $fg
+  ActorFontColor $fg
+  LifeLineBorderColor $border
+  LifeLineBackgroundColor $box2
+  GroupBackgroundColor $box2
+  GroupBorderColor $border
+  GroupFontColor $fg
+  GroupHeaderFontColor $fg
+  DividerBackgroundColor $box2
+  DividerBorderColor $border
+  DividerFontColor $fg
+  BoxBackgroundColor transparent
+  BoxBorderColor $border
+  BoxFontColor $muted
+  ReferenceBackgroundColor $box2
+  ReferenceBorderColor $border
+}
+skinparam DatabaseBackgroundColor $box2
+skinparam EntityBackgroundColor $box
+
+skinparam class {
+  BackgroundColor $box
+  BorderColor $border
+  FontColor $fg
+  AttributeFontColor $fg
+  StereotypeFontColor $muted
+  HeaderBackgroundColor $accentBox
+}
+skinparam stereotypeCBackgroundColor $accentBox
+skinparam stereotypeCBorderColor $accent
+skinparam stereotypeEBackgroundColor $warmBox
+skinparam stereotypeIBackgroundColor $box2
+
+skinparam state {
+  BackgroundColor $box
+  BorderColor $border
+  FontColor $fg
+  StartColor $fg
+  EndColor $fg
+  AttributeFontColor $muted
+}
+skinparam activity {
+  BackgroundColor $box
+  BorderColor $border
+  FontColor $fg
+  StartColor $fg
+  EndColor $fg
+  DiamondBackgroundColor $accentBox
+  DiamondBorderColor $accent
+  DiamondFontColor $fg
+}
+skinparam partition {
+  BorderColor $border
+  FontColor $fg
+}

@@ -1,0 +1,31 @@
+---
+title: Diagram index
+description: Every PlantUML diagram in the specification, with links to its source.
+---
+
+import Diagram from '../../../components/Diagram.astro';
+
+All diagrams are PlantUML. Sources live in `diagrams/` in the repository and are rendered to light and dark SVG by `npm run diagrams`. To propose a change to a diagram, edit its `.puml` file.
+
+## Structure
+
+<Diagram name="01-context" caption="01 · System context" alt="System context diagram." />
+<Diagram name="02-components" caption="02 · Components" alt="Component diagram." />
+<Diagram name="03-deployment" caption="03 · Deployment" alt="Deployment diagram." />
+<Diagram name="09-class-model" caption="09 · Core data model" alt="Class diagram of the core data model." />
+
+## Behaviour
+
+<Diagram name="04-seq-nojs-edit" caption="04 · No-JS edit loop" alt="Sequence diagram of a no-JS edit." />
+<Diagram name="05-seq-convergence" caption="05 · Two peers converge" alt="Sequence diagram of two peers converging." />
+<Diagram name="06-seq-mobile-resume" caption="06 · Mobile resume and catch-up" alt="Sequence diagram of mobile stream resumption." />
+<Diagram name="07-seq-branch" caption="07 · Branch fork, preview, merge" alt="Sequence diagram of a branch fork and merge." />
+<Diagram name="08-state-branch" caption="08 · Branch lifecycle" alt="State diagram of a branch lifecycle." />
+<Diagram name="10-activity-move" caption="10 · Safe tree move" alt="Activity diagram of the safe tree move." />
+<Diagram name="11-seq-negotiation" caption="11 · Gateway content negotiation" alt="Sequence diagram of gateway content negotiation." />
+<Diagram name="12-seq-web-overlay" caption="12 · Live web branching" alt="Sequence diagram of live web branching." />
+
+## Delivery
+
+<Diagram name="13-verification" caption="13 · Verification" alt="Verification pipeline diagram." />
+<Diagram name="14-milestones" caption="14 · Milestones" alt="Milestones diagram." />
