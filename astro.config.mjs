@@ -16,7 +16,7 @@ export default defineConfig({
         Hero: './src/components/Hero.astro',
         SiteTitle: './src/components/SiteTitle.astro',
       },
-      customCss: ['./src/styles/logo.generated.css', './src/styles/custom.css'],
+      customCss: ['./src/styles/theme.css', './src/styles/logo.generated.css', './src/styles/custom.css'],
       lastUpdated: false,
       sidebar: [
         {
@@ -30,7 +30,7 @@ export default defineConfig({
         },
         {
           label: 'Specification',
-          badge: { text: 'Draft', variant: 'caution' },
+          badge: { text: 'Draft', variant: 'default' },
           items: [
             { label: 'The Math', slug: 'spec/math' },
             { label: 'The Wire', slug: 'spec/wire' },
