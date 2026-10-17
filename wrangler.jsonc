@@ -10,5 +10,7 @@
   },
   // Requires the xtxp.link zone to be on the same Cloudflare account.
   // Remove this block to deploy to a *.workers.dev URL first.
-  "routes": [{ "pattern": "xtxp.link", "custom_domain": true }]
+  "routes": [{ "pattern": "xtxp.link", "custom_domain": true }],
+  // Lets Cloudflare build preview deployments for branches and pull requests (`wrangler preview`).
+  "previews": {}
 }
