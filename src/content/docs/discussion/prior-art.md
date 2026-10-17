@@ -111,6 +111,9 @@ Inkscape undoes at the level of its XML tree, which makes it directly relevant t
 - **Small steps can merge.** `DocumentUndo::maybeDone()` takes a key. If it matches the previous action's key, the new events are folded into the top step, so winding a spin button becomes one undo. Drags write to the XML only on release, so a drag is one step too.
 - **History is linear.** Any new action clears the redo stack: `maybeDone()` calls `clearRedo()` before pushing the new step, which is still the case in current Inkscape. Undo a few steps, then edit, and the undone work is gone.
 - **Observers can watch commits.** An `UndoStackObserver` is told about each new step, undo and redo.
+- **The Undo History dialog nests, but doesn't branch.** Its model (`EventLog`) shows history as a tree, and its source calls the nesting "branches". When a new step has the same kind as the previous one, it's added as a child of that row, so a run of moves collapses under one entry. These are groups of consecutive actions, not alternative histories: `_clearRedo()` erases every row after the current one, children included.
+- **Jumping is replay.** Selecting a row in the dialog (`seekTo()`) calls undo or redo repeatedly until it gets there.
+- **History is bounded.** The oldest steps expire from the front of the stack, and the dialog then shows "[Changes forgotten]". A reference point for XTXP's [history limits](/build/milestones/#roadmap).
 
 **What XTXP takes from it:**
 
@@ -118,6 +121,7 @@ Inkscape undoes at the level of its XML tree, which makes it directly relevant t
 - **What branches fix.** Where Inkscape clears redo, XTXP forks: undoing and then editing starts a [branch](/spec/branches/#undo-in-practice), and the undone work stays reachable.
 
 - [`document-undo.cpp` (current Inkscape source, code docs)](https://inkscape.gitlab.io/inkscape/doxygen/document-undo_8cpp_source.html)
+- `event-log.cpp` (Undo History model; Gustav Broberg, Jon A. Cruz; GPL-2.0-or-later): [code docs](https://inkscape.gitlab.io/inkscape/doxygen/event-log_8cpp_source.html)
 - [`document-undo.cpp` (2017 revision, Bazaar)](https://bazaar.launchpad.net/~inkscape.dev/inkscape/trunk/view/15731/src/document-undo.cpp)
 - [Inkscape wiki: Architectural overview](https://wiki.inkscape.org/wiki/Architectural_overview)
 
