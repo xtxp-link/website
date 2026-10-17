@@ -11,10 +11,10 @@ import Diagram from '../../../components/Diagram.astro';
 The gateway can act as a collaborative overlay for **any existing website**, a kind of "git for the web". Visiting
 
 ```
-https://xtxp.link/en.wikipedia.org/wiki/Browser@live
+https://xtxp.link/en.wikipedia.org/wiki/Browser@origin
 ```
 
-There is no special proxy address. A website is addressed like any other document, and the [`@{ref}`](/spec/addressing/#one-address-form) says which version: `@live` is the origin as it is now, and any other ref is a branch.
+There is no special proxy address. A website is addressed like any other document, and the [`@{ref}`](/spec/addressing/#one-address-form) says which version: `@origin` is the website as its origin server publishes it, and any other ref is a branch.
 
 The first visit fetches the canonical page and makes it the genesis state (vector 0). Links and form actions are rewritten to stay inside the gateway, each carrying a ref. Edits POSTed by users become XTXP operations on a branch, and the origin site is never touched.
 
@@ -22,7 +22,7 @@ The first visit fetches the canonical page and makes it the genesis state (vecto
 
 ## The origin site is a peer
 
-Origin pages keep changing after the genesis fetch. XTXP treats the origin as an **upstream peer**: the differences between successive fetches become that peer's operations. Its branch is `@live`. Other branches take in upstream changes the same way they merge anyone else's edits.
+Origin pages keep changing after the genesis fetch. XTXP treats the origin as an **upstream peer**: the differences between successive fetches become that peer's operations. Its branch is `@origin`. Other branches take in upstream changes the same way they merge anyone else's edits.
 
 ## HTML is not XML
 
@@ -38,8 +38,8 @@ These are requirements from the first deploy, not later polish:
 
 1. **No credentials pass through.** Never forward cookies, auth headers or form submissions to origin sites.
 2. **Origin forms are disabled** in overlays. Only XTXP edit forms submit.
-3. **A persistent, visible frame** marks every branch page as an edited copy and links to `@live` and to the original. The ref in the URL does the same job before anyone clicks: `@live` means unedited, anything else means a branch.
-4. **Bare links default to `@live`**, so following a plain link never lands someone on an edited branch by surprise.
+3. **A persistent, visible frame** marks every branch page as an edited copy and links to `@origin` and to the original. The ref in the URL does the same job before anyone clicks: `@origin` means unedited, anything else means a branch.
+4. **Bare links default to `@origin`**, so following a plain link never lands someone on an edited branch by surprise.
 5. **Origins can opt out**, through robots rules or a response header, and the gateway honours it.
 6. **Takedown handling** with a published contact and process.
 7. **Sensitive categories** (login, payment and account pages) are read-only or excluded.

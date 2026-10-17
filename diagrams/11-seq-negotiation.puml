@@ -25,7 +25,7 @@ note over gw
 end note
 
 note over c, node
-  {ref} is @live (an ordinary website as it is now), @main,
+  {ref} is @origin (an ordinary website as it is now), @main,
   a branch name, or a state vector. The last @ always starts the ref;
   a bare URL redirects to the default ref.
 end note

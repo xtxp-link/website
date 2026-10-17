@@ -10,10 +10,10 @@ description: Terms used across the XTXP specification.
 : Conflict-free replicated data type. A data structure whose concurrent updates can be applied in any order and still converge to the same state.
 
 **`@{ref}`**
-: The suffix on every XTXP address that says which version is meant: `@live` (the origin website as it is now), `@main` (the shared branch), a branch name, or a state vector. The last `@` in a URL always starts the ref.
+: The suffix on every XTXP address that says which version is meant: `@origin` (a website as its origin server publishes it), `@main` (the shared branch), a branch name, or a state vector. The last `@` in a URL always starts the ref.
 
-**`@live`**
-: The ref for an ordinary website's current version: the upstream peer's head. Read-only. Name provisional.
+**`@origin`**
+: The ref for an ordinary website's authoritative version: the stream of changes from the origin server, as the upstream peer sees it. Read-only. Not to be confused with genesis (vector 0), the start of a document's history.
 
 **Genesis (vector 0)**
 : The first state of a document. For live web branching, it is the fetched origin page.

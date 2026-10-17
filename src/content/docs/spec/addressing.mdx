@@ -32,7 +32,7 @@ The `@{ref}` suffix says which version you mean:
 
 | Ref | Meaning |
 | --- | --- |
-| `@live` | The origin site as it is right now: the upstream peer's head. Websites only, read-only. *Name provisional.* |
+| `@origin` | The website's authoritative version, as served by its origin server: the upstream peer's branch. Websites only, read-only. |
 | `@main` | The shared collaborative branch. The default for native documents. |
 | `@{branch}` | A named branch: a proposed edit, an undo fork, someone's overlay. |
 | `@{state vector}` | An exact point in history. *Syntax open.* |
@@ -40,10 +40,10 @@ The `@{ref}` suffix says which version you mean:
 Examples:
 
 ```
-xtxp.link/en.wikipedia.org/wiki/Browser@live      Wikipedia's page, unedited
+xtxp.link/en.wikipedia.org/wiki/Browser@origin      Wikipedia's page, unedited
 xtxp.link/en.wikipedia.org/wiki/Browser@b1        an edited branch of it
 xtxp.link/xtxp.example.org/drawing@main           a native document
-xtxp.link/medium.com/@campey/post@live            "@campey" stays in the path
+xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 ```
 
 ### Parsing rules
@@ -51,13 +51,13 @@ xtxp.link/medium.com/@campey/post@live            "@campey" stays in the path
 1. **The last `@` starts the ref.** Every other `@` belongs to the path, so origin paths like Medium's `/@user` need no escaping.
 2. **Links the gateway generates always carry a ref.** That includes every link it rewrites inside a page, so the last `@` is never ambiguous.
 3. **Bare URLs** (typed or pasted from elsewhere):
-   - with no `@` at all, redirect to the default ref (`@live` for websites, `@main` for native documents)
-   - with an `@` whose text doesn't resolve to a ref, as in `medium.com/@campey`, treat it as part of the path and redirect to `…/@campey@live`
+   - with no `@` at all, redirect to the default ref (`@origin` for websites, `@main` for native documents)
+   - with an `@` whose text doesn't resolve to a ref, as in `medium.com/@campey`, treat it as part of the path and redirect to `…/@campey@origin`
 4. **A first path segment without a dot is a keyword**, reserved for the gateway's own pages (such as `/d/` for diagrams). Hostnames always contain a dot, so the two never collide.
 
 ### The ref is the honesty signal
 
-`@live` means unedited. Any other ref means a branch that may contain other people's edits, and the page frame says so, with links to `@live` and to the original site. The ref travels with every shared link, so a reader can tell what they're looking at before they click. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
+`@origin` means unedited. Any other ref means a branch that may contain other people's edits, and the page frame says so, with links to `@origin` and to the original site. The ref travels with every shared link, so a reader can tell what they're looking at before they click. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
 
 <Diagram name="11-seq-negotiation" alt="Sequence: a client requests a document from xtxp.link; the gateway asks the directory which node hosts it; with Accept application/xtxp+xml it opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client. The ref after the last @ picks live, a branch or a state vector." />
 
