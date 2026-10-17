@@ -25,18 +25,12 @@ A y-sweet review → M1 headless convergence → M2 Inkscape plus no-JS → M3 I
 
 ## 7. Peer model with branch trackers
 
-- **MUPPET is client-side Xmesh.** No server "finalises" state.
+- **MUPPET is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are MUPPET views, wherever a MUPPET runs.
 - **XTXP is node to node.**
 - **A server-side branch is held by a tracker**, one actor per branch, and a branch is a fork of the undo history.
 - **Server-side rendering is a server-side MUPPET.** Trackers hold history, MUPPETs execute and render.
 
 *Replaced:* an earlier description in which Xmesh resolved state centrally and broadcast a "finalised canonical state".
-
-## 8. Convector is subsumed into MUPPET
-
-There is no separate application layer. The vector canvas and the spatial chat and comments are MUPPET views, provided wherever a MUPPET runs (Inkscape, Wasm, server).
-
-*Replaced:* Convector as a named application built on top of MUPPET.
 
 ## 9. One address form: `{host}/{path}@{ref}`
 

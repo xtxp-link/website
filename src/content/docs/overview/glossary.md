@@ -37,7 +37,7 @@ description: Terms used across the XTXP specification.
 : *Roadmap.* A chronological log of a branch's patches in cold storage. Until then, branches persist the usual Yjs way: append updates, then compact.
 
 **MUPPET**
-: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh, and the application layer: it owns all views, including the vector canvas and spatial chat and comments. (This absorbed what was earlier called Convector.)
+: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh, and the application layer: it owns all views, including the vector canvas and spatial chat and comments.
 
 **Onion skin**
 : A translucent overlay of another state (a branch, a paused queue, a peer's in-flight edits) drawn over the current one.
