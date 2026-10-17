@@ -109,7 +109,7 @@ Inkscape undoes at the level of its XML tree, which makes it directly relevant t
 - **An action is a transaction.** Every change to the document's XML is recorded as an event (node added, removed or reordered; attribute or content changed). `DocumentUndo::done()` closes the open transaction and pushes its event log onto the undo stack as one step, with a description for the Undo History dialog.
 - **Undo and redo replay logs.** Undo reverses a step's XML events; redo replays them forward.
 - **Small steps can merge.** `DocumentUndo::maybeDone()` takes a key. If it matches the previous action's key, the new events are folded into the top step, so winding a spin button becomes one undo. Drags write to the XML only on release, so a drag is one step too.
-- **History is linear.** Any new action clears the redo stack. Undo a few steps, then edit, and the undone work is gone.
+- **History is linear.** Any new action clears the redo stack: `maybeDone()` calls `clearRedo()` before pushing the new step, which is still the case in current Inkscape. Undo a few steps, then edit, and the undone work is gone.
 - **Observers can watch commits.** An `UndoStackObserver` is told about each new step, undo and redo.
 
 **What XTXP takes from it:**
@@ -117,7 +117,8 @@ Inkscape undoes at the level of its XML tree, which makes it directly relevant t
 - **The capture point for the Inkscape fork.** Hooking the transaction commit turns each Inkscape action into one batch of XTXP operations, already grouped the way a user thinks of their edits ([The Inkscape fork](/build/inkscape-fork/)).
 - **What branches fix.** Where Inkscape clears redo, XTXP forks: undoing and then editing starts a [branch](/spec/branches/#undo-in-practice), and the undone work stays reachable.
 
-- [`document-undo.cpp` (Inkscape source, Bazaar era)](https://bazaar.launchpad.net/~inkscape.dev/inkscape/trunk/view/15731/src/document-undo.cpp)
+- [`document-undo.cpp` (current Inkscape source, code docs)](https://inkscape.gitlab.io/inkscape/doxygen/document-undo_8cpp_source.html)
+- [`document-undo.cpp` (2017 revision, Bazaar)](https://bazaar.launchpad.net/~inkscape.dev/inkscape/trunk/view/15731/src/document-undo.cpp)
 - [Inkscape wiki: Architectural overview](https://wiki.inkscape.org/wiki/Architectural_overview)
 
 ### Undo in shared documents
