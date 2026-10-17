@@ -48,6 +48,12 @@ There is no separate application layer. The vector canvas and the spatial chat a
 
 *Replaced:* Convector as a named application built on top of MUPPET.
 
+## 9. One address form: `{host}/{path}@{ref}`
+
+Every document, native or an ordinary website, is addressed as `xtxp.link/{host}/{path}@{ref}`. There is no proxy marker: a website is a document whose upstream peer is the origin, and `@live` is that peer's head. The last `@` always starts the ref, and generated links always carry one. A first path segment without a dot is a gateway keyword. See [Addressing](/spec/addressing/).
+
+*Replaced:* a `/@/` proxy marker (briefly adopted the same day) and a `?at=` placeholder for state vectors.
+
 ## Naming
 
 - **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor and application layer, **Erlang Trackers** for the routing layer.

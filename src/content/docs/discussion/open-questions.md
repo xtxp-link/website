@@ -24,6 +24,9 @@ Stock Conversations can't render a canvas. The answer affects the protocol now: 
 
 ## Wire and addressing
 
+- **Ref names:** `@live` for the origin's current version (alternatives: `@upstream`, `@origin`, `@web`), and whether `@main` or `@latest` names the shared branch.
+- **State vectors in URLs:** a compact, readable way to write one after `@`.
+- **Native or website?** How the gateway tells that `{host}` is an XTXP node rather than an ordinary site, for example a `/.well-known/` file or a DNS record.
 - **`xtxp://` binding:** does it resolve to an XMPP room (as `xmpp:` URIs do, RFC 5122), or does XTXP get its own socket binding?
 - **Patch envelope:** namespace, transit-safe encoding, fallback body, branch routing.
 - **Media types:** reuse `application/xml-patch+xml` for patches; register a vendor type for the stream.

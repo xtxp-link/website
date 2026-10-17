@@ -11,7 +11,7 @@ import Diagram from '../../../components/Diagram.astro';
 ## `xtxp://` — the native scheme
 
 ```
-xtxp://{host}/{path}
+xtxp://{host}/{path}@{ref}
 ```
 
 Used by native desktop clients, terminal interfaces and automated nodes exchanging raw patch streams. Whether it resolves to an XMPP room or to its own socket binding is [still open](/discussion/open-questions/).
@@ -19,21 +19,47 @@ Used by native desktop clients, terminal interfaces and automated nodes exchangi
 ## `https://xtxp.link/` — the web gateway
 
 ```
-https://xtxp.link/{host}/{path}
+https://xtxp.link/{host}/{path}@{ref}
 ```
 
 A universal HTTP bridge and directory. It exposes any XTXP document to an ordinary browser and routes requests to whichever node hosts it.
 
-### Two kinds of path
+### One address form
 
-| Path | Meaning |
+`{host}` can be an XTXP node hosting native documents, or an **ordinary website**. There is no separate proxy mode. A website is simply a document whose [upstream peer](/spec/web-overlay/#the-origin-site-is-a-peer) is the origin site, and everything else about it is branching.
+
+The `@{ref}` suffix says which version you mean:
+
+| Ref | Meaning |
 | --- | --- |
-| `https://xtxp.link/{host}/{path}` | A **native XTXP document** hosted by the node at `{host}`. |
-| `https://xtxp.link/@/{domain}/{path}` | A **proxied overlay** of an ordinary website. The `/@/` segment tells the reader the page is a copy of `{domain}` being branched, not something `{domain}` published. See [Live web branching](/spec/web-overlay/). |
+| `@live` | The origin site as it is right now: the upstream peer's head. Websites only, read-only. *Name provisional.* |
+| `@main` | The shared collaborative branch. The default for native documents. |
+| `@{branch}` | A named branch: a proposed edit, an undo fork, someone's overlay. |
+| `@{state vector}` | An exact point in history. *Syntax open.* |
 
-Putting the proxy marker in the URL itself means a link is honest before anyone clicks it. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
+Examples:
 
-<Diagram name="11-seq-negotiation" alt="Sequence: a client requests a document from xtxp.link; the gateway asks the directory which node hosts it; with Accept application/xtxp+xml it opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client; a deep link with a vector returns the document as it was at that point." />
+```
+xtxp.link/en.wikipedia.org/wiki/Browser@live      Wikipedia's page, unedited
+xtxp.link/en.wikipedia.org/wiki/Browser@b1        an edited branch of it
+xtxp.link/xtxp.example.org/drawing@main           a native document
+xtxp.link/medium.com/@campey/post@live            "@campey" stays in the path
+```
+
+### Parsing rules
+
+1. **The last `@` starts the ref.** Every other `@` belongs to the path, so origin paths like Medium's `/@user` need no escaping.
+2. **Links the gateway generates always carry a ref.** That includes every link it rewrites inside a page, so the last `@` is never ambiguous.
+3. **Bare URLs** (typed or pasted from elsewhere):
+   - with no `@` at all, redirect to the default ref (`@live` for websites, `@main` for native documents)
+   - with an `@` whose text doesn't resolve to a ref, as in `medium.com/@campey`, treat it as part of the path and redirect to `…/@campey@live`
+4. **A first path segment without a dot is a keyword**, reserved for the gateway's own pages (such as `/d/` for diagrams). Hostnames always contain a dot, so the two never collide.
+
+### The ref is the honesty signal
+
+`@live` means unedited. Any other ref means a branch that may contain other people's edits, and the page frame says so, with links to `@live` and to the original site. The ref travels with every shared link, so a reader can tell what they're looking at before they click. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
+
+<Diagram name="11-seq-negotiation" alt="Sequence: a client requests a document from xtxp.link; the gateway asks the directory which node hosts it; with Accept application/xtxp+xml it opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client. The ref after the last @ picks live, a branch or a state vector." />
 
 ### Content negotiation
 
@@ -41,7 +67,7 @@ Putting the proxy marker in the URL itself means a link is honest before anyone 
 | --- | --- |
 | `Accept: application/xtxp+xml` | The raw CRDT patch stream, for automated nodes. |
 | `Accept: text/html` | The current state rendered as HTML, with forms that POST edits. Served by a server-side MUPPET. |
-| A person who wants their native client | A plain link to `xtxp://{host}/{path}`. |
+| A person who wants their native client | A plain link to `xtxp://{host}/{path}@{ref}`. |
 
 <Aside type="caution" title="Native hand-off">
 The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp://`. A server can't tell whether a protocol handler is installed, and a refresh to a missing handler fails silently. A visible link always works, and it needs no JavaScript.
@@ -53,7 +79,7 @@ The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp:
 
 ### Deep links and short links
 
-- **Vector snapshots**: a link can name a document *at* a specific state vector, so a historical state can be shared exactly. The syntax is <span class="status status--open">open</span>; diagrams use `?at={state vector}` as a placeholder, because `@` now marks proxied paths.
+- **Vector snapshots**: `@{state vector}` names a document at an exact point in history, so a historical state can be shared exactly. How a state vector is written in a URL is <span class="status status--open">open</span>.
 - **Node resolution**: the gateway routes a session to the federated node currently hosting a document.
 - **Short links**: short, low-density URLs that make easily scanned QR codes, for bridging paper and screens.
 

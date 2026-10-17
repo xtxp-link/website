@@ -11,16 +11,18 @@ import Diagram from '../../../components/Diagram.astro';
 The gateway can act as a collaborative overlay for **any existing website**, a kind of "git for the web". Visiting
 
 ```
-https://xtxp.link/@/en.wikipedia.org/wiki/Browser
+https://xtxp.link/en.wikipedia.org/wiki/Browser@live
 ```
 
-The `/@/` segment marks the path as a proxied origin, as opposed to `xtxp.link/{host}/{path}`, which addresses a native XTXP document. Visiting it fetches the canonical page and makes it the genesis state (vector 0). Links and form actions are rewritten to stay inside the gateway. Edits POSTed by users become XTXP operations on an overlay branch, and the origin site is never touched.
+There is no special proxy address. A website is addressed like any other document, and the [`@{ref}`](/spec/addressing/#one-address-form) says which version: `@live` is the origin as it is now, and any other ref is a branch.
+
+The first visit fetches the canonical page and makes it the genesis state (vector 0). Links and form actions are rewritten to stay inside the gateway, each carrying a ref. Edits POSTed by users become XTXP operations on a branch, and the origin site is never touched.
 
 <Diagram name="12-seq-web-overlay" alt="Sequence: first visit fetches the origin page without cookies, the server MUPPET parses it into a tree with stable IDs as vector 0, the page is returned with rewritten links, disabled origin forms and an overlay frame; edits become ops on an overlay branch; later re-fetches are diffed and applied as ops from an upstream peer." />
 
 ## The origin site is a peer
 
-Origin pages keep changing after the genesis fetch. XTXP treats the origin as an **upstream peer**: the differences between successive fetches become that peer's operations. Overlay branches then take in upstream changes the same way they merge anyone else's edits.
+Origin pages keep changing after the genesis fetch. XTXP treats the origin as an **upstream peer**: the differences between successive fetches become that peer's operations. Its branch is `@live`. Other branches take in upstream changes the same way they merge anyone else's edits.
 
 ## HTML is not XML
 
@@ -36,9 +38,10 @@ These are requirements from the first deploy, not later polish:
 
 1. **No credentials pass through.** Never forward cookies, auth headers or form submissions to origin sites.
 2. **Origin forms are disabled** in overlays. Only XTXP edit forms submit.
-3. **A persistent, visible frame** marks every overlay page as an edited copy and links to the original. The `/@/` path segment does the same job in the URL, before anyone clicks.
-4. **Origins can opt out**, through robots rules or a response header, and the gateway honours it.
-5. **Takedown handling** with a published contact and process.
-6. **Sensitive categories** (login, payment and account pages) are read-only or excluded.
+3. **A persistent, visible frame** marks every branch page as an edited copy and links to `@live` and to the original. The ref in the URL does the same job before anyone clicks: `@live` means unedited, anything else means a branch.
+4. **Bare links default to `@live`**, so following a plain link never lands someone on an edited branch by surprise.
+5. **Origins can opt out**, through robots rules or a response header, and the gateway honours it.
+6. **Takedown handling** with a published contact and process.
+7. **Sensitive categories** (login, payment and account pages) are read-only or excluded.
 
 Prior art worth studying: Hypothesis's `via` proxy, which overlays annotations on any page, and the Genius Web Annotator, which drew sustained criticism from site owners for overlaying content on their pages without consent. See [prior art](/discussion/prior-art/).
