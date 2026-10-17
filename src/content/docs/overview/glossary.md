@@ -55,13 +55,13 @@ description: Terms used across the XTXP specification.
 : A map from each client to the highest clock value seen from it. Two peers exchange state vectors to work out which operations the other is missing.
 
 **Tracker**
-: An Erlang process holding one branch's document and presence, admitting operations against the branch's grants, and routing them.
+: A lightweight actor, in the Rust tracker server, holding one branch's document and presence, admitting operations against the branch's grants, and routing them.
 
 **Upstream peer**
 : For live web branching, the origin website treated as a peer. Its "edits" are the differences between successive fetches.
 
 **Xmesh**
-: The CRDT engine: a pure Rust layer on Yrs that adds an XML tree schema, cycle-safe moves and XML Patch translation. Native C++ and pure Elixir rewrites are possible later spikes.
+: The CRDT engine: a pure Rust layer on Yrs that adds an XML tree schema, cycle-safe moves and XML Patch translation. A native C++ rewrite is a possible later spike.
 
 **XTXP**
 : XML to XML Protocol. The specification: The Math and The Wire.

@@ -15,13 +15,12 @@ No implementation code gets written until its behaviour is defined. The source o
 
 ## One suite, every implementation
 
-<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the Xmesh harness and its invariant checks, and SHA-256 hashes of canonical XML are compared across delivery orders; later native C++ or pure Elixir rewrites are held to the same vectors; for M1 the same vectors are replayed by CLI peers through an Erlang tracker over WebSocket, with forced disconnects." />
+<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the Xmesh harness and its invariant checks, and SHA-256 hashes of canonical XML are compared across delivery orders; a later native C++ rewrite is held to the same vectors; for M1 the same vectors are replayed by CLI peers through a Rust tracker over WebSocket, with forced disconnects." />
 
 | Harness | Why it exists |
 | --- | --- |
 | **Xmesh on Yrs** (`cargo test`) | The implementation. Every vector is replayed in many delivery orders. |
 | **Native C++ Xmesh** | *Later spike.* Held to the same vectors and cross-checked against Xmesh on Yrs. |
-| **Pure Elixir Xmesh** | *Later spike.* The same. |
 
 The pass conditions are **invariants**, checked on every run:
 
@@ -43,4 +42,4 @@ The first task from the original handover, re-scoped to feed every harness. It g
 
 ## Over a real network
 
-[Milestone M1](/build/milestones/) runs the same vectors through two CLI peers and an Erlang tracker, all embedding Xmesh, over WebSocket, including dropped connections and reconnect sync. Convergence then holds over a real, unreliable network, not just in a test process.
+[Milestone M1](/build/milestones/) runs the same vectors through two CLI peers and a Rust tracker, all embedding Xmesh, over WebSocket, including dropped connections and reconnect sync. Convergence then holds over a real, unreliable network, not just in a test process.

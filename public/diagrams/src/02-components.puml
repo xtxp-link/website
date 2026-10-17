@@ -11,7 +11,6 @@ package "Xmesh — the engine (Rust)" as engine {
   component "Xmesh tree layer\n(pure: schema, moves,\nXML Patch, canonical XML)" as xm
   component "Yrs\n(YATA, maps, text,\nstate vectors, updates)" as yrs
   component "Native C++ Xmesh\n<<later spike>>" as xcpp #line.dashed
-  component "Pure Elixir Xmesh\n<<later spike>>" as xex #line.dashed
 }
 
 package "MUPPET — the executor (client-side Xmesh)" as muppet {
@@ -21,19 +20,18 @@ package "MUPPET — the executor (client-side Xmesh)" as muppet {
   component "Canvas, spatial chat\nand comments\n(views, shared by all adapters)" as mviews
 }
 
-package "Erlang Trackers — routing layer" as trk {
-  component "Branch process\n(one per branch)" as branch
+package "Trackers — routing layer (Rust)" as trk {
+  component "Branch actor\n(one per branch)" as branch
   database "Branch storage\n(append + compact;\nledger on the roadmap)" as store
 }
 
 xm --> yrs : built on
 xm ..|> math
 xcpp ..|> math : later
-xex ..|> math : later
 mink --> xm : C interface
 mwasm --> xm : Wasm build
 msrv --> xm : Rust
-branch --> xm : Rust NIF
+branch --> xm : Rust
 mink ..> wire
 mwasm ..> wire
 msrv ..> wire

@@ -4,15 +4,17 @@ title Milestones
 
 left to right direction
 
-rectangle "**M1**\nHeadless convergence\n\nCLI peers + an Erlang\ntracker, all on Xmesh,\nover WebSocket, replaying\nvectors with forced disconnects" as m1
+rectangle "**Before M1**\nReview y-sweet\n\nreuse as the\ntracker server?" as m0
+rectangle "**M1**\nHeadless convergence\n\nCLI peers + a Rust\ntracker, all on Xmesh,\nover WebSocket, replaying\nvectors with forced disconnects" as m1
 rectangle "**M2**\nInkscape + no-JS\n\nInkscape fork MUPPET +\nserver MUPPET serving\nplain HTML" as m2
 rectangle "**M3**\nInkscape + Wasm\n\nbrowser MUPPET\n(Wasm polyfill)" as m3
 rectangle "**M4**\nInkscape + Conversations\n\nmobile and chat users\nvia the XMPP bridge\n(scope: open question 7)" as m4
 
 card "xtxp.link gateway\n(placement: open question 9)" as gw
 
-card "Roadmap\nledger, keyframes,\nhistory limits,\nnative C++ / Elixir spikes,\nsigned hash chains" as rm
+card "Roadmap\nledger, keyframes,\nhistory limits,\nnative C++ spike,\nElixir/BEAM if scale needs it,\nsigned hash chains" as rm
 
+m0 --> m1
 m1 --> m2
 m2 --> m3
 m3 --> m4

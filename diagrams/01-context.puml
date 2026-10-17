@@ -11,7 +11,7 @@ actor "Mobile / chat user\n(XMPP client)" as mobile
 
 rectangle "XTXP mesh" as mesh {
   component "Peers running\nMUPPET + Xmesh" as peers
-  component "Erlang Trackers\n(one process per branch)" as trackers
+  component "Trackers\n(one actor per branch)" as trackers
 }
 
 rectangle "xtxp.link\nHTTP gateway" as gateway

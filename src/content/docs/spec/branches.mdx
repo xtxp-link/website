@@ -1,6 +1,6 @@
 ---
 title: Branches and history
-description: Branches as forks of the undo history, held by one Erlang process each, and merged by applying their updates.
+description: Branches as forks of the undo history, held by one tracker actor each, and merged by applying their updates.
 ---
 
 import Diagram from '../../../components/Diagram.astro';
@@ -33,11 +33,11 @@ Where they differ from Inkscape: in Inkscape, undoing and then making a new edit
 
 ## Trackers
 
-Each server-side branch is held by its own lightweight Erlang **process** (a tracker). The BEAM makes these cheap enough to spawn one per proposed edit or undo fork, and isolated enough that a crashed branch can't take its siblings down.
+Each server-side branch is held by its own lightweight **actor** (a tracker): an async task in a small Rust server that owns one branch's document and talks to the rest only by messages. Actors are cheap enough to spawn one per proposed edit or undo fork, and a failure in one branch is contained to that actor.
 
 A tracker:
 
-- holds its branch's document in-process, through Xmesh's Elixir binding (a Rust NIF, as [`y_ex`](/discussion/prior-art/#yata-yjs-and-yrs) does for Yrs)
+- holds its branch's Xmesh document in memory, in the same Rust process
 - admits operations against the branch's [grants](/spec/identity/#access-is-granted-by-key)
 - routes the branch's operations to its subscribers
 - persists the branch using whatever fits the Yrs toolchain first (see below)
@@ -49,7 +49,7 @@ The Yrs ecosystem already has the building blocks a tracker needs:
 - **A full state as one update.** Yrs can encode a whole document as a single update, so a new client loads one compact blob instead of replaying history.
 - **Append, then compact.** Storing each incoming update and periodically merging them into one is the usual pattern for persisting Yjs documents.
 
-XTXP starts with those. A dedicated **ledger** (a chronological patch log in cold storage) and **keyframes** (hot snapshots tuned for instant loading) are on the [roadmap](/build/milestones/#roadmap), to be built only if the toolchain's own approach falls short.
+XTXP starts with those, and [y-sweet](/discussion/prior-art/#y-sweet) already implements them for Yjs documents. A dedicated **ledger** (a chronological patch log in cold storage) and **keyframes** (hot snapshots tuned for instant loading) are on the [roadmap](/build/milestones/#roadmap), to be built only if the toolchain's own approach falls short.
 
 ## Fork, preview, merge
 

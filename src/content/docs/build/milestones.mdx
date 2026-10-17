@@ -1,6 +1,6 @@
 ---
 title: Milestones
-description: M1 headless convergence, M2 Inkscape plus no-JS, M3 Inkscape plus Wasm, M4 Inkscape plus Conversations.
+description: A y-sweet review, then M1 headless convergence, M2 Inkscape plus no-JS, M3 Inkscape plus Wasm, M4 Inkscape plus Conversations.
 ---
 
 import Diagram from '../../../components/Diagram.astro';
@@ -9,9 +9,22 @@ import Diagram from '../../../components/Diagram.astro';
 
 <Diagram name="14-milestones" alt="Milestones M1 to M4 in sequence, with the xtxp.link gateway as a candidate to fold into M2." />
 
+## Before M1: review y-sweet
+
+[y-sweet](/discussion/prior-art/#y-sweet) is an open-source Rust server for Yjs documents, built on Yrs, with persistence and per-document access tokens. It may already be most of a tracker. Before any tracker code is written, review it for reuse:
+
+- **Fit:** can it host Xmesh documents, and carry XTXP's own messages (identity, binding, grants) alongside Yjs sync?
+- **Access control:** how its client tokens compare with XTXP's [key-based grants](/spec/identity/), and whether ours can replace or wrap them.
+- **Branching:** whether forking a document at a state vector and merging back fits its storage model.
+- **Storage:** its persistence (filesystem, S3-compatible) against XTXP's append-then-compact plan.
+- **Hosting:** it can run as a binary or as Wasm on Cloudflare's edge, which bears on the [hosting question](/discussion/open-questions/#engine).
+- **Health:** licence, maintenance activity, and how easily it can be extended without forking.
+
+The outcome decides whether trackers extend y-sweet, borrow from it, or start fresh.
+
 ## M1 — Headless convergence
 
-Two CLI peers (Rust, embedding Xmesh) connect to an Erlang tracker (embedding Xmesh as a NIF) over WebSocket and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network, the Erlang-to-engine boundary and the identity handshake before anyone draws anything.
+Two CLI peers (Rust, embedding Xmesh) connect to a Rust tracker (also embedding Xmesh) over WebSocket and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network and the identity handshake before anyone draws anything.
 
 ## M2 — Inkscape plus no-JS
 
@@ -39,5 +52,5 @@ Deferred until the first milestones show they're needed. Each one starts by chec
 | **Keyframes**: hot snapshots tuned for instant loading | Yrs can encode a whole document as one compact update | The full state as one update |
 | **History limits and garbage collection** | Snapshots need Yrs's garbage collection off, so deleted content is kept | Keep everything; measure growth |
 | **Native C++ Xmesh** | Yrs is already native code; a rewrite would be about owning the engine, not speed | Xmesh on Yrs, through its C interface |
-| **Pure Elixir Xmesh** | Trackers embed Xmesh as a NIF | Xmesh on Yrs, through a Rust NIF |
+| **Elixir / BEAM trackers** | A Rust tracker server is enough at this stage; the BEAM's supervision and clustering would matter only at much larger scale | Rust trackers, one actor per branch |
 | **Signed hash chains** of each client's operations | Signing only at identity steps is enough to start | Authorship from client bindings |

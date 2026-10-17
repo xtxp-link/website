@@ -86,9 +86,15 @@ Branches persist the way the Yrs toolchain already does: a full state encoded as
 
 *Replaced:* trackers with a hot keyframe and a cold ledger from day one.
 
+## 15. One language: trackers in Rust; Elixir dropped
+
+With Xmesh in Rust, trackers are a small Rust server: one async actor per branch, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side MUPPET in the same binary. That removes a second language, toolchain and deploy, and the native-extension boundary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation. Elixir/BEAM moves to the roadmap, to revisit only if scale calls for its supervision and clustering.
+
+*Replaced:* Erlang trackers embedding Xmesh as a Rust NIF (decisions 7, 13), and the pure Elixir engine spike.
+
 ## Naming
 
-- **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor and application layer, **Erlang Trackers** for the routing layer.
+- **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor and application layer, **Trackers** for the routing layer (originally "Erlang Trackers").
 - Name checks so far: *Xmesh* collides with Thinkbox XMesh, a commercial mesh-caching plugin for VFX tools. *Muppet* is a Henson/Disney trademark: fine for an internal component, riskier on anything public-facing. No direct clash was found for *XTXP*.
 
 ## Corrections carried forward

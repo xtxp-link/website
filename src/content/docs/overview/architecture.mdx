@@ -10,11 +10,11 @@ import Diagram from '../../../components/Diagram.astro';
 | Part | Role | Status |
 | --- | --- | --- |
 | **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, cycle-free moves. *The Wire*: sync messages, handshakes, branch routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
-| **Xmesh** | The engine. Resolves concurrent edits. A thin, pure Rust layer on Yrs that adds an XML tree schema, cycle-safe moves and XML Patch translation. Native C++ and pure Elixir rewrites are possible later spikes. | <span class="status status--decided">decided</span> |
+| **Xmesh** | The engine. Resolves concurrent edits. A thin, pure Rust layer on Yrs that adds an XML tree schema, cycle-safe moves and XML Patch translation. A native C++ rewrite is a possible later spike. | <span class="status status--decided">decided</span> |
 | **MUPPET** | Multi User Progressive Patch Execution Tree: client-side Xmesh, and the application layer. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns every view: the vector canvas, spatial chat and comments, paused queues, onion skin and branch previews, none of which change document state. | <span class="status status--decided">decided</span> |
-| **Erlang Trackers** | The routing layer. One lightweight Erlang process per branch, holding that branch's document and presence, admitting edits against its grants, and routing them between nodes. | <span class="status status--decided">decided</span> |
+| **Trackers** | The routing layer. One lightweight actor per branch, in a small Rust server, holding that branch's document and presence, admitting edits against its grants, and routing them between nodes. | <span class="status status--decided">decided</span> |
 
-<Diagram name="02-components" alt="Component diagram: Xmesh, a pure Rust layer on Yrs, implements the Math; MUPPET adapters embed it through a C interface (Inkscape), Wasm (browser) and natively (server); branch trackers embed it through an Elixir NIF; native C++ and pure Elixir rewrites are shown as later spikes." />
+<Diagram name="02-components" alt="Component diagram: Xmesh, a pure Rust layer on Yrs, implements the Math; MUPPET adapters embed it through a C interface (Inkscape), Wasm (browser) and natively (server); branch trackers embed it directly in Rust; a native C++ rewrite is shown as a later spike." />
 
 ## A pure, hexagonal core
 
@@ -23,7 +23,7 @@ Xmesh is the hexagon's centre: pure state transformations, with no networking, n
 - **Inkscape:** linked into the fork through a C interface, the way `yffi` exposes Yrs to C
 - **Browser:** compiled to Wasm
 - **Server MUPPET:** used natively from Rust
-- **Erlang trackers:** loaded in-process as a Rust NIF, the way `y_ex` exposes Yrs to Elixir
+- **Trackers:** used directly, in the same Rust server
 - **Tests:** driven directly by the vector harness
 
 Keeping the core pure is what lets one Rust codebase serve every one of these. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer).
@@ -38,10 +38,10 @@ There is **no central authority**. "Canonical state" means the state every peer 
 
 Because rendering is just a MUPPET running somewhere, the no-JS view and the Inkscape view come from the same code and can't drift apart.
 
-<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a MUPPET linking Xmesh, a Wasm MUPPET in a browser, and an app-server MUPPET connect over WebSocket to a BEAM cluster hosting per-branch trackers, which embed Xmesh and persist branches to storage; a phone reaches the trackers through XMPP federation and a bridge; a no-JS browser reaches the server MUPPET through the xtxp.link edge gateway." />
+<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a MUPPET linking Xmesh, a Wasm MUPPET in a browser, and an app-server MUPPET connect over WebSocket to a Rust tracker server running one actor per branch, which embeds Xmesh and persists branches to storage; a phone reaches the trackers through XMPP federation and a bridge; a no-JS browser reaches the server MUPPET through the xtxp.link edge gateway." />
 
 ## Transport
 
-XTXP is a small sync protocol that doesn't care about transport. Its main binding is **WebSocket**, for raw speed, which trackers speak directly from the BEAM. Browsers without JavaScript use **HTTP** through a server-side MUPPET. Mobile and chat clients reach a tracker through an **XMPP bridge**, which keeps push and store-and-forward for phones. Reconnecting is a state-vector exchange built into XTXP. See [The Wire](/spec/wire/).
+XTXP is a small sync protocol that doesn't care about transport. Its main binding is **WebSocket**, for raw speed, which trackers serve directly. Browsers without JavaScript use **HTTP** through a server-side MUPPET. Mobile and chat clients reach a tracker through an **XMPP bridge**, which keeps push and store-and-forward for phones. Reconnecting is a state-vector exchange built into XTXP. See [The Wire](/spec/wire/).
 
 Identity is a **public key**, and access is granted by key. See [Identity and access](/spec/identity/).

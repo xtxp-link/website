@@ -31,13 +31,14 @@ Stock Conversations can't render a canvas. The answer affects the protocol now: 
 - **Message encoding:** the binary format of operations and the framing of each wire message.
 - **XMPP bridge envelope:** namespace, transit-safe encoding and fallback body for chat clients (from M4).
 - **Media types:** reuse `application/xml-patch+xml` for patches; register a vendor type for the stream.
-- **Where the XMPP bridge runs:** inside an Erlang XMPP server (ejabberd, MongooseIM), or alongside one?
+- **How the XMPP bridge is built:** for example as a component plugged into an existing XMPP server, speaking XTXP to a tracker.
 
 ## Engine
 
 - **Tree layer:** adopt the `yrs_tree` crate, which implements Wallace's algorithm on Yrs, or write our own on the same algorithm? `yrs_tree` is young (0.4.x).
 - **History and memory:** snapshots need Yrs's garbage collection off. How fast do documents grow, and when is the [roadmap](/build/milestones/#roadmap) ledger worth building?
-- **NIF safety:** trackers load Xmesh as a Rust NIF. Long operations need dirty schedulers so they don't stall the BEAM.
+- **Reusing y-sweet:** how much of the tracker server it can provide. Decided by the [y-sweet review](/build/milestones/#before-m1-review-y-sweet) before implementation.
+- **Hosting:** a single self-hosted Rust binary, or Cloudflare Workers with one Durable Object per branch? Keeping the tracker a pure actor with storage behind an interface allows both.
 - **Canonical form:** the exact XML canonicalisation used before hashing.
 
 ## Identity and access

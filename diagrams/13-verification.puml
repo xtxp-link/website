@@ -9,7 +9,6 @@ artifact "JSON test vectors\n(initial state + shuffled\nper-client op streams)" 
 package "Harnesses" {
   component "Xmesh on Yrs\n(cargo test, many\ndelivery orders)" as xm
   component "Native C++ Xmesh\n(later spike)" as cpp #line.dashed
-  component "Pure Elixir Xmesh\n(later spike)" as ex #line.dashed
 }
 
 rectangle "Invariants:\nsame SHA-256 of canonical XML,\nno cycles, idempotent" as cmp
@@ -18,16 +17,14 @@ feat --> fuzz : behaviours to cover
 fuzz --> vec
 vec --> xm
 vec ..> cpp : later
-vec ..> ex : later
 xm --> cmp
 cpp ..> cmp
-ex ..> cmp
 
 package "M1: same vectors over a real network" {
   component "CLI peer 1\n(Xmesh)" as p1
   component "CLI peer 2\n(Xmesh)" as p2
   component "CLI peer 3\n(late joiner)" as p3
-  queue "Erlang tracker (Xmesh NIF)\nover WebSocket: forced\ndisconnects, reconnect sync" as room
+  queue "Rust tracker (Xmesh)\nover WebSocket: forced\ndisconnects, reconnect sync" as room
 }
 vec --> p1
 vec --> p2

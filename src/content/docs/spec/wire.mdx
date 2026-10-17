@@ -40,7 +40,7 @@ Cursors and presence travel separately from operations. A 60 Hz cursor stream sh
 
 | Binding | Used by | Notes |
 | --- | --- | --- |
-| **WebSocket**, binary frames | Wasm MUPPETs in the browser, the Inkscape fork, CLI peers | The primary binding, chosen for raw speed. Trackers speak it directly from the BEAM. |
+| **WebSocket**, binary frames | Wasm MUPPETs in the browser, the Inkscape fork, CLI peers | The primary binding, chosen for raw speed. Trackers serve it directly. |
 | **HTTP** forms and redirects | Browsers with no JavaScript, through a server-side MUPPET | See [Addressing](/spec/addressing/#the-no-js-edit-loop). |
 | **XMPP**, through a bridge | Mobile and chat clients such as Conversations, and federation | A bridge in front of a tracker, not the core transport. |
 
@@ -65,7 +65,7 @@ Every binding runs over TLS. A branch can also be end-to-end encrypted, so that 
 
 - How XTXP's own messages (identity, grants) are framed alongside the Yjs sync messages.
 - Whether `xtxp://` names the WebSocket binding directly, or resolves to it through the gateway.
-- Where the XMPP bridge runs: inside an Erlang XMPP server such as ejabberd or MongooseIM, or alongside one.
+- How the XMPP bridge is built: for example as a component plugged into an existing XMPP server, speaking XTXP to a tracker.
 
 <Aside type="note" title="Changed">
 Earlier drafts ran everything over XMPP rooms, with XMPP addresses as identity. That added XML wrapping and room fan-out to every operation, and mixed up identity with email-like addresses. XMPP is now a bridge, and identity is a public key. See decisions [11](/discussion/decisions/#11-transport-websocket-first-xmpp-as-a-bridge) and [12](/discussion/decisions/#12-identity-is-a-public-key-access-is-granted-by-key).

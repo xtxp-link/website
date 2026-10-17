@@ -28,13 +28,16 @@ node "App server" {
   component "Server MUPPET\n(Xmesh, Rust)" as m3
 }
 
-node "BEAM cluster" {
-  component "WebSocket endpoint\n(Phoenix / Cowboy)" as ws
-  component "XMPP bridge\n(from M4)" as br
-  component "Tracker: main\n(Xmesh NIF)" as t0
-  component "Tracker: branch b1\n(Xmesh NIF)" as t1
-  component "Tracker: branch b2\n(Xmesh NIF)" as t2
+node "Tracker server (Rust)\none binary, or one Durable Object per branch" {
+  component "WebSocket endpoint" as ws
+  component "Tracker: main\n(actor, Xmesh)" as t0
+  component "Tracker: branch b1\n(actor, Xmesh)" as t1
+  component "Tracker: branch b2\n(actor, Xmesh)" as t2
   database "Branch storage\n(append + compact)" as store
+}
+
+node "XMPP bridge (from M4)" {
+  component "Bridge component" as br
 }
 
 cloud "XMPP federation" as xf
@@ -49,7 +52,7 @@ xf --> br : XMPP
 ws --> t0
 ws --> t1
 ws --> t2
-br --> t0
+br --> ws : XTXP
 t0 --> store
 t1 --> store
 t2 --> store

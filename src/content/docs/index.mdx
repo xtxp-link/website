@@ -34,8 +34,8 @@ Pages mark each point as <span class="status status--decided">decided</span>, <s
   <Card title="MUPPET: the executor" icon="pencil">
     Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns every view: the canvas, spatial chat and comments, onion skin and redline.
   </Card>
-  <Card title="Erlang Trackers: the routing layer" icon="random">
-    One lightweight Erlang process per document branch. Trackers hold a branch's state and presence, admit edits against its grants, and route them between nodes.
+  <Card title="Trackers: the routing layer" icon="random">
+    One lightweight actor per document branch, in a small Rust server. Trackers hold a branch's state and presence, admit edits against its grants, and route them between nodes.
   </Card>
 </CardGrid>
 

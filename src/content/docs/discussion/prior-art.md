@@ -33,7 +33,7 @@ An XMPP extension for synchronising XML documents between clients. Worth reviewi
 
 YATA orders concurrent insertions in a sequence. Yjs implements it, including XML element and fragment types, and Yrs is its Rust port. **Xmesh v1 is built on Yrs** ([decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer)). Neither has a native tree move, which is what Xmesh adds.
 
-Yrs already reaches every place XTXP runs: `yffi` exposes it to C, it compiles to Wasm, and `y_ex` exposes it to Elixir as a Rustler NIF. Xmesh follows the same patterns for its own bindings.
+Yrs already reaches every place XTXP runs: `yffi` exposes it to C, and it compiles to Wasm. Xmesh follows the same patterns for its own bindings. (`y_ex` exposes Yrs to Elixir too, which mattered while trackers were planned in Elixir.)
 
 - Nicolaescu et al., *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types* (GROUP 2016)
 - [`yffi` (C bindings for Yrs)](https://docs.rs/crate/yffi/latest)
@@ -62,6 +62,12 @@ A Rust CRDT library with a native movable tree. It was considered as an engine. 
 Peers exchange state vectors, then send each other only the missing updates, over any transport, typically a plain WebSocket. XTXP's [reconnect sync](/spec/wire/#what-the-core-needs-from-a-transport) follows the same two-step shape, and keeps cursors and presence ("awareness") separate from document updates, as Yjs does.
 
 - [y-protocols: PROTOCOL.md](https://github.com/yjs/y-protocols/blob/master/PROTOCOL.md)
+
+### y-sweet
+
+An open-source Rust server for Yjs documents, built on Yrs, from Jamsocket. It persists documents to a filesystem or S3-compatible storage, controls access per document with client tokens, and can run as a binary or as Wasm on Cloudflare's edge. Much of what an XTXP tracker needs; [reviewed for reuse](/build/milestones/#before-m1-review-y-sweet) before tracker code is written.
+
+- [y-sweet on docs.rs](https://docs.rs/crate/y-sweet/0.8.2)
 
 ### Conversations and mobile XMPP
 
