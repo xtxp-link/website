@@ -7,27 +7,27 @@ component "Fuzzer" as fuzz
 artifact "JSON test vectors\n(initial state + shuffled\nper-client op streams)" as vec
 
 package "Harnesses" {
-  component "C++ Xmesh\n(Catch2)" as cpp
-  component "Elixir Xmesh\n(ExUnit, deferred)" as ex #line.dashed
-  component "Yrs oracle\n(non-move subset)" as yrs
+  component "Xmesh on Yrs\n(cargo test, many\ndelivery orders)" as xm
+  component "Native C++ Xmesh\n(later spike)" as cpp #line.dashed
+  component "Pure Elixir Xmesh\n(later spike)" as ex #line.dashed
 }
 
-rectangle "Compare SHA-256 of\ncanonical XML" as cmp
+rectangle "Invariants:\nsame SHA-256 of canonical XML,\nno cycles, idempotent" as cmp
 
 feat --> fuzz : behaviours to cover
 fuzz --> vec
-vec --> cpp
+vec --> xm
+vec ..> cpp : later
 vec ..> ex : later
-vec --> yrs
-cpp --> cmp
+xm --> cmp
+cpp ..> cmp
 ex ..> cmp
-yrs --> cmp
 
 package "M1: same vectors over a real network" {
-  component "C++ CLI peer 1" as p1
-  component "C++ CLI peer 2" as p2
-  component "C++ CLI peer 3\n(late joiner)" as p3
-  queue "Tracker over WebSocket\n(forced disconnects,\nreconnect sync)" as room
+  component "CLI peer 1\n(Xmesh)" as p1
+  component "CLI peer 2\n(Xmesh)" as p2
+  component "CLI peer 3\n(late joiner)" as p3
+  queue "Erlang tracker (Xmesh NIF)\nover WebSocket: forced\ndisconnects, reconnect sync" as room
 }
 vec --> p1
 vec --> p2
@@ -37,9 +37,8 @@ p2 --> room
 p3 --> room
 room --> cmp : final states
 
-note right of yrs
-  Yrs implements YATA and is battle-tested,
-  so it checks our YATA independently.
-  It has no tree move, hence the subset.
+note right of cpp
+  Any rewrite must match
+  Xmesh on Yrs on every vector.
 end note
 @enduml

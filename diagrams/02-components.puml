@@ -3,44 +3,46 @@
 title Components and the contract between them
 
 package "XTXP — the specification" as spec {
-  interface "The Math\n(CRDT rules, clocks,\npatch structures)" as math
-  interface "The Wire\n(stanza framing, handshakes,\nbranch routing)" as wire
+  interface "The Math\n(merge rules, tree moves,\npatch structures)" as math
+  interface "The Wire\n(sync messages, handshakes,\nbranch routing)" as wire
 }
 
-package "Xmesh — the engine" as engine {
-  component "Xmesh C++20\n<<pure hexagonal core>>" as xcpp
-  component "Xmesh Elixir\n<<deferred: later spike>>" as xex #line.dashed
+package "Xmesh — the engine (Rust)" as engine {
+  component "Xmesh tree layer\n(pure: schema, moves,\nXML Patch, canonical XML)" as xm
+  component "Yrs\n(YATA, maps, text,\nstate vectors, updates)" as yrs
+  component "Native C++ Xmesh\n<<later spike>>" as xcpp #line.dashed
+  component "Pure Elixir Xmesh\n<<later spike>>" as xex #line.dashed
 }
 
 package "MUPPET — the executor (client-side Xmesh)" as muppet {
   component "Inkscape adapter\n<<C++, in the fork>>" as mink
   component "Browser adapter\n<<Wasm>>" as mwasm
   component "Server MUPPET\n<<renders HTML/SVG for no-JS>>" as msrv
-  component "Canvas, spatial chat\nand comments\n<<views, shared by all adapters>>" as mviews
+  component "Canvas, spatial chat\nand comments\n(views, shared by all adapters)" as mviews
 }
 
 package "Erlang Trackers — routing layer" as trk {
   component "Branch process\n(one per branch)" as branch
-  database "Hot keyframes" as hot
-  database "Cold ledger\n(chronological patches)" as cold
+  database "Branch storage\n(append + compact;\nledger on the roadmap)" as store
 }
 
-xcpp ..|> math
+xm --> yrs : built on
+xm ..|> math
+xcpp ..|> math : later
 xex ..|> math : later
-mink --> xcpp : embeds
-mwasm --> xcpp : embeds (Wasm build)
-msrv --> xcpp : embeds
+mink --> xm : C interface
+mwasm --> xm : Wasm build
+msrv --> xm : Rust
+branch --> xm : Rust NIF
 mink ..> wire
 mwasm ..> wire
 msrv ..> wire
 branch ..> wire
-branch --> xcpp : via Port
-branch --> hot
-branch --> cold
+branch --> store
 
 note bottom of engine
   Pure core: no I/O, no clocks, no threads.
   Every integration is an adapter. The vector
-  suite would hold a later Elixir port to it.
+  suite holds any later rewrite to the same results.
 end note
 @enduml

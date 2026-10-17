@@ -1,6 +1,6 @@
 ---
 title: The Math
-description: How Xmesh merges concurrent edits to an XML tree. YATA ordering, immortal parents, safe tree moves, clocks and the patch language.
+description: How Xmesh merges concurrent edits to an XML tree. Built on Yrs, with immortal parents, cycle-safe tree moves, state vectors and the patch language.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -17,80 +17,88 @@ The Math half of XTXP defines what every implementation of Xmesh must compute. I
 3. **No cycles.** Concurrent moves can never make an element its own ancestor.
 4. **No central authority.** Merging needs no server to decide order.
 
+## Built on Yrs
+
+The first implementation of Xmesh is a thin layer on **[Yrs](/discussion/prior-art/#yata-yjs-and-yrs)**, the Rust port of Yjs. Yrs already provides the hard, well-tested parts: YATA ordering for sequences and text, maps, state vectors, a compact binary update format, and snapshots. Xmesh adds what an XML tree needs on top:
+
+- a **schema** that maps XML elements onto Yrs maps and text
+- **cycle-safe tree moves**, which Yrs doesn't have
+- **XML Patch translation**, from UI actions to Yrs operations
+- **canonical XML output**, for hashing and rendering
+
+Xmesh stays a pure core: no networking, no files, no clocks. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer).
+
 ## Data model
 
-<Diagram name="09-class-model" alt="Class diagram: an ID is a client and a clock; a YataNode has an id, left and right origins, a parent, content and a tombstone flag; content is a text, map or array payload; a Branch has a parent and a fork state vector; a client ID is bound to an author's public key." />
+<Diagram name="09-class-model" alt="Class diagram: an Xmesh document is a Yrs document holding a map of nodes by stable ID; each node has a tag, an edge map of parent counters, a fractional index for its position, an attribute map and optional text; client IDs are bound to authors' public keys; a branch has a parent and a fork state vector." />
 
-The starting point (from the original design handover, not final):
+The document is a **map of nodes, keyed by a stable node ID**, not a nested Yrs XML fragment. Each node holds:
 
-```cpp
-struct ID { uint32_t client; uint32_t clock; };
+| Field | Yrs type | Purpose |
+| --- | --- | --- |
+| `tag` | string | The element name, such as `circle` or `g` |
+| `edges` | map: parent ID → counter | Every parent the node has had; the highest counter is its current parent (see moves, below) |
+| `position` | fractional index | The node's order among its siblings |
+| `attrs` | map | Attributes: `@fill`, `@d`, `@transform` and so on |
+| `text` | text | Character content, where the element has any |
 
-struct TextPayload  { std::string data; };
-struct MapPayload   { std::unordered_map<std::string, ID> keys; };
-struct ArrayPayload { ID head; ID tail; };
+## Ordering
 
-using NodeContent = std::variant<TextPayload, MapPayload, ArrayPayload>;
+Within text, Yrs orders concurrent insertions with **YATA** (Yet Another Transformation Approach). Each insertion remembers the neighbours it went between, and ties are broken by client ID. Deleted characters become tombstones, so later insertions can still find their place.
 
-struct YataNode {
-  ID id;
-  ID left_origin;
-  ID right_origin;
-  ID parent;
-  NodeContent content;
-  bool deleted;  // tombstone
-};
-```
-
-## Ordering: YATA
-
-Siblings form a sequence. Concurrent insertions at the same position are ordered with **YATA** (Yet Another Transformation Approach). Each node remembers the neighbours it was inserted between (`left_origin`, `right_origin`), and ties are broken deterministically by client ID. Deleted nodes become **tombstones** so later insertions can still find their origins.
-
-YATA (Nicolaescu et al., 2016; see [prior art](/discussion/prior-art/#yata-yjs-and-yrs)) avoids carrying a full causal history on every operation. It is the algorithm behind Yjs, and its Rust port Yrs serves as an [independent oracle](/build/verification/) for our implementation.
+Among siblings, order comes from each node's **fractional index**: a sortable key that can always fit a new key between two others. Moving a node to a new position is just giving it a new key.
 
 ## Immortal parents
 
 An XML element is never replaced, only updated:
 
-- its **attributes** live in a map (`@fill`, `@d`, `@transform` …), last-writer-wins per key
-- its **children** live in a YATA array
+- its **attributes** live in a map, last-writer-wins per key
+- its **children** point to it, rather than living inside it
 
 Setting `@fill="blue"` updates one map entry. The `<circle>` keeps its ID, so a concurrent edit to the same circle still has something to land on. Replacing whole nodes would orphan concurrent edits; immortal parents prevent that.
 
+<Aside type="caution" title="Why not Yrs's own XML types?">
+Yrs has XML element and fragment types, but in them a move is a delete plus an insert: the element gets a new identity, and concurrent edits to it are lost. A flat node map with parent pointers keeps identity through moves.
+</Aside>
+
 ## Moves without cycles
 
-Moving an element changes its parent. If Alice moves group A into group B while Bob moves B into A, a naive merge creates a cycle. Xmesh follows Kleppmann et al.'s replicated tree move algorithm ([prior art](/discussion/prior-art/#replicated-tree-moves)):
+Moving an element changes its parent. If Alice moves group A into group B while Bob moves B into A, a naive merge creates a cycle. Xmesh uses **Evan Wallace's mutable tree algorithm** ([prior art](/discussion/prior-art/#cycle-safe-tree-moves)):
 
-<Diagram name="10-activity-move" alt="Activity: on receiving a move with timestamp t, undo newer ops if needed; if the node equals the new parent or is its ancestor, record a no-op, otherwise set the parent; redo undone ops in timestamp order, re-checking each move." />
+<Diagram name="10-activity-move" alt="Activity: to move a node, set the new parent's counter in its edge map one above its current maximum. To read the tree, each node's parent is the edge with the highest counter; nodes that can reach the root form the tree; nodes caught in a cycle are reattached one at a time to an already-rooted parent, preferring the highest counter, with IDs breaking ties." />
 
-Every replica applies moves in the same timestamp order and skips a move that would close a cycle, so every replica skips the same move.
+- **A move is a map write.** The node's edge map gets the new parent, with a counter one higher than any it already has. Old entries stay.
+- **Reading the tree resolves cycles deterministically.** Each node's parent is its highest-counter edge. Nodes that reach the root form the tree. Any nodes caught in a cycle are reattached one by one to an already-rooted parent, choosing the highest counter and breaking ties by ID.
+- **Every peer agrees**, because they all apply the same rule to the same converged maps. Stored data is never rewritten, so peers never fight over it.
 
-<Aside type="note" title="Correction to the original handover">
-The handover said the algorithm "rejects the older intent". That isn't how it works: moves are applied in timestamp order, and the one skipped is whichever would close a cycle *given the moves before it*.
+The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements this algorithm on Yrs. Adopting it or writing our own layer is [open](/discussion/open-questions/#engine).
+
+<Aside type="note" title="Changed">
+Earlier drafts used Kleppmann et al.'s move algorithm, which undoes and replays operations in timestamp order. Wallace's approach gives the same guarantees, convergence and no cycles, using only ordinary map writes, which suits Yrs.
 </Aside>
 
 ## Clocks and state vectors
 
-- Every operation is stamped with an **ID**: the client that made it, plus that client's own counter (a Lamport-style clock).
+- Every operation is stamped with an **ID**: the client that made it, plus that client's own counter.
 - Every peer keeps a **state vector**: for each client, the highest counter it has integrated.
 - Two peers sync by exchanging state vectors. Each sends the operations the other is missing.
 
-A state vector also names a point in history, which is how [branches](/spec/branches/) are identified.
+Yrs provides all three. A state vector also names a point in history, which is how [branches](/spec/branches/) are identified.
 
 <Aside type="note" title="Terminology">
-The component notes said "Lamport vector clock". Those are two different things. Xmesh uses per-client Lamport-style counters for IDs, and state vectors to describe what a peer has seen.
+The component notes said "Lamport vector clock". Those are two different things: per-client counters stamp operations, and state vectors describe what a peer has seen.
 </Aside>
 
 ## The patch language
 
-UI actions are expressed as **XML Patch** operations (RFC 5261: `add`, `replace`, `remove`, addressed by XPath) before they reach the engine. Xmesh translates each patch into CRDT operations that refer to node IDs, not positions, because XPath positions shift under concurrent edits.
+UI actions are expressed as **XML Patch** operations (RFC 5261: `add`, `replace`, `remove`, addressed by XPath) before they reach the engine. Xmesh translates each patch into Yrs operations that refer to node IDs, not positions, because XPath positions shift under concurrent edits.
 
 RFC 7351 registers the `application/xml-patch+xml` media type for these documents. The patch operations themselves are defined in RFC 5261.
 
 ## Still open
 
-- How tombstones are garbage-collected when no single server sees every peer (epochs, keyframes, or both).
-- The exact canonicalisation used before hashing (for example W3C Canonical XML).
-- Provenance beyond the tracker: whether clients should occasionally sign a hash chain of their own operations (see [Identity and access](/spec/identity/#still-open)).
+- **History and garbage collection.** Snapshots, and so `@{state vector}` and branching from the past, need Yrs's garbage collection turned off, so deleted content is kept. How much history to keep is part of the [roadmap](/build/milestones/#roadmap).
+- **Canonicalisation** before hashing, for example W3C Canonical XML.
+- **Provenance beyond the tracker:** whether clients should occasionally sign a hash chain of their own operations (see [Identity and access](/spec/identity/#still-open)).
 
 See [open questions](/discussion/open-questions/).

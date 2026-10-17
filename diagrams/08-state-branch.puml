@@ -16,8 +16,8 @@ Merged --> [*]
 Abandoned --> [*]
 
 Proposed : onion skin and redline\nrendered for reviewers
-Merged : ops remain in the ledger,\nso the branch is still history
-Abandoned : kept in the ledger;\ncan be re-forked later
+Merged : ops are kept,\nso the branch is still history
+Abandoned : kept as history;\ncan be re-forked later
 
 note right of Paused
   Paused queues are local to a MUPPET:

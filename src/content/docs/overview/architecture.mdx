@@ -9,35 +9,36 @@ import Diagram from '../../../components/Diagram.astro';
 
 | Part | Role | Status |
 | --- | --- | --- |
-| **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, cycle-free moves. *The Wire*: stanza framing, handshakes, branch routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
-| **Xmesh** | The engine. Resolves concurrent patch streams. A pure, hexagonal C++20 core, the only implementation for now. A pure Elixir port is deferred to a later spike. | <span class="status status--decided">decided</span> |
+| **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, cycle-free moves. *The Wire*: sync messages, handshakes, branch routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
+| **Xmesh** | The engine. Resolves concurrent edits. A thin, pure Rust layer on Yrs that adds an XML tree schema, cycle-safe moves and XML Patch translation. Native C++ and pure Elixir rewrites are possible later spikes. | <span class="status status--decided">decided</span> |
 | **MUPPET** | Multi User Progressive Patch Execution Tree: client-side Xmesh, and the application layer. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns every view: the vector canvas, spatial chat and comments, paused queues, onion skin and branch previews, none of which change document state. | <span class="status status--decided">decided</span> |
-| **Erlang Trackers** | The routing layer. One lightweight Erlang process per branch, holding that branch's history, hot keyframes and presence, and routing patches between nodes. | <span class="status status--decided">decided</span> |
+| **Erlang Trackers** | The routing layer. One lightweight Erlang process per branch, holding that branch's document and presence, admitting edits against its grants, and routing them between nodes. | <span class="status status--decided">decided</span> |
 
-<Diagram name="02-components" alt="Component diagram: the pure C++ Xmesh core implements the Math; MUPPET adapters for Inkscape, Wasm and server embed Xmesh and share the canvas, chat and comment views; branch trackers drive the C++ core through a Port and store hot keyframes and a cold ledger; the Elixir port is shown as deferred." />
+<Diagram name="02-components" alt="Component diagram: Xmesh, a pure Rust layer on Yrs, implements the Math; MUPPET adapters embed it through a C interface (Inkscape), Wasm (browser) and natively (server); branch trackers embed it through an Elixir NIF; native C++ and pure Elixir rewrites are shown as later spikes." />
 
 ## A pure, hexagonal core
 
-Xmesh is the hexagon's centre: pure state transformations, with no networking, no file access, no clocks and no threads. Everything that touches the world is an adapter around it:
+Xmesh is the hexagon's centre: pure state transformations, with no networking, no file access, no clocks and no threads. It is a Rust crate built on Yrs, and every integration is an adapter around it:
 
-- **Inkscape:** the core linked into the fork
-- **Browser:** the core compiled to Wasm
-- **Server:** the core as a standalone process, which the server-side MUPPET uses and Erlang trackers drive through a Port
-- **Tests:** the core driven directly by the vector harness
+- **Inkscape:** linked into the fork through a C interface, the way `yffi` exposes Yrs to C
+- **Browser:** compiled to Wasm
+- **Server MUPPET:** used natively from Rust
+- **Erlang trackers:** loaded in-process as a Rust NIF, the way `y_ex` exposes Yrs to Elixir
+- **Tests:** driven directly by the vector harness
 
-Keeping the core pure is what lets one C++ codebase serve every one of these.
+Keeping the core pure is what lets one Rust codebase serve every one of these. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer).
 
 ## The split that matters
 
 There is **no central authority**. "Canonical state" means the state every peer converges to, not a state a server announces.
 
 - **MUPPETs execute and render.** Every client runs Xmesh, so desktop clients work offline and merge on reconnect. A MUPPET can run in three places: the Inkscape fork, the browser (Wasm), and the server, on behalf of a browser with no JavaScript.
-- **Trackers hold history.** Each branch is a process with its own ledger and keyframes. Trackers serve new clients a recent keyframe instead of replaying the whole history.
+- **Trackers hold branches.** Each branch is a process holding its document. New clients load its full state as one compact update instead of replaying history. A dedicated ledger and keyframes are on the [roadmap](/build/milestones/#roadmap).
 - **XTXP is node to node.** It connects MUPPET to MUPPET, MUPPET to tracker, and tracker to tracker. It is not a client–server API.
 
 Because rendering is just a MUPPET running somewhere, the no-JS view and the Inkscape view come from the same code and can't drift apart.
 
-<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a C++ MUPPET, a Wasm MUPPET in a browser, and an app-server MUPPET connect over WebSocket to a BEAM cluster hosting per-branch trackers, which drive C++ core processes and keep hot keyframes and a cold ledger; a phone reaches the trackers through XMPP federation and a bridge; a no-JS browser reaches the server MUPPET through the xtxp.link edge gateway." />
+<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a MUPPET linking Xmesh, a Wasm MUPPET in a browser, and an app-server MUPPET connect over WebSocket to a BEAM cluster hosting per-branch trackers, which embed Xmesh and persist branches to storage; a phone reaches the trackers through XMPP federation and a bridge; a no-JS browser reaches the server MUPPET through the xtxp.link edge gateway." />
 
 ## Transport
 

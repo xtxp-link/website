@@ -29,13 +29,13 @@ Pages mark each point as <span class="status status--decided">decided</span>, <s
     The specification every node obeys. **The Math** defines how concurrent edits merge. **The Wire** defines how they travel.
   </Card>
   <Card title="Xmesh: the engine" icon="setting">
-    The CRDT engine that resolves concurrent edits on an XML tree. A pure, hexagonal C++20 core: no I/O, no clocks, no threads. Everything else is an adapter around it.
+    The CRDT engine that resolves concurrent edits on an XML tree. A thin, pure layer on Yrs, the Rust port of Yjs, that adds cycle-safe tree moves. No I/O, no clocks, no threads: everything else is an adapter around it.
   </Card>
   <Card title="MUPPET: the executor" icon="pencil">
     Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns every view: the canvas, spatial chat and comments, onion skin and redline.
   </Card>
   <Card title="Erlang Trackers: the routing layer" icon="random">
-    One lightweight Erlang process per document branch. Trackers hold history, keyframes and presence, and route patches between nodes.
+    One lightweight Erlang process per document branch. Trackers hold a branch's state and presence, admit edits against its grants, and route them between nodes.
   </Card>
 </CardGrid>
 

@@ -31,10 +31,10 @@ description: Terms used across the XTXP specification.
 : An XML element node that is never replaced, only updated. Attributes live in a map and children in an array inside it, so concurrent edits to one element never orphan each other.
 
 **Keyframe**
-: A compacted snapshot of a branch's state, held in hot memory so new clients load instantly instead of replaying history.
+: *Roadmap.* A compacted snapshot of a branch, tuned for instant loading. Until then, a branch's full state encoded as one Yrs update does the job.
 
 **Ledger**
-: The chronological log of patches for a branch, flushed to cold storage. It makes undo branchable and unbounded.
+: *Roadmap.* A chronological log of a branch's patches in cold storage. Until then, branches persist the usual Yjs way: append updates, then compact.
 
 **MUPPET**
 : Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh, and the application layer: it owns all views, including the vector canvas and spatial chat and comments. (This absorbed what was earlier called Convector.)
@@ -55,16 +55,19 @@ description: Terms used across the XTXP specification.
 : A map from each client to the highest clock value seen from it. Two peers exchange state vectors to work out which operations the other is missing.
 
 **Tracker**
-: An Erlang process holding one branch's history, keyframes and presence, admitting operations against the branch's grants, and routing them.
+: An Erlang process holding one branch's document and presence, admitting operations against the branch's grants, and routing them.
 
 **Upstream peer**
 : For live web branching, the origin website treated as a peer. Its "edits" are the differences between successive fetches.
 
 **Xmesh**
-: The CRDT engine: a pure, hexagonal C++20 core. A pure Elixir port is deferred to a later spike.
+: The CRDT engine: a pure Rust layer on Yrs that adds an XML tree schema, cycle-safe moves and XML Patch translation. Native C++ and pure Elixir rewrites are possible later spikes.
 
 **XTXP**
 : XML to XML Protocol. The specification: The Math and The Wire.
 
+**Yrs**
+: The Rust port of Yjs, and the base Xmesh is built on.
+
 **YATA**
-: Yet Another Transformation Approach. The sequence CRDT algorithm Xmesh uses to order concurrent insertions.
+: Yet Another Transformation Approach. The sequence CRDT algorithm Yrs uses to order concurrent insertions in text.

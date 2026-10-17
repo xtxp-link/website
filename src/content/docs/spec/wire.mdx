@@ -22,6 +22,8 @@ Recovering from a dropped connection is part of XTXP itself, not something borro
 
 <span class="status status--draft">draft</span>
 
+The sync messages follow the [Yjs sync protocol](/discussion/prior-art/#the-yjs-sync-protocol), and operations travel in Yrs's binary update format. XTXP adds its own messages for identity and access alongside them.
+
 | Message | Purpose | Stored? |
 | --- | --- | --- |
 | `hello` / `challenge` / `prove` | Authenticate a connection by public key. See [Identity and access](/spec/identity/). | No |
@@ -57,11 +59,11 @@ Behind the bridge, everything is ordinary XTXP to a tracker. Inkboard's old prob
 
 ## Encryption
 
-Every binding runs over TLS. A branch can also be end-to-end encrypted, so that its tracker only sees ciphertext. The tracker can still **admit** operations, because client bindings and grants are metadata it can check. It can't build keyframes or render previews, though, so those move to the clients. A server-side MUPPET can still take part as one of the user's own devices.
+Every binding runs over TLS. A branch can also be end-to-end encrypted, so that its tracker only sees ciphertext. The tracker can still **admit** operations, because client bindings and grants are metadata it can check. It can't compact the branch into a full state or render previews, though, so those move to the clients. A server-side MUPPET can still take part as one of the user's own devices.
 
 ## Still open
 
-- The binary encoding of operations and the framing of each message.
+- How XTXP's own messages (identity, grants) are framed alongside the Yjs sync messages.
 - Whether `xtxp://` names the WebSocket binding directly, or resolves to it through the gateway.
 - Where the XMPP bridge runs: inside an Erlang XMPP server such as ejabberd or MongooseIM, or alongside one.
 

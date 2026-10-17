@@ -1,36 +1,28 @@
 @startuml 09-class-model
 !include _style.iuml
-title Core data model (starting point, not final)
+title Core data model: an XML tree on Yrs (draft)
 
 hide empty methods
 
-class ID <<value>> {
-  client : uint32
-  clock : uint32
+class "Xmesh document" as Doc <<Yrs Doc>> {
+  nodes : Map<NodeId, Node>
+  root : NodeId
 }
 
-class YataNode {
-  id : ID
-  left_origin : ID
-  right_origin : ID
-  parent : ID
-  content : NodeContent
-  deleted : bool  ' tombstone
+class Node <<Yrs Map>> {
+  tag : string
+  edges : Map<NodeId, counter>
+  position : fractional index
+  attrs : Map<string, string>
+  text : Text (optional)
 }
 
-abstract class NodeContent <<variant>>
-class TextPayload {
-  data : string
-}
-class MapPayload {
-  keys : map<string, ID>
-}
-class ArrayPayload {
-  head : ID
-  tail : ID
+class "ID (Yrs)" as ID <<value>> {
+  client : u64
+  clock : u32
 }
 
-class StateVector {
+class StateVector <<Yrs>> {
   clocks : map<client, clock>
 }
 
@@ -40,30 +32,26 @@ class Branch {
   fork_at : StateVector
 }
 
-class Author {
-  public_key : PublicKey
-}
-
 class ClientBinding <<signed>> {
-  client : uint32
+  client
   document : DocId
   key : PublicKey
 }
 
-YataNode --> ID
-YataNode *-- NodeContent
-NodeContent <|-- TextPayload
-NodeContent <|-- MapPayload
-NodeContent <|-- ArrayPayload
+class Author {
+  public_key : PublicKey
+}
+
+Doc *-- "many" Node
+Node ..> Node : edges point to\nparents by NodeId
 Branch --> StateVector
 ID ..> ClientBinding : client
 ClientBinding --> Author : signed by
 
-note right of MapPayload
-  "Immortal parents": an XML element
-  holds a map of attributes and an
-  array of children. Changing @fill
-  updates the map; the element keeps
-  its ID, so concurrent edits never orphan.
+note right of Node
+  "Immortal parents": an element is never
+  replaced. Changing @fill updates attrs;
+  moving it writes a new edge. Its NodeId
+  survives both, so concurrent edits land.
 end note
 @enduml

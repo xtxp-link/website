@@ -24,7 +24,7 @@ main -> b1 : request ops since SV
 b1 --> main : ops
 main -> main : replay into main\n(ops commute: mechanical)
 main -> main : fan out to all peers
-b1 -> b1 : stays in ledger as history
+b1 -> b1 : stays as history
 
 note over main, b1
   A branch is identified by its parent

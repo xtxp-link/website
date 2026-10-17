@@ -11,11 +11,11 @@ import Diagram from '../../../components/Diagram.astro';
 
 ## M1 — Headless convergence
 
-Two C++ CLI peers connect to an Erlang tracker (driving the C++ core through a Port) over WebSocket and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network, the BEAM-to-core boundary and the identity handshake before anyone draws anything.
+Two CLI peers (Rust, embedding Xmesh) connect to an Erlang tracker (embedding Xmesh as a NIF) over WebSocket and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network, the Erlang-to-engine boundary and the identity handshake before anyone draws anything.
 
 ## M2 — Inkscape plus no-JS
 
-The Inkscape fork, running a C++ MUPPET, and a plain HTML browser served by a server-side MUPPET edit the same drawing. This is the first demo a person can see, and it tests the north star directly.
+The Inkscape fork, linking Xmesh through its C interface, and a plain HTML browser served by a server-side MUPPET edit the same drawing. This is the first demo a person can see, and it tests the north star directly.
 
 ## M3 — Inkscape plus Wasm
 
@@ -28,3 +28,16 @@ Mobile and chat users take part through the XMPP bridge. What a stock Conversati
 ## Where the gateway fits
 
 The xtxp.link gateway and live web branching don't have a milestone yet. See [open question 9](/discussion/open-questions/#q9-where-does-the-web-gateway-sit-in-the-milestones). Folding it into M2 is a strong candidate, since the no-JS path of M2 *is* the gateway.
+
+## Roadmap
+
+Deferred until the first milestones show they're needed. Each one starts by checking what the Yrs toolchain already offers.
+
+| Item | Why deferred | Until then |
+| --- | --- | --- |
+| **Ledger**: a chronological patch log in cold storage, for unbounded, branchable undo | The Yjs ecosystem already persists documents by appending updates and compacting them | Append-and-compact storage per branch |
+| **Keyframes**: hot snapshots tuned for instant loading | Yrs can encode a whole document as one compact update | The full state as one update |
+| **History limits and garbage collection** | Snapshots need Yrs's garbage collection off, so deleted content is kept | Keep everything; measure growth |
+| **Native C++ Xmesh** | Yrs is already native code; a rewrite would be about owning the engine, not speed | Xmesh on Yrs, through its C interface |
+| **Pure Elixir Xmesh** | Trackers embed Xmesh as a NIF | Xmesh on Yrs, through a Rust NIF |
+| **Signed hash chains** of each client's operations | Signing only at identity steps is enough to start | Authorship from client bindings |

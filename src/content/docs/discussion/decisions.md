@@ -19,7 +19,7 @@ A plain HTML browser drives a **server-side MUPPET**, which turns form POSTs int
 
 A **pure Elixir Xmesh** powers trackers and server-side MUPPETs. **C++ is the reference implementation.** Cross-language property tests are the contract between them, owned by the principal from day one.
 
-## 4. Build our own engine, with an oracle
+## 4. Build our own engine, with an oracle (superseded by 13)
 
 Xmesh is our own implementation (YATA plus Kleppmann-style moves). The fuzzer also replays the non-move subset through **Yrs** as an independent correctness check.
 
@@ -54,7 +54,7 @@ Every document, native or an ordinary website, is addressed as `xtxp.link/{host}
 
 *Replaced:* a `/@/` proxy marker (briefly adopted the same day) and a `?at=` placeholder for state vectors.
 
-## 10. One core: pure, hexagonal C++
+## 10. One core: pure, hexagonal C++ (superseded by 13)
 
 **Xmesh is a single pure C++20 core** for now: no I/O, no clocks, no threads, with every integration as an adapter (Inkscape, Wasm, a server process, the test harness). Erlang trackers and the server-side MUPPET drive it through Ports.
 
@@ -73,6 +73,18 @@ XTXP's wire is a small sync protocol that doesn't care about transport: operatio
 A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a branch owns it and grants `read` or `write` to keys or to `*`. A tracker enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits land on a fork the revoked user owns. See [Identity and access](/spec/identity/).
 
 *Replaced:* XMPP addresses (JIDs) as identity, which are easily confused with email addresses.
+
+## 13. Xmesh v1 is Yrs plus a tree layer
+
+The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. Yrs supplies YATA ordering, maps, text, state vectors, a binary update format, snapshots and a sync protocol. Xmesh adds an XML tree schema (a map of nodes with parent pointers and fractional indexes), **cycle-safe moves after Evan Wallace's algorithm**, XML Patch translation and canonical XML output. It stays a pure core, reached through a C interface (Inkscape), Wasm (browser), Rust (server MUPPET) and a Rust NIF (Erlang trackers). A native C++ engine and a pure Elixir engine both become later spikes, held to the same vectors.
+
+*Replaced:* decisions 4 and 10 (our own C++ engine, with Yrs as an oracle; trackers driving it through Ports), and Kleppmann's undo-and-replay moves.
+
+## 14. Toolchain first: ledger and keyframes go on the roadmap
+
+Branches persist the way the Yrs toolchain already does: a full state encoded as one update for loading, and append-then-compact storage. A dedicated ledger and keyframes are on the [roadmap](/build/milestones/#roadmap), to be built only if that falls short.
+
+*Replaced:* trackers with a hot keyframe and a cold ledger from day one.
 
 ## Naming
 

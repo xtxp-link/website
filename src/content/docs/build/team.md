@@ -20,9 +20,9 @@ Owns everything that crosses a boundary:
 
 | Stack | Owns |
 | --- | --- |
-| **C++20 core + Wasm** | The Xmesh reference implementation and its Wasm build |
+| **Engine (Rust)** | Xmesh on Yrs: the tree schema, cycle-safe moves, XML Patch translation, and its C, Wasm and Elixir NIF bindings |
 | **Inkscape fork** | The MUPPET adapter inside Inkscape, and keeping the fork current |
-| **Elixir / BEAM** | The trackers, their WebSocket endpoint, admission and grants, and hosting the C++ core through Ports. The pure Elixir Xmesh port is a later spike. |
+| **Elixir / BEAM** | The trackers, their WebSocket endpoint, admission and grants, and branch storage |
 | **Wire and bridges** | The sync protocol's message encoding, and the XMPP bridge for mobile and chat clients (from M4) |
 | **Web clients** | The Wasm MUPPET and the no-JS HTML client |
 

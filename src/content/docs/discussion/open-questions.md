@@ -35,9 +35,9 @@ Stock Conversations can't render a canvas. The answer affects the protocol now: 
 
 ## Engine
 
-- **Port topology:** trackers drive the C++ core through Ports. One OS process per branch is simple but costs megabytes each; a shared pool of core processes, each holding many branches, scales further. Which one first?
-- **Elixir port spike:** what measurement would justify it, and when to run it.
-- **Garbage collection:** when tombstones can be dropped if the relay may be blind and no server sees every peer.
+- **Tree layer:** adopt the `yrs_tree` crate, which implements Wallace's algorithm on Yrs, or write our own on the same algorithm? `yrs_tree` is young (0.4.x).
+- **History and memory:** snapshots need Yrs's garbage collection off. How fast do documents grow, and when is the [roadmap](/build/milestones/#roadmap) ledger worth building?
+- **NIF safety:** trackers load Xmesh as a Rust NIF. Long operations need dirty schedulers so they don't stall the BEAM.
 - **Canonical form:** the exact XML canonicalisation used before hashing.
 
 ## Identity and access

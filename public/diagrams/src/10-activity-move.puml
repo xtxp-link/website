@@ -1,26 +1,32 @@
 @startuml 10-activity-move
 !include _style.iuml
-title Applying a tree move safely (after Kleppmann et al.)
+title Cycle-safe tree moves (after Evan Wallace)
 
-start
-:receive move(t, node, new_parent);
-if (t older than the latest applied op?) then (yes)
-  :undo applied ops newer than t;
-else (no)
-endif
-if (node == new_parent\nor node is an ancestor of new_parent?) then (would create a cycle)
-  :record the move as a no-op;
-else (safe)
-  :set node.parent = new_parent;
-endif
-:redo the undone ops in timestamp order,\nre-checking each move the same way;
-stop
+partition "Writing a move" {
+  start
+  :move(node, new_parent);
+  :c = highest counter in node.edges;
+  :node.edges[new_parent] = c + 1\n(a plain map write; old edges stay);
+  stop
+}
+
+partition "Reading the tree (every peer, same rule)" {
+  start
+  :for each node, parent = edge with\nthe highest counter (ID breaks ties);
+  :nodes that reach the root\nform the tree;
+  while (any nodes not rooted?\n(they are in a cycle)) is (yes)
+    :pick the next node and an edge to an\nalready-rooted parent: highest counter,\nIDs break ties;
+    :reattach it there\n(view only: stored data unchanged);
+  endwhile (no)
+  :order siblings by fractional index;
+  stop
+}
 
 note right
-  Every replica applies moves in the same
-  timestamp order, so every replica skips
-  the same moves. The move skipped is the
-  one that would close the cycle given the
-  earlier ones, not "the older intent".
+  The same converged maps and the
+  same rule give the same tree on
+  every peer.
+  Nothing is rewritten, so peers
+  never fight over the fix.
 end note
 @enduml

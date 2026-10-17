@@ -1,8 +1,9 @@
 ---
 title: Verification
-description: Behaviour first. One suite of feature files and JSON test vectors, checked against the C++ core and an independent Yrs oracle, with room for an Elixir port later.
+description: Behaviour first. One suite of feature files and JSON test vectors, checked against Xmesh on Yrs, and the contract any later rewrite must meet.
 ---
 
+import { Aside } from '@astrojs/starlight/components';
 import Diagram from '../../../components/Diagram.astro';
 
 <span class="status status--decided">decided</span>
@@ -14,15 +15,23 @@ No implementation code gets written until its behaviour is defined. The source o
 
 ## One suite, every implementation
 
-<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the C++ harness and a Yrs oracle (an Elixir harness is deferred), and SHA-256 hashes of canonical XML are compared; for M1 the same vectors are replayed by C++ CLI peers through an Erlang tracker over WebSocket, with forced disconnects." />
+<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the Xmesh harness and its invariant checks, and SHA-256 hashes of canonical XML are compared across delivery orders; later native C++ or pure Elixir rewrites are held to the same vectors; for M1 the same vectors are replayed by CLI peers through an Erlang tracker over WebSocket, with forced disconnects." />
 
 | Harness | Why it exists |
 | --- | --- |
-| **C++ Xmesh (Catch2)** | The reference implementation. |
-| **Elixir Xmesh (ExUnit)** | *Deferred.* If the Elixir port spike goes ahead, the same vectors become the contract it must meet. |
-| **Yrs oracle** | Yrs (the Rust port of Yjs) implements YATA and is widely used. Replaying the non-move subset through it checks our YATA independently. It has no tree move, hence the subset. |
+| **Xmesh on Yrs** (`cargo test`) | The implementation. Every vector is replayed in many delivery orders. |
+| **Native C++ Xmesh** | *Later spike.* Held to the same vectors and cross-checked against Xmesh on Yrs. |
+| **Pure Elixir Xmesh** | *Later spike.* The same. |
 
-The pass condition is identical **SHA-256 hashes of the canonical XML** across every harness.
+The pass conditions are **invariants**, checked on every run:
+
+- **Convergence:** every delivery order ends with the same **SHA-256 of the canonical XML**.
+- **No cycles:** the materialised tree is always a tree.
+- **Idempotence:** delivering an operation twice changes nothing.
+
+<Aside type="note" title="Changed">
+Yrs was going to be an independent oracle for our own C++ engine. Now that Xmesh is built on Yrs, the oracle role falls to the invariants, and the vectors become the contract any rewrite must meet. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer).
+</Aside>
 
 ## The fuzzer
 
@@ -32,8 +41,6 @@ The first task from the original handover, re-scoped to feed every harness. It g
 - randomised operations from several clients: inserting paths, updating attributes, moving nodes, adding comments
 - one chronological stream per client, plus heavily delayed and shuffled delivery orders
 
-Moves are tagged so the Yrs harness can skip them.
-
 ## Over a real network
 
-[Milestone M1](/build/milestones/) runs the same vectors through two C++ CLI peers and an Erlang tracker (driving the C++ core through a Port) over WebSocket, including dropped connections and reconnect sync. Convergence then holds over a real, unreliable network, not just in a test process.
+[Milestone M1](/build/milestones/) runs the same vectors through two CLI peers and an Erlang tracker, all embedding Xmesh, over WebSocket, including dropped connections and reconnect sync. Convergence then holds over a real, unreliable network, not just in a test process.
