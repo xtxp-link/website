@@ -3,6 +3,15 @@ title: Glossary
 description: Terms used across the XTXP specification.
 ---
 
+**Admission**
+: A tracker's decision, in arrival order, that an operation counts on its branch: the client ID is bound to a key that holds write access.
+
+**Binding** (identity)
+: A signed statement that a public key owns a client ID on a document. It is how operations get their author without being signed one by one.
+
+**Binding** (transport)
+: A way of carrying XTXP: WebSocket, HTTP, or the XMPP bridge.
+
 **Branch**
 : A fork of a document's history at a given state vector. Undo, proposed edits and previews are all branches. Each server-side branch is held by one tracker process.
 
@@ -36,6 +45,9 @@ description: Terms used across the XTXP specification.
 **Paused queue**
 : Local edits a MUPPET holds back from the wire, shown as a preview until released.
 
+**Public key (identity)**
+: What a user is in XTXP. Proved by signing a challenge; fetched onto a device through an existing sign-in, from the user's own storage.
+
 **Redline**
 : A per-author tracked-changes view: the diff produced when a branch is replayed into its parent.
 
@@ -43,7 +55,7 @@ description: Terms used across the XTXP specification.
 : A map from each client to the highest clock value seen from it. Two peers exchange state vectors to work out which operations the other is missing.
 
 **Tracker**
-: An Erlang process holding one branch's history, keyframes and presence, and routing its patches.
+: An Erlang process holding one branch's history, keyframes and presence, admitting operations against the branch's grants, and routing them.
 
 **Upstream peer**
 : For live web branching, the origin website treated as a peer. Its "edits" are the differences between successive fetches.

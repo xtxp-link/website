@@ -19,7 +19,7 @@ The Math half of XTXP defines what every implementation of Xmesh must compute. I
 
 ## Data model
 
-<Diagram name="09-class-model" alt="Class diagram: an ID is a client and a clock; a YataNode has an id, left and right origins, a parent, content and a tombstone flag; content is a text, map or array payload; a Branch has a parent and a fork state vector; a client ID maps to an author JID and device." />
+<Diagram name="09-class-model" alt="Class diagram: an ID is a client and a clock; a YataNode has an id, left and right origins, a parent, content and a tombstone flag; content is a text, map or array payload; a Branch has a parent and a fork state vector; a client ID is bound to an author's public key." />
 
 The starting point (from the original design handover, not final):
 
@@ -46,7 +46,7 @@ struct YataNode {
 
 Siblings form a sequence. Concurrent insertions at the same position are ordered with **YATA** (Yet Another Transformation Approach). Each node remembers the neighbours it was inserted between (`left_origin`, `right_origin`), and ties are broken deterministically by client ID. Deleted nodes become **tombstones** so later insertions can still find their origins.
 
-YATA avoids carrying a full causal history on every operation. It is the algorithm behind Yjs, and its Rust port Yrs serves as an [independent oracle](/build/verification/) for our implementation.
+YATA (Nicolaescu et al., 2016; see [prior art](/discussion/prior-art/#yata-yjs-and-yrs)) avoids carrying a full causal history on every operation. It is the algorithm behind Yjs, and its Rust port Yrs serves as an [independent oracle](/build/verification/) for our implementation.
 
 ## Immortal parents
 
@@ -59,7 +59,7 @@ Setting `@fill="blue"` updates one map entry. The `<circle>` keeps its ID, so a 
 
 ## Moves without cycles
 
-Moving an element changes its parent. If Alice moves group A into group B while Bob moves B into A, a naive merge creates a cycle. Xmesh follows Kleppmann et al.'s replicated tree move algorithm:
+Moving an element changes its parent. If Alice moves group A into group B while Bob moves B into A, a naive merge creates a cycle. Xmesh follows Kleppmann et al.'s replicated tree move algorithm ([prior art](/discussion/prior-art/#replicated-tree-moves)):
 
 <Diagram name="10-activity-move" alt="Activity: on receiving a move with timestamp t, undo newer ops if needed; if the node equals the new parent or is its ancestor, record a no-op, otherwise set the parent; redo undone ops in timestamp order, re-checking each move." />
 
@@ -91,6 +91,6 @@ RFC 7351 registers the `application/xml-patch+xml` media type for these document
 
 - How tombstones are garbage-collected when no single server sees every peer (epochs, keyframes, or both).
 - The exact canonicalisation used before hashing (for example W3C Canonical XML).
-- How client IDs map to XMPP identities (JID plus device), and whether operations are signed.
+- Provenance beyond the tracker: whether clients should occasionally sign a hash chain of their own operations (see [Identity and access](/spec/identity/#still-open)).
 
 See [open questions](/discussion/open-questions/).

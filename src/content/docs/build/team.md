@@ -12,7 +12,7 @@ The build is organised as one **principal** and one **expert per stack**. Each e
 Owns everything that crosses a boundary:
 
 - CRDT semantics (The Math)
-- the wire protocol (The Wire)
+- the wire protocol (The Wire), and identity and access
 - the BDD feature files and JSON vector suite
 - cross-language property tests, from day one
 
@@ -22,8 +22,8 @@ Owns everything that crosses a boundary:
 | --- | --- |
 | **C++20 core + Wasm** | The Xmesh reference implementation and its Wasm build |
 | **Inkscape fork** | The MUPPET adapter inside Inkscape, and keeping the fork current |
-| **Elixir / BEAM** | The trackers, the XMPP integration, and hosting the C++ core through Ports. The pure Elixir Xmesh port is a later spike. |
-| **XMPP** | Rooms, archive, stream management, the patch envelope and namespaces |
+| **Elixir / BEAM** | The trackers, their WebSocket endpoint, admission and grants, and hosting the C++ core through Ports. The pure Elixir Xmesh port is a later spike. |
+| **Wire and bridges** | The sync protocol's message encoding, and the XMPP bridge for mobile and chat clients (from M4) |
 | **Web clients** | The Wasm MUPPET and the no-JS HTML client |
 
 ## Why this shape

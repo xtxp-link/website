@@ -7,7 +7,7 @@ Each entry records what was decided, plus what it replaced where relevant.
 
 ## 1. Relays and peers
 
-The room server is a **relay**: it orders and archives operations, and it may be blind. **Peers** run the CRDT engine.
+The room server is a **relay**: it orders and archives operations, and it may be blind. **Peers** run the CRDT engine. *(Since decision 11, the relay role belongs to trackers, not to an XMPP room server.)*
 
 *Replaced:* a server that validated every patch through a C++ process before accepting it.
 
@@ -61,6 +61,18 @@ Every document, native or an ordinary website, is addressed as `xtxp.link/{host}
 The **pure Elixir port is deferred to a later spike**, to be justified by measurement: in particular, the cost of Ports at scale (one OS process per branch, versus thousands of cheap Erlang processes). The vector suite stays language-agnostic so the spike can be held to it.
 
 *Replaced:* decision 3, a pure Elixir core alongside C++ from day one.
+
+## 11. Transport: WebSocket first, XMPP as a bridge
+
+XTXP's wire is a small sync protocol that doesn't care about transport: operations need only arrive eventually, at least once, in any order, and reconnecting is a state-vector exchange built into XTXP. Its bindings are **WebSocket** (primary, for raw speed), **HTTP** (no-JS browsers, through a server-side MUPPET) and an **XMPP bridge** for mobile and chat clients from M4. Cursors and presence travel as separate, never-archived messages. See [The Wire](/spec/wire/).
+
+*Replaced:* XMPP rooms as the transport for every operation, with stream management and the archive providing resumption.
+
+## 12. Identity is a public key; access is granted by key
+
+A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a branch owns it and grants `read` or `write` to keys or to `*`. A tracker enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits land on a fork the revoked user owns. See [Identity and access](/spec/identity/).
+
+*Replaced:* XMPP addresses (JIDs) as identity, which are easily confused with email addresses.
 
 ## Naming
 

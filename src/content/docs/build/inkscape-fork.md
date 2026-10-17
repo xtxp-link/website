@@ -13,6 +13,6 @@ Inkboard, the earlier attempt to sync Inkscape over XMPP, also lived in a branch
 
 ## Rules for the fork
 
-1. **The engine and the XMPP adapter live in their own repository.** The fork vendors them as a submodule, so Inkscape-specific code stays a thin adapter.
+1. **The engine and the transport adapter live in their own repository.** The fork vendors them as a submodule, so Inkscape-specific code stays a thin adapter.
 2. **CI rebases the fork onto Inkscape's main branch on a schedule.** Breakage shows up within days, not at the next release.
 3. **The size of the fork's diff is a tracked metric.** If it stays small, an upstream proposal becomes realistic later.

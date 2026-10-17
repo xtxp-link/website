@@ -26,8 +26,8 @@ yrs --> cmp
 package "M1: same vectors over a real network" {
   component "C++ CLI peer 1" as p1
   component "C++ CLI peer 2" as p2
-  component "Erlang tracker\n(C++ core via Port)" as p3
-  queue "XMPP MUC room\n(with stream resumption)" as room
+  component "C++ CLI peer 3\n(late joiner)" as p3
+  queue "Tracker over WebSocket\n(forced disconnects,\nreconnect sync)" as room
 }
 vec --> p1
 vec --> p2

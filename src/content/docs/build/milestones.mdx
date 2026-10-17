@@ -11,7 +11,7 @@ import Diagram from '../../../components/Diagram.astro';
 
 ## M1 — Headless convergence
 
-Two C++ CLI peers and an Erlang tracker (driving the C++ core through a Port) join an XMPP room and replay the fuzzer's vectors over real XMPP, with stream resumption. There is no UI. This proves convergence over a patchy network, and the BEAM-to-core boundary, before anyone draws anything.
+Two C++ CLI peers connect to an Erlang tracker (driving the C++ core through a Port) over WebSocket and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network, the BEAM-to-core boundary and the identity handshake before anyone draws anything.
 
 ## M2 — Inkscape plus no-JS
 
@@ -23,7 +23,7 @@ A Wasm MUPPET in the browser joins as a full peer.
 
 ## M4 — Inkscape plus Conversations
 
-Mobile XMPP users take part. What a stock Conversations user gets is [open question 7](/discussion/open-questions/#q7-what-does-a-conversations-user-get-in-m4).
+Mobile and chat users take part through the XMPP bridge. What a stock Conversations user gets is [open question 7](/discussion/open-questions/#q7-what-does-a-conversations-user-get-in-m4).
 
 ## Where the gateway fits
 

@@ -41,8 +41,13 @@ class Branch {
 }
 
 class Author {
-  jid : JID
-  device : string
+  public_key : PublicKey
+}
+
+class ClientBinding <<signed>> {
+  client : uint32
+  document : DocId
+  key : PublicKey
 }
 
 YataNode --> ID
@@ -51,7 +56,8 @@ NodeContent <|-- TextPayload
 NodeContent <|-- MapPayload
 NodeContent <|-- ArrayPayload
 Branch --> StateVector
-ID ..> Author : client maps to\na JID + device (open)
+ID ..> ClientBinding : client
+ClientBinding --> Author : signed by
 
 note right of MapPayload
   "Immortal parents": an XML element

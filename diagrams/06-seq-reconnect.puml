@@ -1,0 +1,29 @@
+@startuml 06-seq-reconnect
+!include _style.iuml
+title Reconnecting after a drop: state-vector sync
+
+participant "Peer\n(MUPPET)" as p
+participant "Tracker\n(branch main)" as t
+
+p -> t : update ops (1,1)…(1,40)
+t --> p : others' ops
+p -x t : connection drops
+...
+p -> p : keeps editing offline:\nops (1,41)…(1,55)
+t -> t : meanwhile admits ops\nfrom other peers
+...
+p -> t : reconnect + authenticate
+p -> t : sync-1: my state vector\n{1:55, 2:120, 3:8}
+t -> p : sync-1: tracker's state vector\n{1:40, 2:131, 3:9}
+t --> p : sync-2: ops you're missing\n(2,121…131), (3,9)
+p --> t : sync-2: ops you're missing\n(1,41…55)
+p -> p : integrate
+t -> t : admit, record, fan out
+
+note over p, t
+  Both now at {1:55, 2:131, 3:9}.
+  Ops are idempotent and order-free, so the transport
+  only needs "eventually, at least once". No resume
+  token, no archive query: the state vectors say it all.
+end note
+@enduml

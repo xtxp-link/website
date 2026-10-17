@@ -37,10 +37,10 @@ There is **no central authority**. "Canonical state" means the state every peer 
 
 Because rendering is just a MUPPET running somewhere, the no-JS view and the Inkscape view come from the same code and can't drift apart.
 
-<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a C++ MUPPET, a Wasm MUPPET in a browser, a phone XMPP client and an app-server MUPPET all connect over XMPP to a BEAM cluster hosting the XMPP server and per-branch trackers with hot keyframes and a cold ledger; a no-JS browser reaches the server MUPPET through the xtxp.link edge gateway." />
+<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a C++ MUPPET, a Wasm MUPPET in a browser, and an app-server MUPPET connect over WebSocket to a BEAM cluster hosting per-branch trackers, which drive C++ core processes and keep hot keyframes and a cold ledger; a phone reaches the trackers through XMPP federation and a bridge; a no-JS browser reaches the server MUPPET through the xtxp.link edge gateway." />
 
 ## Transport
 
-XTXP rides on **XMPP**. Each document session is a multi-user chat room (XEP-0045): presence shows who is in the drawing, and message stanzas carry patches. The archive (XEP-0313) gives late joiners and reconnecting phones an ordered log. See [The Wire](/spec/wire/).
+XTXP is a small sync protocol that doesn't care about transport. Its main binding is **WebSocket**, for raw speed, which trackers speak directly from the BEAM. Browsers without JavaScript use **HTTP** through a server-side MUPPET. Mobile and chat clients reach a tracker through an **XMPP bridge**, which keeps push and store-and-forward for phones. Reconnecting is a state-vector exchange built into XTXP. See [The Wire](/spec/wire/).
 
-ejabberd and MongooseIM are both written in Erlang, so trackers could run inside the same BEAM cluster as the XMPP server. That choice is [still open](/discussion/open-questions/).
+Identity is a **public key**, and access is granted by key. See [Identity and access](/spec/identity/).

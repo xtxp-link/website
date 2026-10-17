@@ -5,9 +5,9 @@ title System context: who talks to the XTXP mesh
 left to right direction
 
 actor "Designer\n(Inkscape fork)" as designer
-actor "Browser user\n(no JavaScript)" as nojs
 actor "Browser user\n(Wasm client)" as wasm
-actor "Mobile user\n(XMPP client)" as mobile
+actor "Browser user\n(no JavaScript)" as nojs
+actor "Mobile / chat user\n(XMPP client)" as mobile
 
 rectangle "XTXP mesh" as mesh {
   component "Peers running\nMUPPET + Xmesh" as peers
@@ -15,17 +15,19 @@ rectangle "XTXP mesh" as mesh {
 }
 
 rectangle "xtxp.link\nHTTP gateway" as gateway
-cloud "XMPP federation\n(any server, JID identity)" as xmpp
+component "XMPP bridge" as bridge
 rectangle "Origin websites\n(e.g. en.wikipedia.org)" as origin
+rectangle "Sign-in provider\n(Google, Apple, Mozilla)\n+ user's own storage" as sso
 
 designer --> peers : edits SVG natively
 wasm --> peers : edits in browser
 nojs --> gateway : HTML forms,\nlinks, HTTP caching
-mobile --> xmpp : chat, comments
+mobile --> bridge : chat, comments,\npush when asleep
 gateway --> peers : server-side MUPPET\nacts for the user
-peers --> xmpp : XTXP over XMPP
-xmpp --> trackers : rooms, archive
+peers --> trackers : XTXP over WebSocket
+bridge --> trackers : XTXP
 gateway ..> origin : genesis fetch\n(no cookies forwarded)
+peers ..> sso : fetch own private key\nafter sign-in
 
 note bottom of gateway
   North star: the no-JS browser

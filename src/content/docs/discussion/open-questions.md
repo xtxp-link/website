@@ -27,18 +27,28 @@ Stock Conversations can't render a canvas. The answer affects the protocol now: 
 - **Ref names:** whether `@main` or `@latest` names the shared branch. (`@origin` was chosen over `@live`, `@upstream` and `@web` for the website's authoritative version.)
 - **State vectors in URLs:** a compact, readable way to write one after `@`.
 - **Native or website?** How the gateway tells that `{host}` is an XTXP node rather than an ordinary site, for example a `/.well-known/` file or a DNS record.
-- **`xtxp://` binding:** does it resolve to an XMPP room (as `xmpp:` URIs do, RFC 5122), or does XTXP get its own socket binding?
-- **Patch envelope:** namespace, transit-safe encoding, fallback body, branch routing.
+- **`xtxp://` binding:** does it name the WebSocket binding directly, or resolve to it through the gateway?
+- **Message encoding:** the binary format of operations and the framing of each wire message.
+- **XMPP bridge envelope:** namespace, transit-safe encoding and fallback body for chat clients (from M4).
 - **Media types:** reuse `application/xml-patch+xml` for patches; register a vendor type for the stream.
-- **Trackers and the XMPP server:** run trackers inside an Erlang XMPP server (ejabberd, MongooseIM), or alongside one?
+- **Where the XMPP bridge runs:** inside an Erlang XMPP server (ejabberd, MongooseIM), or alongside one?
 
 ## Engine
 
 - **Port topology:** trackers drive the C++ core through Ports. One OS process per branch is simple but costs megabytes each; a shared pool of core processes, each holding many branches, scales further. Which one first?
 - **Elixir port spike:** what measurement would justify it, and when to run it.
-- **Identity:** mapping CRDT client IDs to JIDs and devices, and whether operations are signed.
 - **Garbage collection:** when tombstones can be dropped if the relay may be blind and no server sees every peer.
 - **Canonical form:** the exact XML canonicalisation used before hashing.
+
+## Identity and access
+
+- **Key storage:** where the private key lives in the user's own storage, and how it's protected (for example, encrypted with a passkey-derived key).
+- **Admin rights:** a grantable `admin` role, so losing the creator's key doesn't freeze a branch.
+- **Several devices, one person:** a root key that signs per-device keys.
+- **Provenance beyond the tracker:** occasional signed hash chains of each client's operations.
+- **Key recovery** when every device and the backup are lost.
+
+See [Identity and access](/spec/identity/#still-open).
 
 ## Views
 

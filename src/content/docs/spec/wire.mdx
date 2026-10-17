@@ -1,54 +1,70 @@
 ---
 title: The Wire
-description: How XTXP operations travel between nodes. XMPP rooms, archives, resumable streams and the patch envelope.
+description: How XTXP operations travel between nodes. A small sync protocol that doesn't care about transport, bound to WebSocket, HTTP and an XMPP bridge.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 import Diagram from '../../../components/Diagram.astro';
 
+<span class="status status--decided">decided</span> in shape, <span class="status status--draft">draft</span> in detail.
+
+The Wire half of XTXP defines how operations get from one node to another. It is a small sync protocol that doesn't depend on any one transport, plus a few **bindings** that carry it.
+
+## What the core needs from a transport
+
+Very little. Xmesh operations can be applied in any order, and applying one twice does no harm. So a transport only has to deliver operations **eventually, at least once, in any order**. It doesn't need ordering guarantees, exactly-once delivery or a durable message queue.
+
+Recovering from a dropped connection is part of XTXP itself, not something borrowed from the transport:
+
+<Diagram name="06-seq-reconnect" alt="Sequence: a peer edits offline, reconnects, sends its state vector, the tracker replies with exactly the operations the peer is missing and the peer uploads the operations the tracker is missing; both end at the same state vector." />
+
+## Messages
+
 <span class="status status--draft">draft</span>
 
-The Wire half of XTXP defines how operations get from one node to another. It runs over **XMPP**, borrowing the practices that make the Conversations mobile client reliable on patchy connections.
+| Message | Purpose | Stored? |
+| --- | --- | --- |
+| `hello` / `challenge` / `prove` | Authenticate a connection by public key. See [Identity and access](/spec/identity/). | No |
+| `bind` | Signed: "public key P owns client ID 7 on this document." | Yes |
+| `sync-1` | "Here is my state vector." | No |
+| `sync-2` | "Here are the operations you're missing." | Yes, as operations |
+| `update` | New operations, as they happen. | Yes |
+| `grant` / `revoke` | Signed changes to who may read or write a branch. | Yes |
+| `awareness` | Cursors, selections, presence. Fire-and-forget, overwritten, never archived. | No |
 
-## Why XMPP
+Cursors and presence travel separately from operations. A 60 Hz cursor stream should never be archived, wrapped in anything heavy, or replayed to a late joiner.
 
-- **Federated identity.** A participant is `user@domain`, and any domain can host a server.
-- **Rooms with presence.** A document session is a multi-user chat room (XEP-0045). Presence says who is in the drawing; message stanzas carry operations.
-- **An ordered archive.** Message Archive Management (XEP-0313) lets a late joiner or reconnecting phone fetch exactly what it missed.
-- **Chat and drawing share a channel.** Comments are nodes in the document tree, so they merge like any other edit, and they can be mirrored as ordinary room messages for chat-only clients.
+## Bindings
 
-## Convergence over a room
+| Binding | Used by | Notes |
+| --- | --- | --- |
+| **WebSocket**, binary frames | Wasm MUPPETs in the browser, the Inkscape fork, CLI peers | The primary binding, chosen for raw speed. Trackers speak it directly from the BEAM. |
+| **HTTP** forms and redirects | Browsers with no JavaScript, through a server-side MUPPET | See [Addressing](/spec/addressing/#the-no-js-edit-loop). |
+| **XMPP**, through a bridge | Mobile and chat clients such as Conversations, and federation | A bridge in front of a tracker, not the core transport. |
 
-<Diagram name="05-seq-convergence" alt="Sequence: two MUPPETs make concurrent edits, send them to the MUC room, the tracker archives both, each peer integrates the other's op, and both reach the same state vector and hash." />
+<Diagram name="05-seq-convergence" alt="Sequence: two MUPPETs connected to a tracker over WebSocket make concurrent edits; the tracker checks each client's grant, records the operations and fans them out; both peers integrate and reach the same state vector and hash." />
 
-## Surviving bad networks
+## The XMPP bridge
 
-<Diagram name="06-seq-mobile-resume" alt="Sequence: a mobile peer enables stream management, goes inactive in the background, is woken by push, loses the network, then either resumes the stream with its handled-stanza counter or starts a new session and queries the archive for missed operations." />
+XMPP is good at things a browser tab isn't: holding messages while a phone sleeps, waking it with a push, and fitting into chat apps people already use. The bridge keeps those strengths for the clients that need them:
 
-| Extension | What it gives XTXP |
-| --- | --- |
-| XEP-0198 Stream Management | Acknowledgements, and resuming a dropped stream without losing stanzas |
-| XEP-0313 Message Archive Management | Catching up on operations missed while offline |
-| XEP-0352 Client State Indication | Quiet backgrounded clients, saving battery and data |
-| XEP-0357 Push Notifications | Waking a sleeping client when something changes |
+- **XEP-0198** stream management and **XEP-0313** message archive for flaky mobile links
+- **XEP-0352** client state and **XEP-0357** push, to save battery
+- **chat interop**: canvas comments mirrored as room messages, and replies turned back into comments ([open question 7](/discussion/open-questions/#q7-what-does-a-conversations-user-get-in-m4))
+- **OMEMO** end-to-end encryption for rooms that want it
 
-## The patch envelope
+Behind the bridge, everything is ordinary XTXP to a tracker. Inkboard's old problem of XML getting damaged inside XMPP stanzas is now one bridge's concern, not the core wire format's (see [prior art](/discussion/prior-art/#inkboard-and-pedro)).
 
-<span class="status status--open">open</span>
+## Encryption
 
-Operations travel as XML inside XML stanzas, which is where an earlier attempt went wrong (see [Inkboard](/discussion/prior-art/#inkboard-and-pedro)). The envelope needs:
+Every binding runs over TLS. A branch can also be end-to-end encrypted, so that its tracker only sees ciphertext. The tracker can still **admit** operations, because client bindings and grants are metadata it can check. It can't build keyframes or render previews, though, so those move to the clients. A server-side MUPPET can still take part as one of the user's own devices.
 
-- **its own namespace**
-- **an encoding that survives transit** without servers or clients reformatting the payload
-- **a fallback `<body/>`** so clients that don't understand XTXP show something sensible, or nothing, rather than raw XML
-- **branch routing**: which branch an operation belongs to
+## Still open
 
-## Binding to `xtxp://`
+- The binary encoding of operations and the framing of each message.
+- Whether `xtxp://` names the WebSocket binding directly, or resolves to it through the gateway.
+- Where the XMPP bridge runs: inside an Erlang XMPP server such as ejabberd or MongooseIM, or alongside one.
 
-<span class="status status--open">open</span>
-
-Not yet decided: does an `xtxp://host/path` address resolve to an XMPP room (the way `xmpp:` URIs do, RFC 5122), or does XTXP get its own socket binding alongside XMPP? See [Addressing](/spec/addressing/).
-
-<Aside type="tip">
-Encryption: rooms can use transport encryption only, or end-to-end encryption (OMEMO). In an E2E room the server is a blind relay, and a server-side MUPPET can still take part as one of the user's own devices.
+<Aside type="note" title="Changed">
+Earlier drafts ran everything over XMPP rooms, with XMPP addresses as identity. That added XML wrapping and room fan-out to every operation, and mixed up identity with email-like addresses. XMPP is now a bridge, and identity is a public key. See decisions [11](/discussion/decisions/#11-transport-websocket-first-xmpp-as-a-bridge) and [12](/discussion/decisions/#12-identity-is-a-public-key-access-is-granted-by-key).
 </Aside>

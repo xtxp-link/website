@@ -18,6 +18,8 @@ A **branch** is a fork of a document's history at a point given by a state vecto
 
 A branch is identified by its **parent branch** plus the **state vector at the fork**.
 
+**Prior art:** cheap branches, merges as replays and an authoritative upstream all come from git ([prior art](/discussion/prior-art/#git)). Access to branches is covered in [Identity and access](/spec/identity/#access-is-granted-by-key).
+
 ## Trackers
 
 Each server-side branch is held by its own lightweight Erlang **process** (a tracker). The BEAM makes these cheap enough to spawn one per proposed edit or undo fork, and isolated enough that a crashed branch can't take its siblings down.

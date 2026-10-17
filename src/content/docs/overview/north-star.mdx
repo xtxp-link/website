@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 **Real web without JavaScript.** The no-JS HTML client is the point of the design, not a fallback. Plain forms, links and HTTP caching make a browser a full participant in a collaborative session. A server-side MUPPET does the CRDT work on that browser's behalf.
 
-Richer clients (Inkscape, a Wasm MUPPET in the browser, mobile XMPP clients) are peers on the same mesh. They get more, but they don't get *different* documents.
+Richer clients (Inkscape, a Wasm MUPPET in the browser, mobile clients through an XMPP bridge) are peers on the same mesh. They get more, but they don't get *different* documents.
 
 ## The test
 
@@ -30,6 +30,6 @@ Some consequences:
 Around 2005, David Campey wrote an experimental JEP (Jabber Enhancement Proposal, the name for XMPP extensions before the 2006 rename to XEP) for message and document updates over XMPP, with the aim of replacing HTTP.
 </Aside>
 
-XTXP is that idea's second run. This time HTTP stays: it's the no-JS edge every browser already speaks. XMPP becomes the document backbone underneath it, carrying patches between nodes with identity, presence and archives built in.
+XTXP is that idea's second run. This time HTTP stays: it's the no-JS edge every browser already speaks. Underneath it runs a lean streaming protocol for documents, over WebSocket, with XMPP kept as a bridge for the mobile and chat clients it serves well.
 
 The original JEP text hasn't been located yet. It isn't in the XSF's `xeps` repository, whose history starts with the October 2006 import, so the 2005 standards mailing list archives are the next place to look.

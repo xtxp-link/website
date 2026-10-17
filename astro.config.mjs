@@ -34,6 +34,7 @@ export default defineConfig({
           items: [
             { label: 'The Math', slug: 'spec/math' },
             { label: 'The Wire', slug: 'spec/wire' },
+            { label: 'Identity and access', slug: 'spec/identity' },
             { label: 'Branches and history', slug: 'spec/branches' },
             { label: 'Views: onion skin and redline', slug: 'spec/views' },
             { label: 'Addressing and the gateway', slug: 'spec/addressing' },

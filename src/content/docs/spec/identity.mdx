@@ -1,0 +1,59 @@
+---
+title: Identity and access
+description: A user is a public key. Sign-in fetches the key from the user's own storage, signatures happen only at identity steps, owners grant access by key, and revocation closes the door on arrival.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../components/Diagram.astro';
+
+<span class="status status--decided">decided</span> in principle, <span class="status status--draft">draft</span> in detail.
+
+## A user is a public key
+
+XTXP identifies a user by a **public key** and authenticates them by proof that they hold the matching private key. There are no accounts on a central server and no email-like addresses. This follows the same idea as SSH keys and [Nostr](/discussion/prior-art/#identity-and-access), where the key *is* the identity.
+
+**Getting the key onto a device.** People shouldn't have to manage key files. Signing in with an account they already have (Google, Apple or Mozilla) fetches their private key from **their own storage**. XTXP never holds it. The sign-in provider is just a way to get to the user's key, not the identity itself.
+
+**No-JS browsers.** A browser without JavaScript can't hold a key, so the [server-side MUPPET](/overview/architecture/#the-split-that-matters) acting for that user holds it for the session, as one of their devices.
+
+## Signing only at identity steps
+
+Signing every operation would be heavy, so XTXP signs only the steps that establish **who** is acting:
+
+1. **Connecting.** The tracker sends a random challenge and the peer signs it, proving it holds the key.
+2. **Binding a client ID.** Every Xmesh operation already carries a client ID. A peer signs one statement, *"public key P owns client 7 on this document,"* and from then on every operation from client 7 is attributed to P. The redline gets authorship with no per-operation cost.
+3. **Granting and revoking.** Changes to who may read or write are signed by the person making them, so anyone can check them.
+
+Operations themselves travel unsigned, over an authenticated connection.
+
+<Diagram name="15-seq-identity" alt="Sequence: the owner signs in through a provider and fetches their private key from their own storage, answers the tracker's challenge, binds client 7 to their key, sends unsigned operations, grants a collaborator write access, then revokes it; the collaborator's later operations are not admitted and are kept on a fork the collaborator owns." />
+
+## Access is granted by key
+
+- **Whoever creates a branch owns it.**
+- **The owner grants `read` or `write`** to a specific public key, or to `*` for everyone.
+- **Forking needs read access**, and the forker owns the fork, as with forking a repository on GitHub.
+- **Merging a branch back needs write access** on the parent.
+- **The tracker enforces grants** when operations arrive, since trackers already own branches.
+
+This lines up with [branches as history](/spec/branches/), and it covers ordinary websites without special cases: [`@origin`](/spec/addressing/#one-address-form) is readable by `*` and writable by no one. Anyone can fork it, and each fork belongs to whoever made it.
+
+## Revocation closes the door on arrival
+
+Once a tracker has received a revocation, it **admits nothing new** from that key on that branch.
+
+The rule depends on *when the revocation arrives*, not on where an operation claims to sit in history. A revoked user could otherwise backdate edits by claiming an earlier state vector, and those would be indistinguishable from honest offline work.
+
+Edits that arrive too late aren't thrown away. They land on a **fork owned by the revoked user**, so nothing they wrote is lost and nothing reaches the protected branch.
+
+<Aside type="note" title="Admission is the tracker's job">
+Merging is still pure maths that every peer does the same way. *Admission*, meaning whether an operation counts on a branch at all, is decided by the branch's tracker in arrival order. Operations a peer has seen but the tracker hasn't admitted are previews: exactly what the [onion skin](/spec/views/) is for.
+</Aside>
+
+## Still open
+
+- **Where the key lives and how it's protected** in the user's storage. One option is to encrypt it with a key derived from a passkey (the WebAuthn PRF extension), so the storage provider can't read it. That has its own risk: losing the passkey means losing the key.
+- **Admin rights.** If only the creator can grant, losing their key freezes the branch. A grantable `admin` role would fix that.
+- **Several devices, one person.** A personal root key that signs per-device keys would keep one identity across devices, and allow revoking a lost device.
+- **Provenance beyond the tracker.** With signatures only at identity steps, a dishonest tracker could forge operations under a client ID. A later, cheap fix: each client hash-chains its own operations and occasionally signs the chain head.
+- **Key recovery** when every device and the backup are lost.

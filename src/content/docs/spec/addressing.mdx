@@ -14,7 +14,7 @@ import Diagram from '../../../components/Diagram.astro';
 xtxp://{host}/{path}@{ref}
 ```
 
-Used by native desktop clients, terminal interfaces and automated nodes exchanging raw patch streams. Whether it resolves to an XMPP room or to its own socket binding is [still open](/discussion/open-questions/).
+Used by native desktop clients, terminal interfaces and automated nodes exchanging raw patch streams. Whether it names the [WebSocket binding](/spec/wire/#bindings) directly or resolves to it through the gateway is [still open](/discussion/open-questions/).
 
 ## `https://xtxp.link/` — the web gateway
 
@@ -45,6 +45,8 @@ xtxp.link/en.wikipedia.org/wiki/Browser@b1        an edited branch of it
 xtxp.link/xtxp.example.org/drawing@main           a native document
 xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 ```
+
+**Prior art:** the `@` reads like npm's `package@version`, and `origin` follows both git's authoritative remote and HTTP's *origin server* ([prior art](/discussion/prior-art/#addressing-and-branching)).
 
 ### Parsing rules
 

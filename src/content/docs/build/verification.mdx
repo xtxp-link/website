@@ -14,7 +14,7 @@ No implementation code gets written until its behaviour is defined. The source o
 
 ## One suite, every implementation
 
-<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the C++ harness and a Yrs oracle (an Elixir harness is deferred), and SHA-256 hashes of canonical XML are compared; for M1 the same vectors are replayed by C++ CLI peers and an Erlang tracker through a real XMPP room." />
+<Diagram name="13-verification" alt="Verification: feature files feed a fuzzer that emits JSON vectors; vectors run through the C++ harness and a Yrs oracle (an Elixir harness is deferred), and SHA-256 hashes of canonical XML are compared; for M1 the same vectors are replayed by C++ CLI peers through an Erlang tracker over WebSocket, with forced disconnects." />
 
 | Harness | Why it exists |
 | --- | --- |
@@ -36,4 +36,4 @@ Moves are tagged so the Yrs harness can skip them.
 
 ## Over a real network
 
-[Milestone M1](/build/milestones/) runs the same vectors through two C++ CLI peers and an Erlang tracker (driving the C++ core through a Port) in an XMPP room, including dropped connections and stream resumption. Convergence then holds over a real, unreliable network, not just in a test process.
+[Milestone M1](/build/milestones/) runs the same vectors through two C++ CLI peers and an Erlang tracker (driving the C++ core through a Port) over WebSocket, including dropped connections and reconnect sync. Convergence then holds over a real, unreliable network, not just in a test process.
