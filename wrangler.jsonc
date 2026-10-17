@@ -2,7 +2,7 @@
 // Deploy with `npm run deploy` (runs `astro build` then `wrangler deploy`).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "xtxp-link",
+  "name": "xtxp-link-website",
   "compatibility_date": "2026-10-01",
   "assets": {
     "directory": "./dist",
