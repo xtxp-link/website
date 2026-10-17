@@ -34,14 +34,15 @@ The `@{ref}` suffix says which version you mean:
 | --- | --- |
 | `@origin` | The website's authoritative version, as served by its origin server: the upstream peer's branch. Websites only, read-only. |
 | `@main` | The shared collaborative branch. The default for native documents. |
-| `@{branch}` | A named branch: a proposed edit, an undo fork, someone's overlay. |
+| `@{branch}` | A named branch on this host: a proposed edit, an undo fork, someone's overlay. A branch on another host is addressed through that host: `xtxp.link/{other-host}/{path}@{branch}`. |
 | `@{state vector}` | An exact point in history. *Syntax open.* |
 
 Examples:
 
 ```
 xtxp.link/en.wikipedia.org/wiki/Browser@origin      Wikipedia's page, unedited
-xtxp.link/en.wikipedia.org/wiki/Browser@b1        an edited branch of it
+xtxp.link/en.wikipedia.org/wiki/Browser@notes     an edited branch of it
+xtxp.link/my-laptop.lan/drawing@sketch            a fork, living on a laptop
 xtxp.link/xtxp.example.org/drawing@main           a native document
 xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 ```

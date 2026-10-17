@@ -34,8 +34,8 @@ Operations themselves travel unsigned, over an authenticated connection.
 - **The owner grants `read` or `write`** to a specific public key, or to `*` for everyone.
 - **Forking needs read access**, and the forker owns the fork, as with forking a repository on GitHub.
 - **Merging a branch back needs write access** on the parent.
-- **Hosts enforce grants** when operations arrive.
-- **The owner also grants `host`** to the keys of MUPPETs the branch trusts to admit edits for it.
+- **A branch's host enforces its grants** when operations arrive.
+- **The owner also decides which branches this branch trusts**, so their changes merge into it automatically ([trust between branches](/spec/branches/#branches-on-other-hosts-and-trust-between-them)).
 
 This lines up with [branches as history](/spec/branches/), and it covers ordinary websites without special cases: [`@origin`](/spec/addressing/#one-address-form) is readable by `*` and writable by no one. Anyone can fork it, and each fork belongs to whoever made it.
 
@@ -43,14 +43,14 @@ This lines up with [branches as history](/spec/branches/), and it covers ordinar
 
 Once a host has received a revocation, it **admits nothing new** from that key on that branch.
 
-A branch can have [several hosts](/spec/branches/#several-hosts-upstreaming), and each one closes the door when the revocation reaches it. Until then, it may still admit the revoked key's edits, and those count everywhere. Revocation is rare, so that short window is a fair price for being able to run hosts locally and upstream them.
+Each host closes the door on its own branches. A revoked key's edits that were already admitted on *another* branch can still arrive through an automatic merge, if this branch trusts that one. To keep them out, the owner withdraws trust from the branch they come from. Revocation is rare, so that is a fair price for letting branches on different hosts keep each other up to date.
 
 The rule depends on *when the revocation arrives*, not on where an operation claims to sit in history. A revoked user could otherwise backdate edits by claiming an earlier state vector, and those would be indistinguishable from honest offline work.
 
 Edits that arrive too late aren't thrown away. They land on a **fork owned by the revoked user**, so nothing they wrote is lost and nothing reaches the protected branch.
 
 <Aside type="note" title="Admission is the host's job">
-Merging is still pure maths that every peer does the same way. *Admission*, meaning whether an operation counts on a branch at all, is decided by a host in its own arrival order, and an edit admitted by any trusted host counts everywhere. Operations a peer has seen but the host hasn't admitted are previews: exactly what the [onion skin](/spec/views/) is for.
+Merging is still pure maths that every peer does the same way. *Admission*, meaning whether an operation counts on a branch at all, is decided by the branch's own host, in its own arrival order. Edits from other branches arrive by trusted merges. Operations a peer has seen but the host hasn't admitted are previews: exactly what the [onion skin](/spec/views/) is for.
 </Aside>
 
 ## Still open
@@ -60,4 +60,3 @@ Merging is still pure maths that every peer does the same way. *Admission*, mean
 - **Several devices, one person.** A personal root key that signs per-device keys would keep one identity across devices, and allow revoking a lost device.
 - **Provenance beyond the host.** With signatures only at identity steps, a dishonest host could forge operations under a client ID. A later, cheap fix: each client hash-chains its own operations and occasionally signs the chain head.
 - **Key recovery** when every device and the backup are lost.
-- **The revocation window** across several hosts: whether a revocation should travel ahead of ordinary sync, to keep it short.

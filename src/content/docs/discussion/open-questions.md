@@ -51,11 +51,11 @@ Stock Conversations can't render a canvas. The answer affects the protocol now: 
 
 See [Identity and access](/spec/identity/#still-open).
 
-## Hosting
+## Hosting and branches
 
-- **Host trust:** the `host` grant, and whether a host can pass trust on to hosts downstream of it.
-- **The revocation window** across several hosts: whether revocations should travel ahead of ordinary sync.
-- **Storage across hosts:** which host is responsible for durable storage when several host a branch.
+- **Discovery:** how a host finds out which branches on other hosts trust, or are trusted by, its own.
+- **Website branches:** an ordinary website isn't a MUPPET, so its branches need a host. The gateway is the natural default; other hosts address theirs through their own name.
+- **Trust management:** who may set up trust into a branch (its owner only, or anyone with write access), and how trust is shown to collaborators.
 
 ## Views
 

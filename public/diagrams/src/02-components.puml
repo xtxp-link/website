@@ -21,7 +21,7 @@ package "MUPPET — the executor (client-side Xmesh)" as muppet {
 }
 
 package "MUPPET hosting a branch (headless)" as trk {
-  component "Host\n(admit, route, store;\nupstreams to other hosts)" as branch
+  component "Host\n(admit, route, store;\nmerges from trusted branches)" as branch
   database "Branch storage\n(append + compact;\nledger on the roadmap)" as store
 }
 

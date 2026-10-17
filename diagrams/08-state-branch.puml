@@ -5,8 +5,8 @@ title Branch lifecycle (draft)
 [*] --> Forked : fork(parent, SV)
 Forked --> Active : first op
 Active --> Active : ops
-Active --> Paused : stop upstreaming
-Paused --> Active : resume upstreaming
+Active --> Paused : automatic merge off
+Paused --> Active : automatic merge on
 Active --> Proposed : ask for review
 Proposed --> Active : changes requested
 Proposed --> Merged : accept → replay into parent
@@ -21,7 +21,7 @@ Abandoned : kept as history;\ncan be re-forked later
 
 note right of Paused
   A paused queue is a local branch
-  that isn't upstreaming. Its edits show
+  whose automatic merge is off. Its edits show
   as a translucent preview; releasing
   it is an ordinary merge.
 end note

@@ -14,10 +14,19 @@ A **branch** is a fork of a document's history at a point given by a state vecto
 - **Undo** branches from an earlier point, so history is never thrown away.
 - **A proposed edit** is a branch that hasn't been merged yet.
 - **A preview** draws a branch over its parent.
-- **A paused queue** is a local branch that isn't upstreaming yet. Releasing it is an ordinary merge.
+- **A paused queue** is a local branch whose automatic merge is switched off. Releasing it is an ordinary merge.
 - **Infinite, branchable undo** falls out of keeping every branch's operations. How that history is stored long-term is on the [roadmap](/build/milestones/#roadmap).
 
-A branch is identified by its **parent branch** plus the **state vector at the fork**.
+A branch is **identified by where it lives**: its address, `{host}/{path}@{name}`. There are no generated IDs. Each branch also records its **parent** (another branch's address) and the **state vector at the fork**.
+
+### Naming a branch
+
+The creator names a branch, and the name must be unique on its host. Because the name is an address:
+
+- **Asking for a name that already exists opens that branch**, like checking out an existing branch in git, subject to its read and write grants.
+- **Creating a new fork on a name that's taken is rejected**, and so is asking for a branch you have no access to.
+
+Nobody can overwrite or hijack a branch by naming, and two people who pick the same name for the same thing end up working in the same branch.
 
 **Prior art:** cheap branches, merges as replays and an authoritative upstream all come from git ([prior art](/discussion/prior-art/#git)). The undo side builds on Inkscape's transaction-based undo stack ([prior art](/discussion/prior-art/#inkscapes-undo-stack)). Access to branches is covered in [Identity and access](/spec/identity/#access-is-granted-by-key).
 
@@ -42,18 +51,20 @@ Any MUPPET can **host** a branch. A host holds the branch's Xmesh document like 
 
 On a server, each hosted branch runs headless, with no views and no user of its own, as a lightweight actor: an async task that owns one branch and talks to the rest only by messages. Actors are cheap enough to spawn one per proposed edit or undo fork, and a failure in one branch stays contained.
 
-### Several hosts, upstreaming
+### Branches on other hosts, and trust between them
 
 <span class="status status--draft">draft</span>
 
-A branch can have **more than one host**, and hosts can **upstream** to each other, the way a git clone pushes to and pulls from its remote. An Inkscape instance can host a branch for a room on a local network and sync it upstream to a server host; an edge node can host a branch close to its users.
+Every host holds **its own branches**. A branch never lives on two hosts at once: a copy elsewhere is a different branch, with its own address, in the way every git clone has its own branches.
 
-<Diagram name="16-hosts-upstream" alt="Several hosts for one branch: an Inkscape instance hosting a branch on a local network and an edge host both upstream to a main host; clients connect to the nearest host; edits admitted by any trusted host flow to all of them by state-vector sync." />
+<Diagram name="16-branch-trust" alt="Branches on different hosts linked by trust: a branch on an Inkscape instance on a local network and a branch on an edge host both trust and are trusted by main on the server, so changes merge automatically in both directions; a paused branch on the laptop has its automatic merge switched off." />
 
-- **Hosts sync like any peers**, by exchanging state vectors.
-- **An edit admitted by a trusted host counts as admitted everywhere.** Otherwise two hosts could disagree about it forever.
-- **Trust is a grant.** The branch owner grants `host` to a MUPPET's key, so a host accepts admissions only from hosts the branch trusts.
-- **Revocation spreads host by host.** Each host closes the door when the revocation reaches it (see [Identity and access](/spec/identity/#revocation-closes-the-door-on-arrival)).
+- **Only a branch's own host admits edits to it**, in its own arrival order.
+- **Trust between branches drives automatic merging.** If branch A trusts branch B, B's changes merge into A as they arrive, by ordinary state-vector sync. Trust can run one way or both ways, so a studio's branch on its local network and `main` on a server can keep each other up to date.
+- **A paused queue** is a branch whose automatic merge is switched off until it's released.
+- **Merges converge in any direction.** CRDT merges are commutative and idempotent, so two branches that trust each other can't loop or diverge.
+
+For example, `xtxp.example.org/drawing@main` can be forked onto a laptop as `my-laptop.lan/drawing@sketch`, with the fork trusting `main` so it stays current, and `main` trusting the fork only once it's ready.
 
 ### Storage: toolchain first
 

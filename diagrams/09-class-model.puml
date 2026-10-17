@@ -27,9 +27,14 @@ class StateVector <<Yrs>> {
 }
 
 class Branch {
-  id : BranchId
-  parent : BranchId
+  address : host/path@name
+  parent : address
   fork_at : StateVector
+}
+
+class Trust {
+  from : address
+  into : address
 }
 
 class ClientBinding <<signed>> {
@@ -45,6 +50,7 @@ class Author {
 Doc *-- "many" Node
 Node ..> Node : edges point to\nparents by NodeId
 Branch --> StateVector
+Trust --> Branch : changes merge\nautomatically
 ID ..> ClientBinding : client
 ClientBinding --> Author : signed by
 

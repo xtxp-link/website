@@ -21,8 +21,8 @@ gw --> b : page with every link rewritten to\nxtxp.link/…@origin, origin forms
 
 b -> gw : POST edit
 gw -> sm : edit intent
-sm -> t : fork @origin → branch b1,\nXTXP ops on b1
-gw --> b : 303 → /en.wikipedia.org/wiki/Browser@b1\n(frame: "edited branch", links to @origin)
+sm -> t : fork @origin → @notes\n(named by its creator),\nXTXP ops on @notes
+gw --> b : 303 → /en.wikipedia.org/wiki/Browser@notes\n(frame: "edited branch", links to @origin)
 
 == later: origin page changes ==
 gw -> o : re-fetch

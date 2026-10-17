@@ -60,9 +60,9 @@ Branches persist the way the Yrs toolchain already does: a full state encoded as
 With Xmesh in Rust, hosting MUPPETs run as a small Rust server: one async actor per branch, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side MUPPET in the same binary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation.
 
 
-## 16. Any MUPPET can host a branch; hosts can upstream
+## 16. Any MUPPET can host branches; branches are named by where they live
 
-There is one kind of node, the MUPPET. Any MUPPET can host a branch: it admits, routes and stores it, usually headless on a server, with no views and no user of its own. A branch can have several hosts, which upstream to each other. An edit admitted by a trusted host counts everywhere, trust is a `host` grant from the branch owner, and each host closes the door on a revoked key when the revocation reaches it. See [Branches and history](/spec/branches/#several-hosts-upstreaming).
+There is one kind of node, the MUPPET. Any MUPPET can host branches: it admits, routes and stores them, usually headless on a server, with no views and no user of its own. A branch is identified by its address, `{host}/{path}@{name}`, with no generated IDs; it lives on exactly one host, and only that host admits edits to it. The creator names it: asking for an existing name opens that branch (subject to grants), and creating a fork on a taken name is rejected. **Trust between branches drives automatic merges**, one way or both, which is how branches on different hosts keep each other up to date. See [Branches and history](/spec/branches/#branches-on-other-hosts-and-trust-between-them).
 
 ## Naming
 

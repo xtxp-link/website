@@ -30,9 +30,9 @@ node "App server" {
 
 node "Hosting server: headless MUPPETs\none binary, or one Durable Object per branch" {
   component "WebSocket endpoint" as ws
-  component "Host: main\n(headless MUPPET)" as t0
-  component "Host: branch b1\n(headless MUPPET)" as t1
-  component "Host: branch b2\n(headless MUPPET)" as t2
+  component "Host: @main\n(headless MUPPET)" as t0
+  component "Host: @sketch\n(headless MUPPET)" as t1
+  component "Host: @review\n(headless MUPPET)" as t2
   database "Branch storage\n(append + compact)" as store
 }
 

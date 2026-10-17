@@ -22,7 +22,7 @@ Owns everything that crosses a boundary:
 | --- | --- |
 | **Engine (Rust)** | Xmesh on Yrs: the tree schema, cycle-safe moves, XML Patch translation, and its C and Wasm bindings |
 | **Inkscape fork** | The MUPPET adapter inside Inkscape, and keeping the fork current |
-| **MUPPET roles (Rust)** | Hosting (admission, grants, routing, storage, upstreaming), its WebSocket endpoint, and the server-side MUPPET |
+| **MUPPET roles (Rust)** | Hosting (admission, grants, routing, storage, trust between branches), its WebSocket endpoint, and the server-side MUPPET |
 | **Wire and bridges** | The sync protocol's message encoding, and the XMPP bridge for mobile and chat clients (from M4) |
 | **Web clients** | The Wasm MUPPET and the no-JS HTML client |
 

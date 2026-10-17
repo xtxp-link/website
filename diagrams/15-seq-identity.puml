@@ -5,7 +5,7 @@ title Identity and access: sign in, bind, grant, revoke
 actor "Owner\n(key P)" as o
 participant "Device\n(MUPPET)" as d
 participant "Sign-in provider\n+ user's storage" as sso
-participant "Host\n(branch b1)" as t
+participant "Host\n(branch @review)" as t
 actor "Collaborator\n(key Q)" as q
 
 == identity: the key is the user ==
@@ -25,7 +25,7 @@ note right of t : authorship comes from the binding,\nnot from per-op signatures
 
 == authorisation: the creator grants by key ==
 o -> d : share with Q
-d -> t : grant (signed by P): Q may write b1
+d -> t : grant (signed by P): Q may write @review
 t -> t : record grant
 q -> t : hello + prove (key Q), bind client 9
 q -> t : update ops (9, …)
@@ -35,6 +35,6 @@ t -> t : Q holds write: admit
 d -> t : revoke (signed by P): Q
 t -> t : from now, admit nothing new from Q
 q -> t : update ops (9, …)\n(edited offline, claims earlier history)
-t -> t : arrived after the revocation:\nnot admitted to b1
-t --> q : ops kept on a fork owned by Q;\nnothing lost, nothing reaches b1
+t -> t : arrived after the revocation:\nnot admitted to @review
+t --> q : ops kept on a fork owned by Q;\nnothing lost, nothing reaches @review
 @enduml
