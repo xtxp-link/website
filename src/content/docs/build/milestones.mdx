@@ -52,4 +52,5 @@ Deferred until the first milestones show they're needed. Each one starts by chec
 | **Keyframes**: hot snapshots tuned for instant loading | Yrs can encode a whole document as one compact update | The full state as one update |
 | **History limits and garbage collection** | Snapshots need Yrs's garbage collection off, so deleted content is kept | Keep everything; measure growth |
 | **Native C++ Xmesh** | Yrs is already native code; a rewrite would be about owning the engine, not speed | Xmesh on Yrs, through its C interface |
+| **Elixir / BEAM trackers** | Worth considering at large scale, for the BEAM's supervision and clustering | Rust trackers, one actor per branch |
 | **Signed hash chains** of each client's operations | Signing only at identity steps is enough to start | Authorship from client bindings |
