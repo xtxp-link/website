@@ -7,6 +7,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "diagrams": "bash scripts/render-diagrams.sh",
+    "logo": "node scripts/render-logo.mjs",
     "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {

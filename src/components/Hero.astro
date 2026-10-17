@@ -1,0 +1,89 @@
+---
+// Splash hero. Same as Starlight's, except the H1 is the animated logo (the title text stays for readers
+// and search engines) and there is no image column.
+import DraftContentNotice from 'virtual:starlight/components/DraftContentNotice';
+import { LinkButton } from '@astrojs/starlight/components';
+import Logo from './Logo.astro';
+
+const { data } = Astro.locals.starlightRoute.entry;
+const { title = data.title, tagline, actions = [] } = data.hero || {};
+---
+
+<div class="hero">
+  <div class="sl-flex stack">
+    <div class="sl-flex copy">
+      <h1 id="_top" data-page-title>
+        <Logo mode="loop" class="xtxp-hero-logo" />
+        <span class="sr-only" set:html={title} />
+      </h1>
+      {data.draft && <DraftContentNotice />}
+      {tagline && <div class="tagline" set:html={tagline} />}
+    </div>
+    {
+      actions.length > 0 && (
+        <div class="sl-flex actions">
+          {actions.map(
+            ({ attrs: { class: className, ...attrs } = {}, icon, link: href, text, variant }) => (
+              <LinkButton {href} {variant} icon={icon?.name} class:list={[className]} {...attrs}>
+                {text}
+                {icon?.html && <Fragment set:html={icon.html} />}
+              </LinkButton>
+            )
+          )}
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: 100%;
+    padding-block: clamp(2rem, calc(1rem + 8vmin), 7rem);
+  }
+  .stack {
+    flex-direction: column;
+    gap: clamp(1.5rem, calc(1.5rem + 1vw), 2rem);
+    text-align: center;
+  }
+  .copy {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+  }
+  .copy > * {
+    max-width: 50ch;
+  }
+  h1 {
+    margin: 0;
+    line-height: 1;
+    max-width: none;
+  }
+  h1 :global(.xtxp-hero-logo) {
+    display: block;
+    width: min(26rem, 80vw);
+    height: auto;
+    overflow: visible;
+  }
+  .tagline {
+    font-size: clamp(var(--sl-text-base), calc(0.0625rem + 2vw), var(--sl-text-xl));
+    color: var(--sl-color-gray-2);
+  }
+  .actions {
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  @media (min-width: 50rem) {
+    .stack {
+      text-align: start;
+    }
+    .copy {
+      align-items: flex-start;
+    }
+    .actions {
+      justify-content: flex-start;
+    }
+  }
+</style>

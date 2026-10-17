@@ -11,7 +11,12 @@ export default defineConfig({
       title: 'XTXP',
       description:
         'XTXP, the XML to XML Protocol: a draft specification for collaborative, branchable editing of XML documents, from Inkscape to a browser with no JavaScript.',
-      customCss: ['./src/styles/custom.css'],
+      favicon: '/favicon.svg',
+      components: {
+        Hero: './src/components/Hero.astro',
+        SiteTitle: './src/components/SiteTitle.astro',
+      },
+      customCss: ['./src/styles/logo.generated.css', './src/styles/custom.css'],
       lastUpdated: false,
       sidebar: [
         {
