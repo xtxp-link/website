@@ -24,7 +24,7 @@ package "M1: same vectors over a real network" {
   component "CLI peer 1\n(Xmesh)" as p1
   component "CLI peer 2\n(Xmesh)" as p2
   component "CLI peer 3\n(late joiner)" as p3
-  queue "Rust tracker (Xmesh)\nover WebSocket: forced\ndisconnects, reconnect sync" as room
+  queue "Headless MUPPET host\nover WebSocket: forced\ndisconnects, reconnect sync" as room
 }
 vec --> p1
 vec --> p2

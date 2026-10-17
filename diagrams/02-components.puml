@@ -20,8 +20,8 @@ package "MUPPET — the executor (client-side Xmesh)" as muppet {
   component "Canvas, spatial chat\nand comments\n(views, shared by all adapters)" as mviews
 }
 
-package "Trackers — routing layer (Rust)" as trk {
-  component "Branch actor\n(one per branch)" as branch
+package "MUPPET hosting a branch (headless)" as trk {
+  component "Host\n(admit, route, store;\nupstreams to other hosts)" as branch
   database "Branch storage\n(append + compact;\nledger on the roadmap)" as store
 }
 

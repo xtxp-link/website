@@ -77,7 +77,7 @@ The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp:
 
 ### The no-JS edit loop
 
-<Diagram name="04-seq-nojs-edit" alt="Sequence: the browser POSTs a form; the gateway hands it to the server MUPPET, which makes CRDT ops and sends them to the tracker; the tracker fans them out to Inkscape; the browser is redirected and GETs the new HTML; later meta-refresh polls get 304 Not Modified unless someone edited." />
+<Diagram name="04-seq-nojs-edit" alt="Sequence: the browser POSTs a form; the gateway hands it to the server MUPPET, which makes CRDT ops and sends them to the host; the host fans them out to Inkscape; the browser is redirected and GETs the new HTML; later meta-refresh polls get 304 Not Modified unless someone edited." />
 
 ### Deep links and short links
 

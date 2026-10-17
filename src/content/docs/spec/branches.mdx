@@ -1,6 +1,6 @@
 ---
 title: Branches and history
-description: Branches as forks of the undo history, held by one tracker actor each, and merged by applying their updates.
+description: Branches as forks of the undo history, held by the MUPPETs that host them, and merged by applying their updates.
 ---
 
 import Diagram from '../../../components/Diagram.astro';
@@ -14,6 +14,7 @@ A **branch** is a fork of a document's history at a point given by a state vecto
 - **Undo** branches from an earlier point, so history is never thrown away.
 - **A proposed edit** is a branch that hasn't been merged yet.
 - **A preview** draws a branch over its parent.
+- **A paused queue** is a local branch that isn't upstreaming yet. Releasing it is an ordinary merge.
 - **Infinite, branchable undo** falls out of keeping every branch's operations. How that history is stored long-term is on the [roadmap](/build/milestones/#roadmap).
 
 A branch is identified by its **parent branch** plus the **state vector at the fork**.
@@ -31,20 +32,32 @@ Two kinds of undo meet here:
 
 Where they differ from Inkscape: in Inkscape, undoing and then making a new edit clears the redo stack, and the undone work is lost. In XTXP, the undone work is still in the document's history, so it can be reached again through a branch from before the undo.
 
-## Trackers
+## Hosting a branch
 
-Each server-side branch is held by its own lightweight **actor** (a tracker): an async task in a small Rust server that owns one branch's document and talks to the rest only by messages. Actors are cheap enough to spawn one per proposed edit or undo fork, and a failure in one branch is contained to that actor.
+Any MUPPET can **host** a branch. A host holds the branch's Xmesh document like any other MUPPET, and also:
 
-A tracker:
+- **admits** operations against the branch's [grants](/spec/identity/#access-is-granted-by-key), in arrival order
+- **routes** admitted operations to everyone subscribed to the branch
+- **persists** the branch and hands new clients its full state (see below)
 
-- holds its branch's Xmesh document in memory, in the same Rust process
-- admits operations against the branch's [grants](/spec/identity/#access-is-granted-by-key)
-- routes the branch's operations to its subscribers
-- persists the branch using whatever fits the Yrs toolchain first (see below)
+On a server, each hosted branch runs headless, with no views and no user of its own, as a lightweight actor: an async task that owns one branch and talks to the rest only by messages. Actors are cheap enough to spawn one per proposed edit or undo fork, and a failure in one branch stays contained.
+
+### Several hosts, upstreaming
+
+<span class="status status--draft">draft</span>
+
+A branch can have **more than one host**, and hosts can **upstream** to each other, the way a git clone pushes to and pulls from its remote. An Inkscape instance can host a branch for a room on a local network and sync it upstream to a server host; an edge node can host a branch close to its users.
+
+<Diagram name="16-hosts-upstream" alt="Several hosts for one branch: an Inkscape instance hosting a branch on a local network and an edge host both upstream to a main host; clients connect to the nearest host; edits admitted by any trusted host flow to all of them by state-vector sync." />
+
+- **Hosts sync like any peers**, by exchanging state vectors.
+- **An edit admitted by a trusted host counts as admitted everywhere.** Otherwise two hosts could disagree about it forever.
+- **Trust is a grant.** The branch owner grants `host` to a MUPPET's key, so a host accepts admissions only from hosts the branch trusts.
+- **Revocation spreads host by host.** Each host closes the door when the revocation reaches it (see [Identity and access](/spec/identity/#revocation-closes-the-door-on-arrival)).
 
 ### Storage: toolchain first
 
-The Yrs ecosystem already has the building blocks a tracker needs:
+The Yrs ecosystem already has the building blocks a host needs:
 
 - **A full state as one update.** Yrs can encode a whole document as a single update, so a new client loads one compact blob instead of replaying history.
 - **Append, then compact.** Storing each incoming update and periodically merging them into one is the usual pattern for persisting Yjs documents.
@@ -53,7 +66,7 @@ XTXP starts with those, and [y-sweet](/discussion/prior-art/#y-sweet) already im
 
 ## Fork, preview, merge
 
-<Diagram name="07-seq-branch" alt="Sequence: an author forks main at a state vector, a tracker process for the branch is spawned, the author sends ops to it, a reviewer views onion skin and redline rendered by the server MUPPET, accepts, and main replays the branch ops and fans them out." />
+<Diagram name="07-seq-branch" alt="Sequence: an author forks main at a state vector, a host for the branch is spawned, the author sends ops to it, a reviewer views onion skin and redline rendered by the server MUPPET, accepts, and main replays the branch ops and fans them out." />
 
 **Merging is mechanical.** CRDT operations commute, so merging a branch means applying its updates to the parent. Nobody has to resolve conflicts by hand, and the **redline** is exactly the set of operations being applied, grouped by author.
 

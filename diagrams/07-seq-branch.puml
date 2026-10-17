@@ -4,8 +4,8 @@ title Branch as undo history: fork, preview, merge
 
 actor "Author" as au
 participant "Author's\nMUPPET" as am
-participant "Tracker\nmain" as main
-participant "Tracker\nbranch b1" as b1
+participant "Host\nmain" as main
+participant "Host\nbranch b1" as b1
 participant "Server MUPPET\n(views)" as sm
 actor "Reviewer" as rv
 

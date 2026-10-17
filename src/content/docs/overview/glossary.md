@@ -4,7 +4,7 @@ description: Terms used across the XTXP specification.
 ---
 
 **Admission**
-: A tracker's decision, in arrival order, that an operation counts on its branch: the client ID is bound to a key that holds write access.
+: A host's decision, in its own arrival order, that an operation counts on a branch: the client ID is bound to a key that holds write access. An operation admitted by any trusted host counts everywhere.
 
 **Binding** (identity)
 : A signed statement that a public key owns a client ID on a document. It is how operations get their author without being signed one by one.
@@ -13,7 +13,7 @@ description: Terms used across the XTXP specification.
 : A way of carrying XTXP: WebSocket, HTTP, or the XMPP bridge.
 
 **Branch**
-: A fork of a document's history at a given state vector. Undo, proposed edits and previews are all branches. Each server-side branch is held by one tracker process.
+: A fork of a document's history at a given state vector. Undo, proposed edits and previews are all branches. Each branch is held by at least one host.
 
 **CRDT**
 : Conflict-free replicated data type. A data structure whose concurrent updates can be applied in any order and still converge to the same state.
@@ -26,6 +26,9 @@ description: Terms used across the XTXP specification.
 
 **Genesis (vector 0)**
 : The first state of a document. For live web branching, it is the fetched origin page.
+
+**Host**
+: A MUPPET hosting a branch: it admits operations against the branch's grants, routes them and stores the branch, usually headless on a server. A branch can have several hosts that upstream to each other.
 
 **Immortal parent**
 : An XML element node that is never replaced, only updated. Attributes live in a map and children in an array inside it, so concurrent edits to one element never orphan each other.
@@ -43,7 +46,7 @@ description: Terms used across the XTXP specification.
 : A translucent overlay of another state (a branch, a paused queue, a peer's in-flight edits) drawn over the current one.
 
 **Paused queue**
-: Local edits a MUPPET holds back from the wire, shown as a preview until released.
+: A local branch that isn't upstreaming yet, shown as a preview until it's released (merged).
 
 **Public key (identity)**
 : What a user is in XTXP. Proved by signing a challenge; fetched onto a device through an existing sign-in, from the user's own storage.
@@ -54,8 +57,8 @@ description: Terms used across the XTXP specification.
 **State vector**
 : A map from each client to the highest clock value seen from it. Two peers exchange state vectors to work out which operations the other is missing.
 
-**Tracker**
-: A lightweight actor, in the Rust tracker server, holding one branch's document and presence, admitting operations against the branch's grants, and routing them.
+**Upstreaming** (hosts)
+: One host syncing a branch with another, the way a git clone syncs with its remote.
 
 **Upstream peer**
 : For live web branching, the origin website treated as a peer. Its "edits" are the differences between successive fetches.

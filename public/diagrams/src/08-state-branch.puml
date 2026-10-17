@@ -5,8 +5,8 @@ title Branch lifecycle (draft)
 [*] --> Forked : fork(parent, SV)
 Forked --> Active : first op
 Active --> Active : ops
-Active --> Paused : author pauses queue
-Paused --> Active : resume
+Active --> Paused : stop upstreaming
+Paused --> Active : resume upstreaming
 Active --> Proposed : ask for review
 Proposed --> Active : changes requested
 Proposed --> Merged : accept → replay into parent
@@ -20,8 +20,9 @@ Merged : ops are kept,\nso the branch is still history
 Abandoned : kept as history;\ncan be re-forked later
 
 note right of Paused
-  Paused queues are local to a MUPPET:
-  edits are held back from the wire
-  but shown as a translucent preview.
+  A paused queue is a local branch
+  that isn't upstreaming. Its edits show
+  as a translucent preview; releasing
+  it is an ordinary merge.
 end note
 @enduml

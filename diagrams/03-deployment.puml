@@ -28,11 +28,11 @@ node "App server" {
   component "Server MUPPET\n(Xmesh, Rust)" as m3
 }
 
-node "Tracker server (Rust)\none binary, or one Durable Object per branch" {
+node "Hosting server: headless MUPPETs\none binary, or one Durable Object per branch" {
   component "WebSocket endpoint" as ws
-  component "Tracker: main\n(actor, Xmesh)" as t0
-  component "Tracker: branch b1\n(actor, Xmesh)" as t1
-  component "Tracker: branch b2\n(actor, Xmesh)" as t2
+  component "Host: main\n(headless MUPPET)" as t0
+  component "Host: branch b1\n(headless MUPPET)" as t1
+  component "Host: branch b2\n(headless MUPPET)" as t2
   database "Branch storage\n(append + compact)" as store
 }
 

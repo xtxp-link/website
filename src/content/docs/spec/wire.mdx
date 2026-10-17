@@ -16,7 +16,7 @@ Very little. Xmesh operations can be applied in any order, and applying one twic
 
 Recovering from a dropped connection is part of XTXP itself, not something borrowed from the transport:
 
-<Diagram name="06-seq-reconnect" alt="Sequence: a peer edits offline, reconnects, sends its state vector, the tracker replies with exactly the operations the peer is missing and the peer uploads the operations the tracker is missing; both end at the same state vector." />
+<Diagram name="06-seq-reconnect" alt="Sequence: a peer edits offline, reconnects, sends its state vector, the host replies with exactly the operations the peer is missing and the peer uploads the operations the host is missing; both end at the same state vector." />
 
 ## Messages
 
@@ -40,11 +40,11 @@ Cursors and presence travel separately from operations. A 60 Hz cursor stream sh
 
 | Binding | Used by | Notes |
 | --- | --- | --- |
-| **WebSocket**, binary frames | Wasm MUPPETs in the browser, the Inkscape fork, CLI peers | The primary binding, chosen for raw speed. Trackers serve it directly. |
+| **WebSocket**, binary frames | Wasm MUPPETs in the browser, the Inkscape fork, CLI peers | The primary binding, chosen for raw speed. Hosts serve it directly. |
 | **HTTP** forms and redirects | Browsers with no JavaScript, through a server-side MUPPET | See [Addressing](/spec/addressing/#the-no-js-edit-loop). |
-| **XMPP**, through a bridge | Mobile and chat clients such as Conversations, and federation | A bridge in front of a tracker, not the core transport. |
+| **XMPP**, through a bridge | Mobile and chat clients such as Conversations, and federation | A bridge in front of a host, not the core transport. |
 
-<Diagram name="05-seq-convergence" alt="Sequence: two MUPPETs connected to a tracker over WebSocket make concurrent edits; the tracker checks each client's grant, records the operations and fans them out; both peers integrate and reach the same state vector and hash." />
+<Diagram name="05-seq-convergence" alt="Sequence: two MUPPETs connected to a host over WebSocket make concurrent edits; the host checks each client's grant, records the operations and fans them out; both peers integrate and reach the same state vector and hash." />
 
 ## The XMPP bridge
 
@@ -55,15 +55,15 @@ XMPP is good at things a browser tab isn't: holding messages while a phone sleep
 - **chat interop**: canvas comments mirrored as room messages, and replies turned back into comments ([open question 7](/discussion/open-questions/#q7-what-does-a-conversations-user-get-in-m4))
 - **OMEMO** end-to-end encryption for rooms that want it
 
-Behind the bridge, everything is ordinary XTXP to a tracker. Inkboard's old problem of XML getting damaged inside XMPP stanzas is now one bridge's concern, not the core wire format's (see [prior art](/discussion/prior-art/#inkboard-and-pedro)).
+Behind the bridge, everything is ordinary XTXP to a host. Inkboard's old problem of XML getting damaged inside XMPP stanzas is now one bridge's concern, not the core wire format's (see [prior art](/discussion/prior-art/#inkboard-and-pedro)).
 
 ## Encryption
 
-Every binding runs over TLS. A branch can also be end-to-end encrypted, so that its tracker only sees ciphertext. The tracker can still **admit** operations, because client bindings and grants are metadata it can check. It can't compact the branch into a full state or render previews, though, so those move to the clients. A server-side MUPPET can still take part as one of the user's own devices.
+Every binding runs over TLS. A branch can also be end-to-end encrypted, so that its host only sees ciphertext. The host can still **admit** operations, because client bindings and grants are metadata it can check. It can't compact the branch into a full state or render previews, though, so those move to the clients. A server-side MUPPET can still take part as one of the user's own devices.
 
 ## Still open
 
 - How XTXP's own messages (identity, grants) are framed alongside the Yjs sync messages.
 - Whether `xtxp://` names the WebSocket binding directly, or resolves to it through the gateway.
-- How the XMPP bridge is built: for example as a component plugged into an existing XMPP server, speaking XTXP to a tracker.
+- How the XMPP bridge is built: for example as a component plugged into an existing XMPP server, speaking XTXP to a host.
 

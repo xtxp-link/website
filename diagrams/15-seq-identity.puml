@@ -5,7 +5,7 @@ title Identity and access: sign in, bind, grant, revoke
 actor "Owner\n(key P)" as o
 participant "Device\n(MUPPET)" as d
 participant "Sign-in provider\n+ user's storage" as sso
-participant "Tracker\n(branch b1)" as t
+participant "Host\n(branch b1)" as t
 actor "Collaborator\n(key Q)" as q
 
 == identity: the key is the user ==

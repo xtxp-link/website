@@ -11,7 +11,7 @@ actor "Mobile / chat user\n(XMPP client)" as mobile
 
 rectangle "XTXP mesh" as mesh {
   component "Peers running\nMUPPET + Xmesh" as peers
-  component "Trackers\n(one actor per branch)" as trackers
+  component "Hosts\n(headless MUPPETs,\nupstreaming)" as hosts
 }
 
 rectangle "xtxp.link\nHTTP gateway" as gateway
@@ -24,8 +24,8 @@ wasm --> peers : edits in browser
 nojs --> gateway : HTML forms,\nlinks, HTTP caching
 mobile --> bridge : chat, comments,\npush when asleep
 gateway --> peers : server-side MUPPET\nacts for the user
-peers --> trackers : XTXP over WebSocket
-bridge --> trackers : XTXP
+peers --> hosts : XTXP over WebSocket
+bridge --> hosts : XTXP
 gateway ..> origin : genesis fetch\n(no cookies forwarded)
 peers ..> sso : fetch own private key\nafter sign-in
 

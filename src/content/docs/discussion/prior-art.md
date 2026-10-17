@@ -69,7 +69,7 @@ Peers exchange state vectors, then send each other only the missing updates, ove
 
 ### y-sweet
 
-An open-source Rust server for Yjs documents, built on Yrs, from Jamsocket. It persists documents to a filesystem or S3-compatible storage, controls access per document with client tokens, and can run as a binary or as Wasm on Cloudflare's edge. Much of what an XTXP tracker needs; [reviewed for reuse](/build/milestones/#before-m1-review-y-sweet) before tracker code is written.
+An open-source Rust server for Yjs documents, built on Yrs, from Jamsocket. It persists documents to a filesystem or S3-compatible storage, controls access per document with client tokens, and can run as a binary or as Wasm on Cloudflare's edge. Much of what hosting an XTXP branch needs; [reviewed for reuse](/build/milestones/#before-m1-review-y-sweet) before host code is written.
 
 - [y-sweet on docs.rs](https://docs.rs/crate/y-sweet/0.8.2)
 

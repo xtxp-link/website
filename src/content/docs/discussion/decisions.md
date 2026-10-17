@@ -7,7 +7,7 @@ The decisions currently in force. Numbers stay stable so links keep working.
 
 ## 1. Relays and peers
 
-**Trackers** relay: they admit, order and pass on operations, and they may be blind to content. **Peers** run the CRDT engine.
+**Hosting MUPPETs** relay: they admit, order and pass on operations, and they may be blind to content. **Peers** run the CRDT engine.
 
 
 ## 2. The no-JS client is a puppet
@@ -22,12 +22,12 @@ With a separate engine repository, scheduled rebases and a tracked diff size. Se
 
 A y-sweet review → M1 headless convergence → M2 Inkscape plus no-JS → M3 Inkscape plus Wasm → M4 Inkscape plus Conversations. See [Milestones](/build/milestones/).
 
-## 7. Peer model with branch trackers
+## 7. Peer model with hosted branches
 
 - **MUPPET is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are MUPPET views, wherever a MUPPET runs.
 - **XTXP is node to node.**
-- **A server-side branch is held by a tracker**, one actor per branch, and a branch is a fork of the undo history.
-- **Server-side rendering is a server-side MUPPET.** Trackers hold history, MUPPETs execute and render.
+- **A branch is held by the MUPPETs that host it**, and a branch is a fork of the undo history.
+- **Server-side rendering is a server-side MUPPET.** Hosts hold branches; every MUPPET executes, and those with a user render.
 
 
 ## 9. One address form: `{host}/{path}@{ref}`
@@ -42,12 +42,12 @@ XTXP's wire is a small sync protocol that doesn't care about transport: operatio
 
 ## 12. Identity is a public key; access is granted by key
 
-A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a branch owns it and grants `read` or `write` to keys or to `*`. A tracker enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits land on a fork the revoked user owns. See [Identity and access](/spec/identity/).
+A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a branch owns it and grants `read` or `write` to keys or to `*`. A host enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits land on a fork the revoked user owns. See [Identity and access](/spec/identity/).
 
 
 ## 13. Xmesh v1 is Yrs plus a tree layer
 
-The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. Yrs supplies YATA ordering, maps, text, state vectors, a binary update format, snapshots and a sync protocol. Xmesh adds an XML tree schema (a map of nodes with parent pointers and fractional indexes), **cycle-safe moves after Evan Wallace's algorithm**, XML Patch translation and canonical XML output. It stays a pure core, reached through a C interface (Inkscape), Wasm (browser) and Rust directly (server MUPPET and trackers). A native C++ engine becomes a later spike, held to the same vectors.
+The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. Yrs supplies YATA ordering, maps, text, state vectors, a binary update format, snapshots and a sync protocol. Xmesh adds an XML tree schema (a map of nodes with parent pointers and fractional indexes), **cycle-safe moves after Evan Wallace's algorithm**, XML Patch translation and canonical XML output. It stays a pure core, reached through a C interface (Inkscape), Wasm (browser) and Rust directly (server MUPPET and hosts). A native C++ engine becomes a later spike, held to the same vectors.
 
 
 ## 14. Toolchain first: ledger and keyframes go on the roadmap
@@ -55,14 +55,18 @@ The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. 
 Branches persist the way the Yrs toolchain already does: a full state encoded as one update for loading, and append-then-compact storage. A dedicated ledger and keyframes are on the [roadmap](/build/milestones/#roadmap), to be built only if that falls short.
 
 
-## 15. Trackers are a small Rust server
+## 15. Hosting runs as a small Rust server
 
-With Xmesh in Rust, trackers are a small Rust server: one async actor per branch, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side MUPPET in the same binary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation.
+With Xmesh in Rust, hosting MUPPETs run as a small Rust server: one async actor per branch, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side MUPPET in the same binary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation.
 
+
+## 16. Any MUPPET can host a branch; hosts can upstream
+
+There is one kind of node, the MUPPET. Any MUPPET can host a branch: it admits, routes and stores it, usually headless on a server, with no views and no user of its own. A branch can have several hosts, which upstream to each other. An edit admitted by a trusted host counts everywhere, trust is a `host` grant from the branch owner, and each host closes the door on a revoked key when the revocation reaches it. See [Branches and history](/spec/branches/#several-hosts-upstreaming).
 
 ## Naming
 
-- **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor and application layer, **Trackers** for the routing layer.
+- **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor, the application layer and hosting.
 - Name checks so far: *Xmesh* collides with Thinkbox XMesh, a commercial mesh-caching plugin for VFX tools. *Muppet* is a Henson/Disney trademark: fine for an internal component, riskier on anything public-facing. No direct clash was found for *XTXP*.
 
 ## Conventions

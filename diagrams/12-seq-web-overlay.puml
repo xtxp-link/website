@@ -5,7 +5,7 @@ title Live web branching: genesis, overlay, upstream as a peer
 actor "Browser" as b
 participant "xtxp.link\ngateway" as gw
 participant "Server MUPPET" as sm
-participant "Trackers\n@origin + branches" as t
+participant "Hosts\n@origin + branches" as t
 participant "Origin site" as o
 
 b -> gw : GET /en.wikipedia.org/wiki/Browser@origin

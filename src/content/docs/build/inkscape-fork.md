@@ -19,7 +19,7 @@ Inkboard, the earlier attempt to sync Inkscape over XMPP, also lived in a branch
 
 Before writing the Inkscape adapter, read Inkboard's implementation. It solved many of the same problems inside Inkscape, and reading it first saves rediscovering them:
 
-- **Where it lives:** `src/jabber_whiteboard/` (Inkboard) and `src/pedro/` (its XMPP library) in Inkscape's 0.46 release branch. David Yip's initial commit (August 2005) went into `src/jabber_whiteboard`, behind `--enable-inkboard`, with a "Whiteboard" menu and a debug "Dump XML tracker" item.
+- **Where it lives:** `src/jabber_whiteboard/` (Inkboard) and `src/pedro/` (its XMPP library) in Inkscape's 0.46 release branch. David Yip's initial commit (August 2005) went into `src/jabber_whiteboard`, behind `--enable-inkboard`, with a "Whiteboard" menu and a debug "Dump XML host" item.
 - **What to take from it:** how it observed changes to Inkscape's XML tree, how it applied remote changes, and how it kept track of elements across peers (its "XML tracker").
 - **What to test for, from its known problems:** elements Inkscape names automatically (gradient and pattern fills broke its session files), `defs` and metadata that never synced, and crashes when sessions opened in new windows.
 - **What to leave behind:** the XMPP transport (now a [bridge](/spec/wire/#the-xmpp-bridge)) and the custom wire format (now Yrs updates).

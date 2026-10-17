@@ -5,14 +5,14 @@ title No-JS edit: form POST, redirect, cached polling
 actor "Browser\n(no JS)" as b
 participant "xtxp.link\ngateway" as gw
 participant "Server MUPPET\n(acts for this user)" as sm
-participant "Tracker\n(branch main)" as t
+participant "Host\n(branch main)" as t
 participant "Inkscape\nMUPPET" as ink
 
 b -> gw : POST /host/doc (form fields)
 gw -> sm : edit intent for user@domain
 sm -> sm : Xmesh: turn intent into\nCRDT op(s), apply locally
-sm -> t : XTXP op (XMPP message)
-t -> t : order, append to ledger
+sm -> t : XTXP op (WebSocket)
+t -> t : admit, record
 t -> ink : fan out op
 ink -> ink : Xmesh integrate,\nupdate canvas
 t --> sm : echo (acknowledged)
