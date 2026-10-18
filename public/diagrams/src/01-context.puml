@@ -42,11 +42,7 @@ nojs -[hidden]right- mobile
 note top of native
   North star: XTXP built into the
   browser, a first-class web standard.
-end note
-
-note top of nojs
-  Compatible everywhere: the Wasm
-  polyfill, and no-JS browsers as
-  full participants, not a fallback.
+  The Wasm polyfill and no-JS browsers
+  make it work everywhere.
 end note
 @enduml
