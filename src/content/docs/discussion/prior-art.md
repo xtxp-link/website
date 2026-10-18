@@ -64,7 +64,7 @@ Yrs already reaches every place XTXP runs: `yffi` exposes it to C, and it compil
 
 ### Cycle-safe tree moves
 
-**Evan Wallace's mutable tree hierarchy** gives each node a map of every parent it has had, with counters; the highest counter wins, and nodes caught in a cycle are reattached deterministically when the tree is read. It needs only ordinary map writes, so it fits Yrs. The basis for [moves in Xmesh](/spec/math/#later-a-tree-layer-of-our-own). The **`yrs_tree`** crate implements it on Yrs.
+**Evan Wallace's mutable tree hierarchy** gives each node a map of every parent it has had, with counters; the highest counter wins, and nodes caught in a cycle are reattached deterministically when the tree is read. It needs only ordinary map writes, so it fits Yrs. One basis for [a later tree layer of our own](/spec/math/#later-a-tree-layer-of-our-own); v1 moves are copies. The **`yrs_tree`** crate implements it on Yrs.
 
 **Kleppmann, Mulligan, Gomes and Beresford**, *A highly-available move operation for replicated trees* (IEEE TPDS, 2021), solves the same problem by undoing and replaying operations in timestamp order.
 
