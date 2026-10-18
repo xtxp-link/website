@@ -183,8 +183,8 @@ export function glyphs({ withP = true } = {}) {
 }
 
 const PALETTES = {
-  light: { x: '#11151f', t: RED, p: '#8a91a3' },
-  dark: { x: '#eceff7', t: '#ff7a5e', p: '#7c8396' },
+  light: { x: '#11151f', t: RED, p: '#8a8a90' },
+  dark: { x: '#eceff7', t: RED, p: '#7d7d83' },
   blue: { x: '#ffffff', t: RED, p: '#a3aac4', bg: '#3347ff' },
 };
 const vars = (p) => `--xl-x:${p.x};--xl-t:${p.t};--xl-p:${p.p}`;
