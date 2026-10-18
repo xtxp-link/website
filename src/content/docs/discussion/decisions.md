@@ -20,7 +20,7 @@ With a separate engine repository, scheduled rebases and a tracked diff size. Se
 
 ## 6. Milestones
 
-A y-sweet review → M1 headless convergence → M2 Inkscape plus no-JS → M3 Inkscape plus Wasm → M4 Inkscape plus Conversations. See [Milestones](/build/milestones/).
+M1-y-sweet and M2-y-sweet on a stock y-sweet ([decision 25](#25-run-m1-and-m2-on-a-stock-y-sweet-first)) → M1 headless convergence → M2 Inkscape plus no-JS → M3 Inkscape plus Wasm → M4 Inkscape plus Conversations. See [Milestones](/build/milestones/).
 
 ## 7. Peer model with hosted sessions
 
@@ -57,7 +57,7 @@ Sessions persist the way the Yrs toolchain already does: a full state encoded as
 
 ## 15. Hosting runs as a small Rust server
 
-With Xmesh in Rust, hosting muppets run as a small Rust server: one async actor per session, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side muppet in the same binary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation.
+With Xmesh in Rust, hosting muppets run as a small Rust server: one async actor per session, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side muppet in the same binary. It's built only after M1 and M2 have run on a stock **y-sweet** ([decision 25](#25-run-m1-and-m2-on-a-stock-y-sweet-first)), and borrows from y-sweet rather than extending it.
 
 
 ## 16. Any muppet can host sessions; sessions are named by where they live
@@ -106,6 +106,15 @@ Xmesh v1 builds on Yrs's XML fragment, element and text types: a stable, open im
 ## 24. North star: the read-write web, with XTXP in the browser
 
 The long-term goal is XTXP as a first-class web standard, built into browsers: a browser that runs its own muppet and opens `xtxp://` links. Backwards compatibility is part of it: a Wasm muppet polyfills browsers with JavaScript, and the no-JS client keeps every other browser a full participant, so XTXP works everywhere. "Does this still work with no JS?" stays the design test. See [North star](/overview/north-star/).
+
+## 25. Run M1 and M2 on a stock y-sweet first
+
+- **Borrow from y-sweet; don't extend it.** y-sweet admits per connection rather than per session, uses bearer tokens rather than signed grants, starts syncing before any handshake, stores one snapshot per document rather than appending, and has nothing for forks; its core authors stopped committing in 2025. Its WebSocket wiring, storage interface and sync handling are worth borrowing.
+- **A self-hosted binary, not Cloudflare Durable Objects, for M1.** y-sweet's Cloudflare support is deprecated, and M1's file storage, chaos proxy and CI suit a plain binary. A pure session actor with storage behind an interface keeps Durable Objects open for later.
+- **First, M1 and M2 run on a stock, unmodified y-sweet** (v0.9.1), used its own way, to get a feel for the stack and feedback from real people. What y-sweet can't express (key grants, refusing a session, the signed handshake) is recorded as a gap, not built. XTXP's own host is then decided on what was learnt.
+- **Xmesh uses Yrs 0.28** while y-sweet keeps its Yrs 0.19.2; a probe checks that the two agree.
+
+See [Milestones](/build/milestones/#m1-y-sweet-and-m2-y-sweet).
 
 ## Naming
 

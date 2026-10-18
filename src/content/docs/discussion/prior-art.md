@@ -59,8 +59,11 @@ YATA orders concurrent insertions in a sequence. Yjs implements it, including XM
 
 Yrs already reaches every place XTXP runs: `yffi` exposes it to C, and it compiles to Wasm. Xmesh follows the same patterns for its own bindings.
 
+Yrs is released steadily; Xmesh uses 0.28 (September 2026). Fixes since 0.19 matter to XTXP: a delete set lost after applying an update (0.27.2), a missing right neighbour when inserting at index 0 (0.27.3), a swallowed pending update (0.27.1), and decoders hardened against malformed updates (0.28.0). Version 0.27 dropped Yrs's array move, which XTXP never used. Building Xmesh found that 0.28 can still leave a pending update stuck after everything it depends on has arrived; Xmesh re-applies such updates until nothing is missing.
+
 - Nicolaescu et al., *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types* (GROUP 2016)
 - [`yffi` (C bindings for Yrs)](https://docs.rs/crate/yffi/latest)
+- [y-crdt on GitHub](https://github.com/y-crdt/y-crdt)
 
 ### Cycle-safe tree moves
 
@@ -88,9 +91,12 @@ Peers exchange state vectors, then send each other only the missing updates, ove
 
 ### y-sweet
 
-An open-source Rust server for Yjs documents, built on Yrs, from Jamsocket. It persists documents to a filesystem or S3-compatible storage, controls access per document with client tokens, and can run as a binary or as Wasm on Cloudflare's edge. Much of what hosting an XTXP session needs; [reviewed for reuse](/build/milestones/#before-m1-review-y-sweet) before host code is written.
+An open-source Rust server for Yjs documents, built on Yrs, from Jamsocket (MIT). It persists each document as one snapshot to a filesystem or S3-compatible storage, and controls access per document with bearer tokens, full or read-only. It runs as a binary; its Wasm build for Cloudflare's edge is deprecated. Its core authors stopped committing in 2025, and v0.9.1 (September 2025) is the latest release.
 
-- [y-sweet on docs.rs](https://docs.rs/crate/y-sweet/0.8.2)
+It runs Yrs 0.19.2, which loses a delete that arrives before the insert it deletes, so deleted content can come back when updates arrive out of order. XTXP borrows from y-sweet rather than extending it, and runs M1 and M2 on it as is first ([decision 25](/discussion/decisions/#25-run-m1-and-m2-on-a-stock-y-sweet-first)).
+
+- [y-sweet on GitHub](https://github.com/jamsocket/y-sweet)
+- [y-sweet on docs.rs](https://docs.rs/crate/y-sweet/0.9.1)
 
 ### Conversations and mobile XMPP
 
