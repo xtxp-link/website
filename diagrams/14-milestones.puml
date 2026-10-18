@@ -4,7 +4,7 @@ title Milestones
 
 left to right direction
 
-rectangle "**Before M1**\nReview y-sweet\n\nreuse for\nhosting?" as m0
+rectangle "**First**\nM1-y-sweet, M2-y-sweet\n\nthe same milestones\non a stock y-sweet:\nhow much host\ndo we need?" as m0
 rectangle "**M1**\nHeadless convergence\n\n3 CLI peers + a headless\nmuppet host, all on Xmesh,\nover WebSocket, replaying\nvectors with forced disconnects" as m1
 rectangle "**M2**\nInkscape + no-JS\n\nInkscape fork muppet +\nserver muppet serving\nplain HTML" as m2
 rectangle "**M3**\nInkscape + Wasm\n\nbrowser muppet\n(full Wasm peer)" as m3
@@ -15,7 +15,7 @@ card "Live web branching\n(placement: open question 9)" as gw
 
 card "Roadmap\nledger, keyframes,\nhistory limits,\nnative C++ spike,\nElixir/BEAM at scale,\nsigned hash chains" as rm
 
-m0 --> m1
+m0 --> m1 : if XTXP's own\nhost is needed
 m1 --> m2
 m2 --> m3
 m3 --> m4

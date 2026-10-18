@@ -1,6 +1,6 @@
 ---
 title: Milestones
-description: A y-sweet review, then M1 headless convergence, M2 Inkscape plus no-JS, M3 Inkscape plus Wasm, M4 Inkscape plus Conversations.
+description: M1 and M2 first on a stock y-sweet, then M1 headless convergence, M2 Inkscape plus no-JS, M3 Inkscape plus Wasm, M4 Inkscape plus Conversations.
 ---
 
 import Diagram from '../../../components/Diagram.astro';
@@ -9,18 +9,16 @@ import Diagram from '../../../components/Diagram.astro';
 
 <Diagram name="14-milestones" alt="Milestones M1 to M4 in sequence, followed by the muppet disco as a future milestone, with live web branching's placement open." />
 
-## Before M1: review y-sweet
+## M1-y-sweet and M2-y-sweet
 
-[y-sweet](/discussion/prior-art/#y-sweet) is an open-source Rust server for Yjs documents, built on Yrs, with persistence and per-document access tokens. It may already be most of what hosting needs. Before any hosting code is written, review it for reuse:
+<span class="status status--draft">draft</span>
 
-- **Fit:** can it host Xmesh documents, and carry XTXP's own messages (identity, binding, grants) alongside Yjs sync?
-- **Access control:** how its client tokens compare with XTXP's [key-based grants](/spec/identity/), and whether ours can replace or wrap them.
-- **Branching:** whether forking a document at a state vector and merging back fits its storage model.
-- **Storage:** its persistence (filesystem, S3-compatible) against XTXP's append-then-compact plan.
-- **Hosting:** it can run as a binary or as Wasm on Cloudflare's edge, which bears on the [hosting question](/discussion/open-questions/#engine).
-- **Health:** licence, maintenance activity, and how easily it can be extended without forking.
+Before XTXP's own host is built, M1 and M2 run on a stock, unmodified [y-sweet](/discussion/prior-art/#y-sweet) (v0.9.1), used its own way ([decision 25](/discussion/decisions/#25-run-m1-and-m2-on-a-stock-y-sweet-first)). The review of y-sweet recommends borrowing from it rather than extending it, and a self-hosted binary rather than Durable Objects; this spike tests how far it goes as it is.
 
-The outcome decides whether hosting extends y-sweet, borrows from it, or starts fresh.
+- **M1-y-sweet** is CLI only. Xmesh peers on Yrs 0.28 sync through y-sweet over WebSocket, through the chaos proxy, and a person can watch and edit a drawing from two terminals. Its first part, with no network, is built: Xmesh, the hand-written vectors, the fuzzer, and a probe that replays every vector on y-sweet's Yrs 0.19.2.
+- **M2-y-sweet** adds the Inkscape fork and a browser with no JavaScript, served by a server-side muppet that is one more peer of the y-sweet document.
+
+What y-sweet can't express (key grants, refusing a session, the signed handshake) is recorded as a gap, not built. The spike answers whether y-sweet can hold "every connection edits in its own session" and how it behaves on a patchy network, and puts something in real people's hands. Then the full M1 and M2 are decided on what was learnt.
 
 ## M1 — Headless convergence
 
@@ -33,7 +31,7 @@ Deliberately small ([decision 22](/discussion/decisions/#22-handshake-signatures
 - **File storage**: append, then compact.
 - **A chaos proxy** between peers and host that drops, delays and duplicates frames.
 - **Revocation** only as "stop merging that key's session".
-- The **y-sweet review** comes first.
+- It follows [M1-y-sweet and M2-y-sweet](#m1-y-sweet-and-m2-y-sweet), if they show XTXP's own host is needed.
 
 ## M2 — Inkscape plus no-JS
 

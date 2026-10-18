@@ -40,8 +40,8 @@ M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live
 
 - **A tree layer of our own:** after M2, reflect on closing v1's move gaps with a "moved to" link resolved when reading, or a node map with Wallace's cycle-safe moves (the `yrs_tree` crate, young at 0.4.x, implements the latter). See [later: a tree layer of our own](/spec/math/#later-a-tree-layer-of-our-own).
 - **History and memory:** snapshots need Yrs's garbage collection off. How fast do documents grow, and when is the [roadmap](/build/milestones/#roadmap) ledger worth building?
-- **Reusing y-sweet:** how much of hosting it can provide. Decided by the [y-sweet review](/build/milestones/#before-m1-review-y-sweet) before implementation.
-- **Hosting:** a single self-hosted Rust binary, or Cloudflare Workers with one Durable Object per session? Keeping each hosted session a pure actor with storage behind an interface allows both.
+- **Reusing y-sweet:** the review recommends borrowing from it rather than extending it ([decision 25](/discussion/decisions/#25-run-m1-and-m2-on-a-stock-y-sweet-first)). [M1-y-sweet and M2-y-sweet](/build/milestones/#m1-y-sweet-and-m2-y-sweet) test how far a stock y-sweet goes before XTXP's own host is decided.
+- **Hosting later:** M1 runs as a self-hosted binary. Whether Cloudflare Workers with one Durable Object per session is worth it stays open; keeping each hosted session a pure actor with storage behind an interface allows both.
 
 ## Identity and access
 
