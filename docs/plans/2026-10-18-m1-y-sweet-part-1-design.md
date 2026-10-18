@@ -32,6 +32,8 @@ Decided by David during brainstorming on 2026-10-18. They hold for the spike and
 | S6 | **Snapshot hash:** SHA-256 over XTXP's own canonical snapshot encoding (section 3.6), shortened to 16 hex characters. How it is written after `@` stays open. |
 | S7 | Reserved names for comments, processing instructions and CDATA are provisional (section 3.2) and reviewed after the spike. |
 | S8 | Message framing (handover open point) is deferred to the full M1: y-sweet carries plain Yjs sync with no XTXP frames. |
+| S9 | *Proposed with the plan, for David's review.* The fragment holds the root element plus any comments and processing instructions around it, in order, because Inkscape writes a comment before `<svg>`. Paths start at the root element. |
+| S10 | *Proposed with the plan, for David's review.* Text offsets count UTF-16 code units, as Yjs does, so the M2 browser agrees. |
 
 ## 3. `xmesh`
 
@@ -40,7 +42,7 @@ A pure library: no networking, file access, clocks or threads. It depends on `yr
 ### 3.1 Document
 
 - An `Xmesh` wraps one Yrs `Doc`, with a client ID supplied by the caller and garbage collection off (`Options::skip_gc`, present in Yrs 0.28).
-- The document is the Yrs XML fragment named `xmesh`. Its single child is the root element, such as `<svg>`.
+- The document is the Yrs XML fragment named `xmesh`. It holds the root element, such as `<svg>`, plus any comments and processing instructions before or after it, in order (S9).
 - **Seed:** `Xmesh::seed(xml) -> Vec<u8>` imports `xml` into an empty `Doc` with client ID `0` and returns the update. Client ID `0` is reserved for seeds; `Xmesh::new` refuses it. Applying the same seed twice changes nothing. The importer keeps attribute order from the source and never iterates a hash map, so the seed bytes are deterministic; a test checks this across runs.
 
 ### 3.2 Data model
@@ -70,7 +72,8 @@ Each call is one Yrs transaction and returns the update bytes it produced, so on
 | `delete_text(path, offset, len)` | Deletes from a text node |
 | `move(path, new_parent, index)` | Inserts a copy at the destination and deletes the original, in one transaction (decision 20). `index` is counted before the original is removed. |
 
-- A **path** is a list of child indexes among live children, starting at the fragment: `[0]` is the root element, `[0, 2]` its third child.
+- A **path** is a list of child indexes among live children, starting at the root element: `[]` is the root element, `[2]` its third child (S9). Nodes outside the root element can't be edited in part 1.
+- Text offsets count UTF-16 code units (S10).
 - Errors, never panics: a path that doesn't resolve, an index out of range, XML that isn't well-formed, a text operation on an element, and a move into the node's own subtree.
 - A moved node gets a new node ID. This is one of decision 20's known gaps.
 
@@ -121,8 +124,8 @@ Each call is one Yrs transaction and returns the update bytes it produced, so on
   "peers": { "a": 1, "b": 2 },
   "rounds": [
     {
-      "a": [[{ "op": "set_attr", "path": [0, 0], "name": "fill", "value": "red" }]],
-      "b": [[{ "op": "set_attr", "path": [0, 0], "name": "fill", "value": "blue" }]]
+      "a": [[{ "op": "set_attr", "path": [0], "name": "fill", "value": "red" }]],
+      "b": [[{ "op": "set_attr", "path": [0], "name": "fill", "value": "blue" }]]
     }
   ],
   "expect": {
