@@ -37,6 +37,8 @@ There is **no central authority**. "Canonical state" means the state every peer 
 
 Because rendering is just a muppet running somewhere, the no-JS view and the Inkscape view come from the same code and can't drift apart.
 
+**In a browser, the browser itself is the muppet's client.** The muppet changes the page with HTML patches the browser applies on its own (declarative partial updates), view transitions make each change visible, and popovers carry the control handles, with almost no JavaScript in between. See [The browser as client](/spec/browser/).
+
 <Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a muppet linking Xmesh, a Wasm muppet in a browser, and an app-server muppet connect over WebSocket to a Rust server of headless muppets, each hosting one session, which embeds Xmesh and persists sessions to storage; a phone reaches the hosts through XMPP federation and a bridge; a no-JS browser reaches the server muppet on the host directly; the xtxp.link muppet disco only points clients to hosts." />
 
 ## Transport

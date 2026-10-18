@@ -1,0 +1,34 @@
+@startuml 17-seq-browser-patch
+!include _style.iuml
+title The browser as client: forms in, HTML patches out
+
+actor "Browser\n(no JS)" as b
+participant "Server muppet\n(acts for this user)" as sm
+participant "Host\n(session main)" as t
+participant "Agent or\nother peer" as p
+
+b -> sm : GET /host/doc@main (Accept: text/html)
+sm --> b : 200 HTML: page, markers, handle popovers\n(response stays open: the patch stream)
+
+== the user edits ==
+b -> b : click the shape: its handle popover\nopens in the top layer (no request)
+b -> sm : POST nudge form (node ID, snapshot, CSRF)
+sm -> sm : Xmesh: intent → CRDT op(s), apply
+sm -> t : XTXP op (WebSocket)
+sm --> b : 204 No Content (the page stays put)
+sm --> b : stream: <template for="n7-12">…</template>
+b -> b : browser applies the patch;\nview transition moves the shape
+
+== someone else edits ==
+p -> t : XTXP op
+t -> sm : fan out op
+sm -> sm : Xmesh integrate, re-render the node
+sm --> b : stream: <template for="n9-3">…</template>
+b -> b : patch applied; the change animates\n(styled by author: you, peer, agent)
+
+note over sm
+  All CRDT work stays in the muppet.
+  The browser's own parser applies
+  the patches: no client framework.
+end note
+@enduml

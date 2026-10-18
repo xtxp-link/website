@@ -27,6 +27,9 @@ description: Terms used across the XTXP specification.
 **`@origin`**
 : The ref for an ordinary website's authoritative version: the stream of changes from the origin server, as the upstream peer sees it. Read-only. Not to be confused with genesis (vector 0), the start of a document's history.
 
+**Declarative partial updates**
+: A browser feature: processing-instruction markers name places in a page, and a later `<template for>` replaces what's there, applied by the browser's own parser. How a muppet changes a page in the browser. See [The browser as client](/spec/browser/).
+
 **Genesis (vector 0)**
 : The first state of a document: one fixed update that creates the root, identical everywhere. For live web branching, it is the fetched origin page.
 
@@ -56,6 +59,9 @@ description: Terms used across the XTXP specification.
 
 **Paused queue**
 : A local session whose automatic merge is switched off, shown as a preview until it's released (merged).
+
+**Patch stream**
+: A page's HTTP response kept open by a server-side muppet, which flushes a `<template for>` HTML patch each time the session changes. Not XTXP operations: rendered HTML.
 
 **Public key (identity)**
 : What a user is in XTXP. Proved by signing a challenge; fetched onto a device through an existing sign-in, from the user's own storage.

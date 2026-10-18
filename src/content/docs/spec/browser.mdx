@@ -1,0 +1,146 @@
+---
+title: The browser as client
+description: The browser itself is the muppet's client. Declarative partial updates change the document, CSS view transitions make each change visible, and popovers carry the control handles, with almost no JavaScript.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../components/Diagram.astro';
+
+<span class="status status--decided">decided</span> in direction ([decision 26](/discussion/decisions/#26-the-browser-is-the-muppets-client)), <span class="status status--draft">draft</span> in detail.
+
+A browser doesn't need a client-side framework to take part in an XTXP session. It already has the three things a client needs, built in:
+
+| The client needs to | The browser does it with | So the muppet sends |
+| --- | --- | --- |
+| **change the document** | [declarative partial updates](#declarative-partial-updates-change-the-document) | HTML patches aimed at named parts of the page |
+| **show what changed** | [CSS view transitions](#view-transitions-make-each-change-visible) | stable names for every node |
+| **take input on an element** | [popovers with anchor positioning](#popovers-carry-the-control-handles) | a handle for every selectable element |
+
+Put together, **the browser itself is the muppet's client**. Patches go in, transitions show the change, popovers handle input, and almost no JavaScript sits in between. The muppet does all the CRDT work, exactly as [decision 2](/discussion/decisions/#2-the-no-js-client-is-a-puppet) says; what changes is that the browser stops being a page that reloads and becomes a live view, applying the muppet's patches with its own HTML parser.
+
+This idea comes from Schalk Venter's talk [*Surprise, it's server rendering*](https://za.pycon.org/talks/4-suprise-its-server-rendering/) (see [North star](/overview/north-star/#surprise-its-server-rendering)). The talk named these features as ways to make server-rendered sites feel live. For XTXP they are more than that: they are the client.
+
+<Diagram name="17-seq-browser-patch" alt="Sequence: a no-JS browser GETs the page and the response stays open as a patch stream; clicking a shape opens its handle popover locally; a nudge form POST becomes CRDT ops in the server muppet, which answers 204 and streams a template-for patch that the browser applies with a view transition; an agent's edit arrives through the host and streams to the browser the same way, styled by author." />
+
+## Declarative partial updates change the document
+
+<span class="status status--draft">draft</span>
+
+[Declarative partial updates](https://developer.chrome.com/docs/web-platform/declarative-partial-updates) let a page mark places in its HTML with processing instructions, and let later HTML replace what's there with a `<template for>`. The browser's parser applies the patch itself, as the HTML arrives.
+
+**HTML patches are the wire format to the browser.** When the muppet renders a document, it marks every node it may need to replace, named from the node's [node ID](/overview/glossary/):
+
+```html
+<?start name="n7-12">
+  <rect id="sun" x="40" y="40" width="80" height="80" fill="gold"/>
+<?end>
+```
+
+When that node changes, whoever changed it, the muppet sends only its new rendering:
+
+```html
+<template for="n7-12">
+  <?start name="n7-12">
+    <rect id="sun" x="48" y="40" width="80" height="80" fill="gold"/>
+  <?end>
+</template>
+```
+
+The template repeats the marker, so the same node can be patched again. A Yrs update never reaches the browser, and the browser never runs Xmesh: the muppet integrates operations, works out which nodes they touched, and renders just those.
+
+### The patch stream
+
+**The page's own response stays open.** After the first render, the muppet keeps the HTTP response open and flushes a `<template for>` each time the session changes. With no `fetch`, no polling and no script, the page stays live. This replaces the `<meta http-equiv="refresh">` and `304 Not Modified` loop of the [no-JS edit loop](/spec/addressing/#the-no-js-edit-loop) wherever the browser supports it.
+
+Templates are streamed as children of `<body>`, which lets them reach markers anywhere in the document.
+
+### Edits still go in as forms
+
+**Edits stay [form POSTs](/spec/addressing/#forms)**, each naming its node, the snapshot it was rendered from and a CSRF token. What changes is the answer: with a patch stream open, the muppet answers **`204 No Content`**, so the browser stays on the page, and the edit comes back through the stream like everyone else's. One path renders every change, the user's own included.
+
+### Coarse or fine patches
+
+- **Per node** (the default): a marker around every node the muppet may patch, as above. The smallest patches, and the closest match to the operations that caused them.
+- **Per region:** replace a whole region, such as a layer, and let [view transitions](#view-transitions-make-each-change-visible) match old nodes to new ones by name. Simpler to render, and enough for small documents.
+
+Both are the same mechanism; a muppet can mix them.
+
+## View transitions make each change visible
+
+<span class="status status--draft">draft</span>
+
+A patch that simply swaps one rendering for another makes edits from other people hard to follow: something on the canvas jumps, and you have to work out what. With [CSS view transitions](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API), every patch becomes a change a person can **watch happen**: the shape slides to its new place, the colour fades across, a new element grows in, a deleted one fades out.
+
+**Every rendered node gets a stable `view-transition-name`**, so the browser can pair its old and new renderings. The name comes from the element's own `id` where it has one, since [v1 moves](/spec/math/) replace a node with a copy and give it a new node ID, and from its node ID otherwise.
+
+**Changes are styled by who made them.** A `view-transition-class` says whose change it is (yours, another person's, an agent's), so CSS can animate each differently: your own edits settle quickly, and others' are slower and highlighted in their author's colour, the same colour the [redline](/spec/views/) uses.
+
+### Agents and peers you can follow
+
+This matters most for edits you didn't make. An **agent** is just another peer with a key: its edits arrive through the host like anyone's, become patches like anyone's, and animate like anyone's. Watching an agent move, recolour and add things on the canvas is what makes its work easy to follow, check and trust, rather than a document that silently changed under you.
+
+### Navigations animate too
+
+Where a browser falls back to the form, redirect and GET loop, cross-document view transitions (`@view-transition { navigation: auto; }` in CSS) animate from the old page to the new one, with the same names and the same author styling. The fallback looks like the live version, only less often.
+
+## Popovers carry the control handles
+
+<span class="status status--draft">draft</span>
+
+To edit an element, a person needs handles on it: move, recolour, delete, edit an attribute. The [popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) with [CSS anchor positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning) gives every element its handles declaratively:
+
+```html
+<button popovertarget="h-n7-12" class="select" style="position-anchor: --n7-12">
+  Select sun
+</button>
+<div id="h-n7-12" popover style="position-anchor: --n7-12">
+  <form method="post"> … nudge, recolour, delete … </form>
+</div>
+```
+
+- **The handles are the M2 forms**, from [decision 23](/discussion/decisions/#23-the-m2-contracts-inkscape-no-js-editing-rendering-safety), put where the user's eyes are: attached to the element, not in a list beside the canvas.
+- **They live in the top layer**, so they're never clipped by the drawing's `viewBox` or hidden behind other shapes, and they need no positioning code.
+- **Selecting is local.** Opening a handle is the browser's own state, with no request to the host. Like every [view](/spec/views/), it never changes the session. Light dismiss and one-open-at-a-time come free with `popover="auto"`.
+- **Handles are patched with their element.** When a node changes, its handle popover comes in the same patch, so a handle never offers to edit a stale version.
+
+The select control is itself anchored over its element, sized to it with `anchor-size()`, so clicking a shape is clicking its button.
+
+## Where the browser stops and the muppet starts
+
+| | Browser | muppet |
+| --- | --- | --- |
+| CRDT state, merging, grants | | ✓ |
+| Rendering nodes to HTML and SVG | | ✓ |
+| Applying patches to the page | ✓ (its parser) | |
+| Animating changes | ✓ (view transitions) | names and classes |
+| Selection and handles | ✓ (popovers) | renders them |
+| Turning an edit into operations | sends a form | ✓ |
+
+The same split holds wherever the muppet runs:
+
+- **Server-side, for a browser with no JavaScript:** the patches travel in the page's own HTTP response.
+- **In the page, as a Wasm muppet ([M3](/build/milestones/#m3--inkscape-plus-wasm)):** the muppet renders the same HTML patches and applies them with the browser's own HTML setters (`setHTML`, `streamHTML`), inside `document.startViewTransition()`. No virtual DOM or hand-written DOM code: both muppets share one renderer, and the no-JS view and the Wasm view can't drift apart.
+- **In a browser that speaks XTXP ([north star](/overview/north-star/)):** the browser's own muppet has a native way to change the document already.
+
+## Support today
+
+<Aside type="caution" title="Chromium first">
+Declarative partial updates are new. `<template for>` ships in Chrome and Edge 150; the streaming HTML setters are behind a flag, planned for Chrome 155. Firefox and Safari support neither yet. View transitions and popovers are more widely available; anchor positioning is newer.
+</Aside>
+
+"Does this still work with no JS?" stays the test, so every browser keeps a full path:
+
+| Browser | Changes arrive by | Feels like |
+| --- | --- | --- |
+| **Supports declarative partial updates** | the patch stream | live, animated |
+| **Doesn't** | form POST, `303` redirect, GET, and meta refresh with ETags | page by page, animated where cross-document view transitions are supported |
+
+Without popovers or anchor positioning, the handles fall back to the plain forms the page already carries. Nobody gets a different document, only more or less on screen.
+
+## Still open
+
+- **Does a streamed patch start a view transition on its own?** Today a same-document view transition is started from script, with `document.startViewTransition()`. Whether a `<template for>` patch can trigger one declaratively, or whether that one call is the near-zero JavaScript this design needs, is the first thing to probe.
+- **SVG.** Whether markers survive the parser inside inline `<svg>`, whether SVG child elements can take a `view-transition-name` and act as anchors, and what to do where they can't: per-region patches, or an HTML layer over the drawing.
+- **Knowing when to stream.** Without script, a host can't feature-detect `<template for>`, and a browser that ignores it would sit on a page that never finishes loading. Client hints, an explicit "live" link, or something else.
+- **Rendering safety.** Patches carry rendered user content into the page, so the [rendering-safety](/spec/addressing/#rendering-safety) questions apply to every patch, not just the first page.
+- **Awareness.** Whether other people's open handles and selections are shown, as [awareness](/spec/wire/#messages) patched into the page.

@@ -32,7 +32,8 @@ Every design decision gets checked against one question:
 Some consequences:
 
 - Edits from a plain browser arrive as **form POSTs**, followed by a redirect and a GET, so refresh and the back button behave.
-- Passive viewing uses **`<meta http-equiv="refresh">`** with **ETag / `If-None-Match`**, so an unchanged document costs a `304 Not Modified`.
+- Where the browser supports **declarative partial updates**, the page stays live: the muppet streams HTML patches into it, view transitions animate each change, and popovers carry the control handles. See [The browser as client](/spec/browser/).
+- Elsewhere, passive viewing uses **`<meta http-equiv="refresh">`** with **ETag / `If-None-Match`**, so an unchanged document costs a `304 Not Modified`.
 - **Onion skin, redline and session previews** are rendered on the server as SVG layers. To a browser they are just images and markup.
 - The hand-off to a native client is a **plain link** to `xtxp://`, not a script that probes for a protocol handler.
 
@@ -53,5 +54,7 @@ Ink & Switch's work on local-first software argued that collaborative apps shoul
 ### "Surprise, it's server rendering"
 
 Schalk Venter's talk at PyCon ZA, [*Surprise, it's server rendering*](https://za.pycon.org/talks/4-suprise-its-server-rendering/), stacked up the browser features that let server-rendered sites feel live without a JavaScript framework: **CSS View Transitions**, the **Popover API**, **Speculation Rules** and **declarative partial updates**. It started a debate: could we, and should we, stream a site's content into the browser without JavaScript polyfills at all?
+
+For XTXP those features turned out to be more than polish: together they are the client. Declarative partial updates change the document, view transitions show each change, and popovers carry the handles ([decision 26](/discussion/decisions/#26-the-browser-is-the-muppets-client)).
 
 That debate led to XTXP. This time HTTP stays: it's the no-JS edge every browser already speaks, one of the layers that make XTXP compatible everywhere, alongside a lean streaming protocol for documents over WebSocket, with XMPP kept as a bridge for the mobile and chat clients it serves well.

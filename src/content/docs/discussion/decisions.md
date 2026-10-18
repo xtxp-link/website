@@ -116,6 +116,10 @@ The long-term goal is XTXP as a first-class web standard, built into browsers: a
 
 See [Milestones](/build/milestones/#m1-y-sweet-and-m2-y-sweet).
 
+## 26. The browser is the muppet's client
+
+A browser takes part through three features it already has, not through a client-side framework. **Declarative partial updates** are how the muppet changes the document: it sends HTML patches (`<template for>`) aimed at named nodes, streamed in the page's own response, and the browser's parser applies them. **CSS view transitions** make every patch visible, so edits from other people and from agents can be watched and followed. **Popovers with anchor positioning** carry each element's control handles, which are the M2 forms. Edits still go in as form POSTs; with a patch stream open, the answer is `204 No Content` and the change comes back as a patch. The Wasm muppet renders the same patches and applies them with the browser's HTML setters. Browsers without these features keep the form, redirect and refresh loop. See [The browser as client](/spec/browser/).
+
 ## Naming
 
 - **XTXP** for the protocol, **Xmesh** for the engine, **muppet** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.
