@@ -150,6 +150,8 @@ Handles work the same way: the plain forms are the baseline, and popovers with a
 
 ## Still open
 
+The platform is close. Each gap below is expected to need a small polyfill now, against the first-class browser support it points to, in the same spirit as the Wasm muppet polyfilling a browser that doesn't speak XTXP yet ([decision 24](/discussion/decisions/#24-north-star-the-read-write-web-with-xtxp-in-the-browser)). A polyfill is a few lines of script, never a framework, and it goes away as browsers catch up; pages without it still work on the baseline.
+
 - **Does a streamed patch start a view transition on its own?** Today a same-document view transition is started from script, with `document.startViewTransition()`. Whether a `<template for>` patch can trigger one declaratively, or whether that one call is the near-zero JavaScript this design needs, is the first thing to probe.
 - **SVG.** Whether markers survive the parser inside inline `<svg>`, whether SVG child elements can take a `view-transition-name` and act as anchors, and what to do where they can't: per-region patches, or an HTML layer over the drawing.
 - **Knowing when to stream.** Without script, a host can't feature-detect `<template for>`, and a browser that ignores it would sit on a page that never finishes loading. Client hints, an explicit "live" link, or something else.
