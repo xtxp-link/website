@@ -1,0 +1,52 @@
+---
+title: Use cases
+description: Thought experiments for what XTXP could carry beyond a shared drawing, from wikis and comments to user sessions, shared worlds, chat and LLM conversations.
+---
+
+<span class="status status--sketch">sketch</span> · for discussion, not for the MVP
+
+The MVP is a shared drawing: [M1 and M2](/build/milestones/) stick to that. These use cases are here to test the protocol's ideas against other kinds of work, and to start discussions. Most are at the sketch stage.
+
+A thread runs through them. XTXP supplies the substrate: an XML document, [sessions](/spec/sessions/) forked from its history, and grants by key. Each site or fork brings its own **rules** for which edits are accepted and which get bounced, in the same way a domain owner's [bouncer](/spec/disco/#domain-owners-and-the-bouncer) controls its `@origin`.
+
+## Wikis
+
+Suggesting an edit to a page, such as these protocol discussions on xtxp.link, in a fluent, web-native way: fork a session, edit, and propose it back.
+
+Merge rules layer on top. Wikipedia is a deep study in such rules: who may edit what, how edits are reviewed, and how disputes are settled. Everything2 took a different approach to who writes what and how it's kept.
+
+## Comments
+
+A traditional comments section, highlights in the style of Kindle's, or answers in the style of Stack Overflow all fit the protocol. The rules of the canonical site, or of a fork, define which interactions won't be bounced.
+
+## User sessions
+
+<span class="status status--sketch">sketch</span>
+
+A user interacting with an XTXP site creates their own state: a [personal session](/spec/sessions/#one-mechanism-for-undo-proposals-and-previews), held in a client-side MUPPET, on a server, or both. It does what a session token such as a JWT does today, and could even be identified by one if needed.
+
+That covers a shopping cart, a scratch editor, or simply the state of browsing through a site's tree of links. This needs refining towards a draft.
+
+## Shared worlds
+
+<span class="status status--sketch">sketch</span>
+
+Multi-user worlds such as WorkAdventure could keep the base map as a document, with each user's avatar, pets and custom objects on their own layer: a session that's ephemeral to them, with the possibility of merging persistent objects into the world. Each world sets its own rules for what may be created, and how its economy works.
+
+That retraces an old arc. Text adventures led to MUDs, and MUDs to MUSHes and MOOs, where users added their own objects, with logic. XTXP makes read-write worlds possible on the web.
+
+## Shared documents
+
+The best-defined case. Google Docs defined the category, and others are following, among them cDox and Euro-Office. Cloud or offline is still a choice there.
+
+In XTXP, a first-class local editor and a cloud editor collaborate on the same XML document, each with its own fast MUPPET, on the machine or in the browser. That's a strength of the design, and the shared drawing in M2 is the first instance of it.
+
+## Chat
+
+Chat between users is a document with many sessions, where by default each message is appended at the end, and visibility, discoverability, reading and editing go by public key.
+
+On top of that, people can edit their own messages or suggest edits to others', within whatever transforms the chat's rules permit. Chat can run strictly peer to peer, MUPPET to MUPPET, without a server-side MUPPET, for privacy. Or a MUPPET can serve history, caching each user's sessions.
+
+## LLM conversations
+
+A special case of chat, between a human and a non-human participant. These conversations are already growing to include other artifacts, such as documents and mockups, and being shared between people. Few tackle several users in one conversation yet, though patchmill.dev is heading in a good direction. Protocol-level support for the document underneath would add value here.

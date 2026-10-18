@@ -21,7 +21,7 @@ Some consequences:
 
 - Edits from a plain browser arrive as **form POSTs**, followed by a redirect and a GET, so refresh and the back button behave.
 - Passive viewing uses **`<meta http-equiv="refresh">`** with **ETag / `If-None-Match`**, so an unchanged document costs a `304 Not Modified`.
-- **Onion skin, redline and branch previews** are rendered on the server as SVG layers. To a browser they are just images and markup.
+- **Onion skin, redline and session previews** are rendered on the server as SVG layers. To a browser they are just images and markup.
 - The hand-off to a native client is a **plain link** to `xtxp://`, not a script that probes for a protocol handler.
 
 ## Roots

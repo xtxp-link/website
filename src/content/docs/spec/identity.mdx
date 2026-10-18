@@ -14,7 +14,7 @@ XTXP identifies a user by a **public key** and authenticates them by proof that 
 
 **Getting the key onto a device.** People shouldn't have to manage key files. Signing in with an account they already have (Google, Apple or Mozilla) fetches their private key from **their own storage**. XTXP never holds it. The sign-in provider is just a way to get to the user's key, not the identity itself.
 
-**No-JS browsers.** A browser without JavaScript can't hold a key, so the [server-side MUPPET](/overview/architecture/#the-split-that-matters) acting for that user holds it for the session, as one of their devices.
+**No-JS browsers.** A browser without JavaScript can't hold a key, so the [server-side MUPPET](/overview/architecture/#the-split-that-matters) acting for that user holds it while they're signed in, as one of their devices.
 
 ## Signing only at identity steps
 
@@ -30,33 +30,33 @@ Operations themselves travel unsigned, over an authenticated connection.
 
 ## Access is granted by key
 
-- **Whoever creates a branch owns it.**
+- **Whoever creates a session owns it.**
 - **The owner grants `read` or `write`** to a specific public key, or to `*` for everyone.
 - **Forking needs read access**, and the forker owns the fork, as with forking a repository on GitHub.
-- **Merging a branch back needs write access** on the parent.
-- **A branch's host enforces its grants** when operations arrive.
-- **The owner also decides which branches this branch trusts**, so their changes merge into it automatically ([trust between branches](/spec/branches/#branches-on-other-hosts-and-trust-between-them)).
+- **Merging a session back needs write access** on the parent.
+- **A session's host enforces its grants** when operations arrive.
+- **The owner also decides which sessions this session trusts**, so their changes merge into it automatically ([trust between sessions](/spec/sessions/#sessions-on-other-hosts-and-trust-between-them)).
 
-This lines up with [branches as history](/spec/branches/), and it covers ordinary websites without special cases: [`@origin`](/spec/addressing/#one-address-form) is readable by `*` and writable by no one. Anyone can fork it, and each fork belongs to whoever made it.
+This lines up with [sessions as history](/spec/sessions/), and it covers ordinary websites without special cases: [`@origin`](/spec/addressing/#one-address-form) is readable by `*` and writable by no one. Anyone can fork it, and each fork belongs to whoever made it.
 
 ## Revocation closes the door on arrival
 
-Once a host has received a revocation, it **admits nothing new** from that key on that branch.
+Once a host has received a revocation, it **admits nothing new** from that key on that session.
 
-Each host closes the door on its own branches. A revoked key's edits that were already admitted on *another* branch can still arrive through an automatic merge, if this branch trusts that one. To keep them out, the owner withdraws trust from the branch they come from. Revocation is rare, so that is a fair price for letting branches on different hosts keep each other up to date.
+Each host closes the door on its own sessions. A revoked key's edits that were already admitted on *another* session can still arrive through an automatic merge, if this session trusts that one. To keep them out, the owner withdraws trust from the session they come from. Revocation is rare, so that is a fair price for letting sessions on different hosts keep each other up to date.
 
 The rule depends on *when the revocation arrives*, not on where an operation claims to sit in history. A revoked user could otherwise backdate edits by claiming an earlier state vector, and those would be indistinguishable from honest offline work.
 
-Edits that arrive too late aren't thrown away. They land on a **fork owned by the revoked user**, so nothing they wrote is lost and nothing reaches the protected branch.
+Edits that arrive too late aren't thrown away. They land on a **fork owned by the revoked user**, so nothing they wrote is lost and nothing reaches the protected session.
 
 <Aside type="note" title="Admission is the host's job">
-Merging is still pure maths that every peer does the same way. *Admission*, meaning whether an operation counts on a branch at all, is decided by the branch's own host, in its own arrival order. Edits from other branches arrive by trusted merges. Operations a peer has seen but the host hasn't admitted are previews: exactly what the [onion skin](/spec/views/) is for.
+Merging is still pure maths that every peer does the same way. *Admission*, meaning whether an operation counts on a session at all, is decided by the session's own host, in its own arrival order. Edits from other sessions arrive by trusted merges. Operations a peer has seen but the host hasn't admitted are previews: exactly what the [onion skin](/spec/views/) is for.
 </Aside>
 
 ## Still open
 
 - **Where the key lives and how it's protected** in the user's storage. One option is to encrypt it with a key derived from a passkey (the WebAuthn PRF extension), so the storage provider can't read it. That has its own risk: losing the passkey means losing the key.
-- **Admin rights.** If only the creator can grant, losing their key freezes the branch. A grantable `admin` role would fix that.
+- **Admin rights.** If only the creator can grant, losing their key freezes the session. A grantable `admin` role would fix that.
 - **Several devices, one person.** A personal root key that signs per-device keys would keep one identity across devices, and allow revoking a lost device.
 - **Provenance beyond the host.** With signatures only at identity steps, a dishonest host could forge operations under a client ID. A later, cheap fix: each client hash-chains its own operations and occasionally signs the chain head.
 - **Key recovery** when every device and the backup are lost.

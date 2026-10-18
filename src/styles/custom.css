@@ -72,3 +72,8 @@
   background: var(--sl-color-gray-6);
   color: var(--sl-color-gray-2);
 }
+.status--sketch {
+  background: transparent;
+  color: var(--sl-color-gray-2);
+  outline: 1px dashed var(--sl-color-gray-4);
+}

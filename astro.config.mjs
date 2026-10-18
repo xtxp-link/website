@@ -5,6 +5,7 @@ import starlightThemeGalaxy from 'starlight-theme-galaxy';
 
 export default defineConfig({
   site: 'https://xtxp.link',
+  redirects: { '/spec/branches/': '/spec/sessions/' },
   integrations: [
     starlight({
       plugins: [starlightThemeGalaxy()],
@@ -23,6 +24,7 @@ export default defineConfig({
           label: 'Start here',
           items: [
             { label: 'What is XTXP?', slug: 'overview/what-is-xtxp' },
+            { label: 'Use cases', slug: 'overview/use-cases' },
             { label: 'North star: the web without JS', slug: 'overview/north-star' },
             { label: 'Architecture', slug: 'overview/architecture' },
             { label: 'Glossary', slug: 'overview/glossary' },
@@ -35,9 +37,10 @@ export default defineConfig({
             { label: 'The Math', slug: 'spec/math' },
             { label: 'The Wire', slug: 'spec/wire' },
             { label: 'Identity and access', slug: 'spec/identity' },
-            { label: 'Branches and history', slug: 'spec/branches' },
+            { label: 'Sessions and history', slug: 'spec/sessions' },
             { label: 'Views: onion skin and redline', slug: 'spec/views' },
-            { label: 'Addressing and the gateway', slug: 'spec/addressing' },
+            { label: 'Addressing and discovery', slug: 'spec/addressing' },
+            { label: 'The muppet disco', slug: 'spec/disco' },
             { label: 'Live web branching', slug: 'spec/web-overlay' },
           ],
         },

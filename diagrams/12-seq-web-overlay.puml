@@ -3,11 +3,14 @@
 title Live web branching: genesis, overlay, upstream as a peer
 
 actor "Browser" as b
-participant "xtxp.link\ngateway" as gw
+participant "Muppet disco\n(xtxp.link)" as d
+participant "Hosting instance\n(HTTPS)" as gw
 participant "Server MUPPET" as sm
-participant "Hosts\n@origin + branches" as t
+participant "Hosts\n@origin + sessions" as t
 participant "Origin site" as o
 
+b -> d : GET /en.wikipedia.org/wiki/Browser@origin
+d --> b : 303 → a hosting instance\n(sessions listed per the bouncer)
 b -> gw : GET /en.wikipedia.org/wiki/Browser@origin
 gw -> t : document exists?
 t --> gw : no
@@ -17,17 +20,17 @@ gw -> sm : genesis(HTML)
 sm -> sm : HTML5 parse → tree,\nassign stable node IDs
 sm -> t : vector 0 on @origin\n(upstream snapshot)
 sm --> gw : rendered page
-gw --> b : page with every link rewritten to\nxtxp.link/…@origin, origin forms disabled
+gw --> b : page with every link rewritten to\n…@origin, origin forms disabled
 
 b -> gw : POST edit
 gw -> sm : edit intent
 sm -> t : fork @origin → @notes\n(named by its creator),\nXTXP ops on @notes
-gw --> b : 303 → /en.wikipedia.org/wiki/Browser@notes\n(frame: "edited branch", links to @origin)
+gw --> b : 303 → /en.wikipedia.org/wiki/Browser@notes\n(frame: "edited session", links to @origin)
 
 == later: origin page changes ==
 gw -> o : re-fetch
 o --> gw : new HTML
 gw -> sm : diff against last upstream snapshot
 sm -> t : ops by the upstream peer on @origin
-t -> t : branches take in @origin changes\nlike any other peer's edits
+t -> t : sessions take in @origin changes\nlike any other peer's edits
 @enduml

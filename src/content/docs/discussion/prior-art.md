@@ -69,7 +69,7 @@ Peers exchange state vectors, then send each other only the missing updates, ove
 
 ### y-sweet
 
-An open-source Rust server for Yjs documents, built on Yrs, from Jamsocket. It persists documents to a filesystem or S3-compatible storage, controls access per document with client tokens, and can run as a binary or as Wasm on Cloudflare's edge. Much of what hosting an XTXP branch needs; [reviewed for reuse](/build/milestones/#before-m1-review-y-sweet) before host code is written.
+An open-source Rust server for Yjs documents, built on Yrs, from Jamsocket. It persists documents to a filesystem or S3-compatible storage, controls access per document with client tokens, and can run as a binary or as Wasm on Cloudflare's edge. Much of what hosting an XTXP session needs; [reviewed for reuse](/build/milestones/#before-m1-review-y-sweet) before host code is written.
 
 - [y-sweet on docs.rs](https://docs.rs/crate/y-sweet/0.8.2)
 
@@ -122,7 +122,7 @@ Inkscape undoes at the level of its XML tree, which makes it directly relevant t
 **What XTXP takes from it:**
 
 - **The capture point for the Inkscape fork.** Hooking the transaction commit turns each Inkscape action into one batch of XTXP operations, already grouped the way a user thinks of their edits ([The Inkscape fork](/build/inkscape-fork/)).
-- **What branches fix.** Where Inkscape clears redo, XTXP forks: undoing and then editing starts a [branch](/spec/branches/#undo-in-practice), and the undone work stays reachable.
+- **What branches fix.** Where Inkscape clears redo, XTXP forks: undoing and then editing starts a [session](/spec/sessions/#undo-in-practice), and the undone work stays reachable.
 
 - [`document-undo.cpp` (current Inkscape source, code docs)](https://inkscape.gitlab.io/inkscape/doxygen/document-undo_8cpp_source.html)
 - `event-log.cpp` (Undo History model; Gustav Broberg, Jon A. Cruz; GPL-2.0-or-later): [code docs](https://inkscape.gitlab.io/inkscape/doxygen/event-log_8cpp_source.html)
@@ -137,7 +137,7 @@ Yjs and Yrs have an undo manager that can be scoped to the local user's own chan
 
 ### Git
 
-Branches as cheap forks of history, merges as replays, `origin` as the authoritative upstream. XTXP's [branches](/spec/branches/) and the [`@origin` ref](/spec/addressing/#one-address-form) borrow all three ideas.
+Branches as cheap forks of history, merges as replays, `origin` as the authoritative upstream. XTXP's [sessions](/spec/sessions/) and the [`@origin` ref](/spec/addressing/#one-address-form) borrow all three ideas.
 
 ### `package@version`
 
@@ -149,15 +149,39 @@ HTTP calls the server that holds the authoritative version of a resource the *or
 
 - [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110)
 
+## Discovery and federation
+
+### Mastodon and ActivityPub
+
+ActivityPub is the W3C protocol behind the fediverse. Mastodon runs it as independent instances, each with its own rules and moderation, that choose whom to federate with. That is the model for how [muppet discos](/spec/disco/) might federate, and ActivityPub might even carry it.
+
+- [W3C: ActivityPub](https://www.w3.org/TR/activitypub/)
+
+### Claiming a domain by DNS record
+
+Proving control of a domain with a DNS record is well established. ACME's DNS-01 challenge does it to issue certificates, and Bluesky lets an account claim a domain as its handle with a TXT record that names its identifier. A domain owner [claiming `@origin`](/spec/disco/#domain-owners-and-the-bouncer) by public key works the same way.
+
+- [RFC 8555: ACME](https://www.rfc-editor.org/rfc/rfc8555)
+
+## Use cases
+
+Precedents for the [use cases](/overview/use-cases/):
+
+- **Wikipedia** for merge rules layered on open editing: who may edit, how edits are reviewed, how disputes are settled.
+- **Everything2** for a different take on who writes what and how it's kept.
+- **MUDs, MUSHes and MOOs**, such as LambdaMOO, where users added their own objects, with logic, to a shared text world.
+- **WorkAdventure**, a shared 2D world for teams, as a candidate for base maps with per-user layers.
+- **Google Docs**, which defined the shared document editor.
+
 ## Seeing edits before they merge
 
 ### Onion skinning
 
-From traditional animation: drawing on translucent paper over the previous frames. XTXP uses the term for drawing a branch or pending edits over the current state ([Views](/spec/views/)).
+From traditional animation: drawing on translucent paper over the previous frames. XTXP uses the term for drawing a session or pending edits over the current state ([Views](/spec/views/)).
 
 ### Tracked changes
 
-Word processors' redlines, which show who changed what, before it's accepted. XTXP's redline is the same idea, computed from branch operations.
+Word processors' redlines, which show who changed what, before it's accepted. XTXP's redline is the same idea, computed from a session's operations.
 
 ## Web overlays
 

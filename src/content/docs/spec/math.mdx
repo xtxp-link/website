@@ -30,7 +30,7 @@ Xmesh stays a pure core: no networking, no files, no clocks. See [decision 13](/
 
 ## Data model
 
-<Diagram name="09-class-model" alt="Class diagram: an Xmesh document is a Yrs document holding a map of nodes by stable ID; each node has a tag, an edge map of parent counters, a fractional index for its position, an attribute map and optional text; client IDs are bound to authors' public keys; a branch has a parent and a fork state vector." />
+<Diagram name="09-class-model" alt="Class diagram: an Xmesh document is a Yrs document holding a map of nodes by stable ID; each node has a tag, an edge map of parent counters, a fractional index for its position, an attribute map and optional text; client IDs are bound to authors' public keys; a session has a parent and a fork state vector." />
 
 The document is a **map of nodes, keyed by a stable node ID**, not a nested Yrs XML fragment. Each node holds:
 
@@ -79,7 +79,7 @@ The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements 
 - Every peer keeps a **state vector**: for each client, the highest counter it has integrated.
 - Two peers sync by exchanging state vectors. Each sends the operations the other is missing.
 
-Yrs provides all three. A state vector also describes how far a peer has got, which is how a [branch](/spec/branches/) records where it was forked. (Branches themselves are identified by their address.)
+Yrs provides all three. A state vector also describes how far a peer has got, which is how a [session](/spec/sessions/) records where it was forked. (Sessions themselves are identified by their address.)
 
 <Aside type="note" title="Terminology">
 Per-client counters stamp operations, and state vectors describe what a peer has seen. Neither is a vector clock in the usual sense.

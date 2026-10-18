@@ -4,7 +4,7 @@ description: Terms used across the XTXP specification.
 ---
 
 **Admission**
-: A host's decision, in its own arrival order, that an operation counts on one of its branches: the client ID is bound to a key that holds write access.
+: A host's decision, in its own arrival order, that an operation counts on one of its sessions: the client ID is bound to a key that holds write access.
 
 **Binding** (identity)
 : A signed statement that a public key owns a client ID on a document. It is how operations get their author without being signed one by one.
@@ -12,14 +12,14 @@ description: Terms used across the XTXP specification.
 **Binding** (transport)
 : A way of carrying XTXP: WebSocket, HTTP, or the XMPP bridge.
 
-**Branch**
-: A line of a document's history, identified by where it lives: `{host}/{path}@{name}`. It records its parent's address and the point where it was forked. History undo, proposed edits, previews and paused queues are all branches. Each branch lives on exactly one host.
+**Bouncer**
+: *Sketch.* A domain owner's control over its `@origin` session at a muppet disco: which forked sessions are listed, which edits are permitted where, and what is officially relayed. The domain is claimed by public key through a DNS TXT record.
 
 **CRDT**
 : Conflict-free replicated data type. A data structure whose concurrent updates can be applied in any order and still converge to the same state.
 
 **`@{ref}`**
-: The suffix on every XTXP address that says which version is meant: `@origin` (a website as its origin server publishes it), `@main` (the shared branch), a branch name, or a state vector. The last `@` in a URL always starts the ref.
+: The suffix on every XTXP address that says which version is meant: `@origin` (a website as its origin server publishes it), `@main` (the shared session), a session name, or a state vector. The last `@` in a URL always starts the ref.
 
 **`@origin`**
 : The ref for an ordinary website's authoritative version: the stream of changes from the origin server, as the upstream peer sees it. Read-only. Not to be confused with genesis (vector 0), the start of a document's history.
@@ -28,37 +28,43 @@ description: Terms used across the XTXP specification.
 : The first state of a document. For live web branching, it is the fetched origin page.
 
 **Host**
-: A MUPPET hosting branches: it admits operations to its own branches against their grants, routes them and stores them, usually headless on a server.
+: A MUPPET hosting sessions: it admits operations to its own sessions against their grants, routes them and stores them, usually headless on a server.
 
 **Immortal parent**
 : An element node that is never replaced, only updated. Its attributes live in a map, and its children point to it through their own parent maps, so concurrent edits to one element never orphan each other.
 
 **Keyframe**
-: *Roadmap.* A compacted snapshot of a branch, tuned for instant loading. Until then, a branch's full state encoded as one Yrs update does the job.
+: *Roadmap.* A compacted snapshot of a session, tuned for instant loading. Until then, a session's full state encoded as one Yrs update does the job.
 
 **Ledger**
-: *Roadmap.* A chronological log of a branch's patches in cold storage. Until then, branches persist the usual Yjs way: append updates, then compact.
+: *Roadmap.* A chronological log of a session's patches in cold storage. Until then, sessions persist the usual Yjs way: append updates, then compact.
 
 **MUPPET**
-: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh and the application layer: it owns all views, including the vector canvas and spatial chat and comments. Run headless, a MUPPET hosts branches.
+: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh and the application layer: it owns all views, including the vector canvas and spatial chat and comments. Run headless, a MUPPET hosts sessions.
+
+**Muppet disco**
+: *Future milestone.* A discovery service that helps a client find the MUPPETs hosting the sessions it may see, from a query signed with its key. A disco doesn't host sessions itself, and anyone can run one. xtxp.link is one.
 
 **Onion skin**
-: A translucent overlay of another state (a branch, a paused queue, a peer's in-flight edits) drawn over the current one.
+: A translucent overlay of another state (a session, a paused queue, a peer's in-flight edits) drawn over the current one.
 
 **Paused queue**
-: A local branch whose automatic merge is switched off, shown as a preview until it's released (merged).
+: A local session whose automatic merge is switched off, shown as a preview until it's released (merged).
 
 **Public key (identity)**
 : What a user is in XTXP. Proved by signing a challenge; fetched onto a device through an existing sign-in, from the user's own storage.
 
 **Redline**
-: A per-author tracked-changes view: the diff produced when a branch is replayed into its parent.
+: A per-author tracked-changes view: the diff produced when a session is replayed into its parent.
+
+**Session**
+: A lightweight line of a document's history (a branch, in git's terms), identified by where it lives: `{host}/{path}@{name}`. It records its parent's address and the point where it was forked. A user's private state, history undo, proposed edits, previews and paused queues are all sessions. Each session lives on exactly one host.
 
 **State vector**
 : A map from each client to the highest clock value seen from it. Two peers exchange state vectors to work out which operations the other is missing.
 
-**Trust** (between branches)
-: A branch trusting another branch, so the other's changes merge into it automatically. Trust can run one way or both ways.
+**Trust** (between sessions)
+: A session trusting another session, so the other's changes merge into it automatically. Trust can run one way or both ways.
 
 **Upstream peer**
 : For live web branching, the origin website treated as a peer. Its "edits" are the differences between successive fetches.

@@ -7,7 +7,7 @@ import Diagram from '../../../components/Diagram.astro';
 
 <span class="status status--decided">decided</span> in shape, <span class="status status--draft">draft</span> in detail
 
-<Diagram name="14-milestones" alt="Milestones M1 to M4 in sequence, with the xtxp.link gateway as a candidate to fold into M2." />
+<Diagram name="14-milestones" alt="Milestones M1 to M4 in sequence, followed by the muppet disco as a future milestone, with live web branching's placement open." />
 
 ## Before M1: review y-sweet
 
@@ -24,7 +24,7 @@ The outcome decides whether hosting extends y-sweet, borrows from it, or starts 
 
 ## M1 — Headless convergence
 
-Three CLI peers (Rust, embedding Xmesh), one of them a late joiner that loads the full state, connect over WebSocket to a headless MUPPET hosting the branch and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network and the identity handshake before anyone draws anything.
+Three CLI peers (Rust, embedding Xmesh), one of them a late joiner that loads the full state, connect over WebSocket to a headless MUPPET hosting the session and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network and the identity handshake before anyone draws anything.
 
 ## M2 — Inkscape plus no-JS
 
@@ -38,9 +38,9 @@ A Wasm MUPPET in the browser joins as a full peer.
 
 Mobile and chat users take part through the XMPP bridge. What a stock Conversations user gets is [open question 7](/discussion/open-questions/#q7-what-does-a-conversations-user-get-in-m4).
 
-## Where the gateway fits
+## Later: the muppet disco and live web branching
 
-The xtxp.link gateway and live web branching don't have a milestone yet. See [open question 9](/discussion/open-questions/#q9-where-does-the-web-gateway-sit-in-the-milestones). Folding it into M2 is a strong candidate, since the no-JS path of M2 *is* the gateway.
+The [muppet disco](/spec/disco/) is a future milestone, deliberately deferred. Until then, a host serves its own sessions directly, which is all M2's no-JS path needs. Where live web branching fits is [open question 9](/discussion/open-questions/#q9-where-does-live-web-branching-sit-in-the-milestones).
 
 ## Roadmap
 
@@ -48,9 +48,9 @@ Deferred until the first milestones show they're needed. Each one starts by chec
 
 | Item | Why deferred | Until then |
 | --- | --- | --- |
-| **Ledger**: a chronological patch log in cold storage, for unbounded, branchable undo | The Yjs ecosystem already persists documents by appending updates and compacting them | Append-and-compact storage per branch |
+| **Ledger**: a chronological patch log in cold storage, for unbounded, branchable undo | The Yjs ecosystem already persists documents by appending updates and compacting them | Append-and-compact storage per session |
 | **Keyframes**: hot snapshots tuned for instant loading | Yrs can encode a whole document as one compact update | The full state as one update |
 | **History limits and garbage collection** | Snapshots need Yrs's garbage collection off, so deleted content is kept | Keep everything; measure growth |
 | **Native C++ Xmesh** | Yrs is already native code; a rewrite would be about owning the engine, not speed | Xmesh on Yrs, through its C interface |
-| **Elixir / BEAM hosting** | Worth considering at large scale, for the BEAM's supervision and clustering | Rust hosting, one actor per branch |
+| **Elixir / BEAM hosting** | Worth considering at large scale, for the BEAM's supervision and clustering | Rust hosting, one actor per session |
 | **Signed hash chains** of each client's operations | Signing only at identity steps is enough to start | Authorship from client bindings |

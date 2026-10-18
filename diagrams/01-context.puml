@@ -11,25 +11,27 @@ actor "Mobile / chat user\n(XMPP client)" as mobile
 
 rectangle "XTXP mesh" as mesh {
   component "Peers running\nMUPPET + Xmesh" as peers
-  component "Hosts\n(headless MUPPETs;\nbranches merge by trust)" as hosts
+  component "Hosts\n(headless MUPPETs;\nsessions merge by trust)" as hosts
+  component "Server MUPPET on a host\n(acts for the user)" as server
 }
 
-rectangle "xtxp.link\nHTTP gateway" as gateway
+rectangle "Muppet disco\n(xtxp.link, or anyone's)\nfinds sessions, hosts none\n(future milestone)" as disco
 component "XMPP bridge" as bridge
 rectangle "Origin websites\n(e.g. en.wikipedia.org)" as origin
 rectangle "Sign-in provider\n(Google, Apple, Mozilla)\n+ user's own storage" as sso
 
 designer --> peers : edits SVG natively
 wasm --> peers : edits in browser
-nojs --> gateway : HTML forms,\nlinks, HTTP caching
+nojs --> server : HTML forms,\nlinks, HTTP caching
 mobile --> bridge : chat, comments,\npush when asleep
-gateway --> peers : server-side MUPPET\nacts for the user
+server --> hosts : in process
 peers --> hosts : XTXP over WebSocket
 bridge --> hosts : XTXP
-gateway ..> origin : genesis fetch\n(no cookies forwarded)
+hosts ..> origin : genesis fetch\n(no cookies forwarded)
 peers ..> sso : fetch own private key\nafter sign-in
+peers ..> disco : signed query:\nwhich sessions may I see?
 
-note bottom of gateway
+note bottom of server
   North star: the no-JS browser
   is a full participant, not a fallback.
 end note

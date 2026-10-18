@@ -2,7 +2,9 @@
 
 An independent review of the whole spec ran overnight. The full report is in [`spec-review.md`](spec-review.md), with section numbers in brackets below. It was meant to run on Fable, but Fable needed usage credits on the account, so a fresh Opus agent that hadn't seen our conversation did it instead. It can be re-run on Fable once credits are available.
 
-**Already fixed overnight** (stale text only, no new decisions): the glossary's old data model, branch identity wording, decision 1 and 7 wording to match decision 16, `user@domain` in the no-JS diagram, undo-versus-branch wording, "headless Inkscape", two versus three CLI peers, the stale `live` ref, links without a ref, the server MUPPET's place in the deployment diagram, "borrows", "polyfill", and the "decided" labels on Verification and Milestones.
+**Already fixed overnight** (stale text only, no new decisions): the glossary's old data model, session identity wording, decision 1 and 7 wording to match decision 16, `user@domain` in the no-JS diagram, undo-versus-session wording, "headless Inkscape", two versus three CLI peers, the stale `live` ref, links without a ref, the server MUPPET's place in the deployment diagram, "borrows", "polyfill", and the "decided" labels on Verification and Milestones.
+
+**Since the review:** branches are now called **sessions**, and xtxp.link is a **muppet disco** that finds hosts rather than serving documents (decisions 17 and 18). This list uses the new terms; the report predates them, and its "gateway" findings now apply to whichever host serves a session. B5 and C2 are partly answered by the disco.
 
 Each item below needs your call. The recommendation is the reviewer's, with mine noted where it differs.
 
@@ -16,11 +18,11 @@ Yrs keeps deletions outside the state vector, so a state vector alone doesn't pi
 
 **A2. Hosts refuse whole client IDs, never single updates** [2.2, high]
 Yrs needs each client's updates to be contiguous, so refusing one update leaves that client's later ones stuck forever. An admitted edit that depends on a refused one also gets stuck.
-*Recommendation:* a peer's copy of a branch only ever contains admitted updates; previews live in separate local documents. A host refuses a whole client ID, with a defined error. A refused client starts again with a fresh client ID.
+*Recommendation:* a peer's copy of a session only ever contains admitted updates; previews live in separate local documents. A host refuses a whole client ID, with a defined error. A refused client starts again with a fresh client ID.
 
-**A3. Fresh client ID per branch per session** [2.3, high]
-Reusing a client ID on a branch and its fork makes merges silently drop edits.
-*Recommendation:* make it a rule. Bindings are scoped to a branch address (drop the undefined "DocId"), and the first binding for a client ID wins.
+**A3. Fresh client ID per session per connection** [2.3, high]
+Reusing a client ID on a session and its fork makes merges silently drop edits.
+*Recommendation:* make it a rule. Bindings are scoped to a session address (drop the undefined "DocId"), and the first binding for a client ID wins.
 
 **A4. Deterministic move algorithm** [2.5, high]
 The order in which nodes caught in a cycle are reattached isn't pinned, so two implementations can build different trees. Also undefined: a cycle with no rooted parent, a deleted parent, and the tie-break key.
@@ -44,7 +46,7 @@ The spec currently implies three: binary Yrs updates, an `application/xtxp+xml` 
 
 **A8. Handshake security** [2.10, high]
 Signing only a random challenge lets a malicious host relay it and log in elsewhere as the victim.
-*Recommendation:* Ed25519; the signed challenge includes a domain tag, the host's name, the branch and the nonce. Awareness messages are scoped to the authenticated connection.
+*Recommendation:* Ed25519; the signed challenge includes a domain tag, the host's name, the session and the nonce. Awareness messages are scoped to the authenticated connection.
 
 **A9. Smallest M1** [3.1]
 *Recommendation:* one host binary, `@main` only, three CLI peers (one a late joiner), key files, static grants signed by the owner, file storage, a chaos proxy that drops, delays and duplicates frames, and revocation either left out of M1 or limited to "refuse and disconnect".
@@ -65,20 +67,20 @@ Which forms exist (select, edit attribute, recolour, move, delete, add a basic s
 User SVG can carry scripts. Sanitise it, apply a strict CSP, and serve user content from a separate origin. Edit forms need CSRF protection.
 
 **B4. Keys for no-JS users** [2.13, 3.2.4, medium]
-*Recommendation:* a server-generated device key per session, granted by the owner, rather than the server holding a user's root key.
+*Recommendation:* a server-generated device key per sign-in, granted by the owner, rather than the server holding a user's root key.
 
-**B5. Gateway scope for M2** [3.2.7, medium]
+**B5. Website scope for M2** [3.2.7, medium]
 *Recommendation:* native documents only; no website overlays yet.
 
 ## C. Can wait until after M2
 
-- **C1. Trust between branches** [1.11, 2.4]: trust lets edits bypass admission and passes along chains of branches; "paused" and "merged" are described inconsistently. Decide whether trust is per edge, and how revocation interacts with it.
-- **C2. Website branch addresses** [1.9]: where a website's branches live in the address, and who may write `@origin`.
+- **C1. Trust between sessions** [1.11, 2.4]: trust lets edits bypass admission and passes along chains of sessions; "paused" and "merged" are described inconsistently. Decide whether trust is per edge, and how revocation interacts with it.
+- **C2. Website session addresses** [1.9]: where a website's sessions live in the address, and who may write `@origin`.
 - **C3. Open versus fork on a taken name** [1.13]: define `open(name)` and `fork(parent, name)` as separate operations.
 - **C4. LAN hosts and TLS** [1.10]: `.lan` names can't get public certificates; how LAN hosts authenticate.
 - **C5. End-to-end encryption** [1.21]: a blind host can't answer sync, so mark E2E as out of scope until after M4, or design an envelope for it.
 - **C6. "Fork owned by the revoked user"** [2.12]: the reviewer suggests the client keeps refused edits locally instead of the host storing them.
-- **C7. Restoring an old version** [2.11]: merging a branch from the past doesn't undo later changes; "restore" needs generated inverse operations.
+- **C7. Restoring an old version** [2.11]: merging a session from the past doesn't undo later changes; "restore" needs generated inverse operations.
 - **C8. SVG attribute granularity** [2.9]: `style`, `d` and `transform` are single values, so concurrent changes to different style properties clash.
 - **C9. Sign-in providers** [2.13]: the reviewer couldn't confirm that Mozilla accounts offer user storage to third parties; the key-custody threat needs stating.
 - **C10. `@` in bare URLs and hostnames without dots** [2.14]: the reviewer suggests treating bare URLs as path only, and defining allowed host forms (`localhost`, IPv6, ports).

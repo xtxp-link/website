@@ -1,6 +1,6 @@
-@startuml 08-state-branch
+@startuml 08-state-session
 !include _style.iuml
-title Branch lifecycle (draft)
+title Session lifecycle (draft)
 
 [*] --> Forked : fork(parent, SV)
 Forked --> Active : first op
@@ -16,11 +16,11 @@ Merged --> [*]
 Abandoned --> [*]
 
 Proposed : onion skin and redline\nrendered for reviewers
-Merged : ops are kept,\nso the branch is still history
+Merged : ops are kept,\nso the session is still history
 Abandoned : kept as history;\ncan be re-forked later
 
 note right of Paused
-  A paused queue is a local branch
+  A paused queue is a local session
   whose automatic merge is off. Its edits show
   as a translucent preview; releasing
   it is an ordinary merge.

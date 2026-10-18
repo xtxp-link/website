@@ -26,7 +26,7 @@ class StateVector <<Yrs>> {
   clocks : map<client, clock>
 }
 
-class Branch {
+class Session {
   address : host/path@name
   parent : address
   fork_at : StateVector
@@ -49,8 +49,8 @@ class Author {
 
 Doc *-- "many" Node
 Node ..> Node : edges point to\nparents by NodeId
-Branch --> StateVector
-Trust --> Branch : changes merge\nautomatically
+Session --> StateVector
+Trust --> Session : changes merge\nautomatically
 ID ..> ClientBinding : client
 ClientBinding --> Author : signed by
 

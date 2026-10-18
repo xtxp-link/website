@@ -10,7 +10,8 @@ rectangle "**M2**\nInkscape + no-JS\n\nInkscape fork MUPPET +\nserver MUPPET ser
 rectangle "**M3**\nInkscape + Wasm\n\nbrowser MUPPET\n(full Wasm peer)" as m3
 rectangle "**M4**\nInkscape + Conversations\n\nmobile and chat users\nvia the XMPP bridge\n(scope: open question 7)" as m4
 
-card "xtxp.link gateway\n(placement: open question 9)" as gw
+rectangle "**Later**\nThe muppet disco\n\ndiscovery, the bouncer,\nfederation" as disco
+card "Live web branching\n(placement: open question 9)" as gw
 
 card "Roadmap\nledger, keyframes,\nhistory limits,\nnative C++ spike,\nElixir/BEAM at scale,\nsigned hash chains" as rm
 
@@ -18,6 +19,7 @@ m0 --> m1
 m1 --> m2
 m2 --> m3
 m3 --> m4
-gw ..> m2 : candidate:\nfold into M2
+m4 ..> disco
+gw ..> disco : needs the\nbouncer?
 m4 ..> rm : when needed
 @enduml

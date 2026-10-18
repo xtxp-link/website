@@ -20,9 +20,9 @@ package "MUPPET — the executor (Xmesh plus views)" as muppet {
   component "Canvas, spatial chat\nand comments\n(views, shared by all adapters)" as mviews
 }
 
-package "MUPPET hosting a branch (headless)" as hosting {
-  component "Host\n(admit, route, store;\nmerges from trusted branches)" as branch
-  database "Branch storage\n(append + compact;\nledger on the roadmap)" as store
+package "MUPPET hosting a session (headless)" as hosting {
+  component "Host\n(admit, route, store;\nmerges from trusted sessions)" as session
+  database "Session storage\n(append + compact;\nledger on the roadmap)" as store
 }
 
 xm --> yrs : built on
@@ -31,12 +31,12 @@ xcpp ..|> math : later
 mink --> xm : C interface
 mwasm --> xm : Wasm build
 msrv --> xm : Rust
-branch --> xm : Rust
+session --> xm : Rust
 mink ..> wire
 mwasm ..> wire
 msrv ..> wire
-branch ..> wire
-branch --> store
+session ..> wire
+session --> store
 
 note bottom of engine
   Pure core: no I/O, no clocks, no threads.

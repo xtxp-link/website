@@ -3,7 +3,7 @@
 title Reconnecting after a drop: state-vector sync
 
 participant "Peer\n(MUPPET)" as p
-participant "Host\n(branch main)" as t
+participant "Host\n(session main)" as t
 
 p -> t : update ops (1,1)…(1,40)
 t --> p : others' ops

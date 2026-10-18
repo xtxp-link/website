@@ -3,7 +3,7 @@ title: What is XTXP?
 description: A short introduction to the XML to XML Protocol and the problem it solves.
 ---
 
-XTXP (XML to XML Protocol) lets many people edit the same XML document at the same time, on different software, over unreliable networks. Anyone can branch the document's history, preview a branch over the original, and merge it back.
+XTXP (XML to XML Protocol) lets many people edit the same XML document at the same time, on different software, over unreliable networks. Anyone can session the document's history, preview a session over the original, and merge it back.
 
 The first document type is **SVG**, so the first application is a shared vector canvas with spatial chat and comments, following the Conversations model. It isn't a separate layer: the canvas, chat and comments are views that [MUPPET](/overview/architecture/) provides wherever it runs. The engine is not SVG-specific, though. Any XML tree works, and an HTML page parsed into a tree is close enough, which is what makes [live web branching](/spec/web-overlay/) possible.
 
@@ -13,13 +13,13 @@ Collaborative design tools today mostly share three traits:
 
 1. **Identity and data live with one vendor.** Your drawing and your account sit in that company's cloud.
 2. **Collaboration needs their client.** Usually that means a heavy JavaScript app, or a desktop app that only talks to its own servers.
-3. **History is linear.** You can undo, but you can't branch, preview a branch over the current state, and merge it back.
+3. **History is linear.** You can undo, but you can't session, preview a session over the current state, and merge it back.
 
 ## The XTXP answer
 
 - **Identity as a public key**, fetched to a device through a sign-in people already have, so no central account owns anyone.
 - **A CRDT engine (Xmesh)** that merges concurrent edits without a central authority. Every client runs it, so desktop clients keep working offline.
-- **Branches as history.** Going back to an earlier version, proposing an edit and previewing it are all the same thing: a branch forked from a point in history. Ctrl+Z still undoes just your own recent actions.
+- **Sessions as history.** Going back to an earlier version, proposing an edit and previewing it are all the same thing: a session forked from a point in history. Ctrl+Z still undoes just your own recent actions.
 - **Plain HTML as a first-class client.** A server-side MUPPET does the CRDT work for a browser that only submits forms and follows links.
 
 ## Status

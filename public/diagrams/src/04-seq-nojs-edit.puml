@@ -3,9 +3,9 @@
 title No-JS edit: form POST, redirect, cached polling
 
 actor "Browser\n(no JS)" as b
-participant "xtxp.link\ngateway" as gw
+participant "Hosting instance\n(HTTPS)" as gw
 participant "Server MUPPET\n(acts for this user)" as sm
-participant "Host\n(branch main)" as t
+participant "Host\n(session main)" as t
 participant "Inkscape\nMUPPET" as ink
 
 b -> gw : POST /host/doc@main (form fields)

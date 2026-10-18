@@ -22,17 +22,17 @@ With a separate engine repository, scheduled rebases and a tracked diff size. Se
 
 A y-sweet review → M1 headless convergence → M2 Inkscape plus no-JS → M3 Inkscape plus Wasm → M4 Inkscape plus Conversations. See [Milestones](/build/milestones/).
 
-## 7. Peer model with hosted branches
+## 7. Peer model with hosted sessions
 
 - **MUPPET is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are MUPPET views, wherever a MUPPET runs.
 - **XTXP is node to node.**
-- **A branch is hosted by exactly one MUPPET**; any number of MUPPETs may hold copies. A branch is a fork of the document's history.
-- **Server-side rendering is a server-side MUPPET.** Hosts hold branches; every MUPPET executes, and those with a user render.
+- **A session is hosted by exactly one MUPPET**; any number of MUPPETs may hold copies. A session is a fork of the document's history.
+- **Server-side rendering is a server-side MUPPET.** Hosts hold sessions; every MUPPET executes, and those with a user render.
 
 
 ## 9. One address form: `{host}/{path}@{ref}`
 
-Every document, native or an ordinary website, is addressed as `xtxp.link/{host}/{path}@{ref}`. There is no proxy marker: a website is a document whose upstream peer is the origin, and `@origin` is that peer's branch. The last `@` always starts the ref, and generated links always carry one. A first path segment without a dot is a gateway keyword. See [Addressing](/spec/addressing/).
+Every document, native or an ordinary website, is addressed as `xtxp.link/{host}/{path}@{ref}`. There is no proxy marker: a website is a document whose upstream peer is the origin, and `@origin` is that peer's session. The last `@` always starts the ref, and generated links always carry one. A first path segment without a dot is a keyword for the disco's own pages. See [Addressing](/spec/addressing/).
 
 
 ## 11. Transport: WebSocket first, XMPP as a bridge
@@ -42,7 +42,7 @@ XTXP's wire is a small sync protocol that doesn't care about transport: operatio
 
 ## 12. Identity is a public key; access is granted by key
 
-A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a branch owns it and grants `read` or `write` to keys or to `*`. A host enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits land on a fork the revoked user owns. See [Identity and access](/spec/identity/).
+A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a session owns it and grants `read` or `write` to keys or to `*`. A host enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits land on a fork the revoked user owns. See [Identity and access](/spec/identity/).
 
 
 ## 13. Xmesh v1 is Yrs plus a tree layer
@@ -52,21 +52,29 @@ The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. 
 
 ## 14. Toolchain first: ledger and keyframes go on the roadmap
 
-Branches persist the way the Yrs toolchain already does: a full state encoded as one update for loading, and append-then-compact storage. A dedicated ledger and keyframes are on the [roadmap](/build/milestones/#roadmap), to be built only if that falls short.
+Sessions persist the way the Yrs toolchain already does: a full state encoded as one update for loading, and append-then-compact storage. A dedicated ledger and keyframes are on the [roadmap](/build/milestones/#roadmap), to be built only if that falls short.
 
 
 ## 15. Hosting runs as a small Rust server
 
-With Xmesh in Rust, hosting MUPPETs run as a small Rust server: one async actor per branch, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side MUPPET in the same binary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation.
+With Xmesh in Rust, hosting MUPPETs run as a small Rust server: one async actor per session, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side MUPPET in the same binary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation.
 
 
-## 16. Any MUPPET can host branches; branches are named by where they live
+## 16. Any MUPPET can host sessions; sessions are named by where they live
 
-There is one kind of node, the MUPPET. Any MUPPET can host branches: it admits, routes and stores them, usually headless on a server, with no views and no user of its own. A branch is identified by its address, `{host}/{path}@{name}`, with no generated IDs; it lives on exactly one host, and only that host admits edits to it. The creator names it: asking for an existing name opens that branch (subject to grants), and creating a fork on a taken name is rejected. **Trust between branches drives automatic merges**, one way or both, which is how branches on different hosts keep each other up to date. See [Branches and history](/spec/branches/#branches-on-other-hosts-and-trust-between-them).
+There is one kind of node, the MUPPET. Any MUPPET can host sessions: it admits, routes and stores them, usually headless on a server, with no views and no user of its own. A session is identified by its address, `{host}/{path}@{name}`, with no generated IDs; it lives on exactly one host, and only that host admits edits to it. The creator names it: asking for an existing name opens that session (subject to grants), and creating a fork on a taken name is rejected. **Trust between sessions drives automatic merges**, one way or both, which is how sessions on different hosts keep each other up to date. See [Sessions and history](/spec/sessions/#sessions-on-other-hosts-and-trust-between-them).
+
+## 17. Sessions
+
+A line of a document's history is a **session**: lightweight enough to make one per person, per proposal or per visit. That includes a single user's private state, which may never leave that user's own MUPPET. Everything decision 16 says of branches holds for sessions. See [Sessions and history](/spec/sessions/).
+
+## 18. xtxp.link is a muppet disco, not a host
+
+XTXP doesn't aim to host everyone's sessions, which cost server resources. xtxp.link is a **muppet disco**: it finds the MUPPETs hosting the sessions a signed query may see, and can start a session on an instance, including one on the user's own machine, but hosts nothing itself. Anyone can run a disco. A domain owner can claim its `@origin` by key with a DNS TXT record, and decide through the **bouncer** which forks are listed and what's officially relayed. Federation follows Mastodon's model on ActivityPub in spirit; its rules are still to be defined. Until then, a host serves its own sessions directly. The disco is a future milestone, deliberately deferred. See [The muppet disco](/spec/disco/).
 
 ## Naming
 
-- **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor, the application layer and hosting.
+- **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.
 - Name checks so far: *Xmesh* collides with Thinkbox XMesh, a commercial mesh-caching plugin for VFX tools. *Muppet* is a Henson/Disney trademark: fine for an internal component, riskier on anything public-facing. No direct clash was found for *XTXP*.
 
 ## Conventions

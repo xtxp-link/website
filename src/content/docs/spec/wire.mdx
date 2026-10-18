@@ -31,7 +31,7 @@ The sync messages follow the [Yjs sync protocol](/discussion/prior-art/#the-yjs-
 | `sync-1` | "Here is my state vector." | No |
 | `sync-2` | "Here are the operations you're missing." | Yes, as operations |
 | `update` | New operations, as they happen. | Yes |
-| `grant` / `revoke` | Signed changes to who may read or write a branch. | Yes |
+| `grant` / `revoke` | Signed changes to who may read or write a session. | Yes |
 | `awareness` | Cursors, selections, presence. Fire-and-forget, overwritten, never archived. | No |
 
 Cursors and presence travel separately from operations. A 60 Hz cursor stream should never be archived, wrapped in anything heavy, or replayed to a late joiner.
@@ -59,11 +59,11 @@ Behind the bridge, everything is ordinary XTXP to a host. Inkboard's old problem
 
 ## Encryption
 
-Every binding runs over TLS. A branch can also be end-to-end encrypted, so that its host only sees ciphertext. The host can still **admit** operations, because client bindings and grants are metadata it can check. It can't compact the branch into a full state or render previews, though, so those move to the clients. A server-side MUPPET can still take part as one of the user's own devices.
+Every binding runs over TLS. A session can also be end-to-end encrypted, so that its host only sees ciphertext. The host can still **admit** operations, because client bindings and grants are metadata it can check. It can't compact the session into a full state or render previews, though, so those move to the clients. A server-side MUPPET can still take part as one of the user's own devices.
 
 ## Still open
 
 - How XTXP's own messages (identity, grants) are framed alongside the Yjs sync messages.
-- Whether `xtxp://` names the WebSocket binding directly, or resolves to it through the gateway.
+- Whether `xtxp://` names the WebSocket binding directly, or resolves to it through a muppet disco.
 - How the XMPP bridge is built: for example as a component plugged into an existing XMPP server, speaking XTXP to a host.
 

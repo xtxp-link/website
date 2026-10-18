@@ -3,7 +3,7 @@
 title Two peers edit concurrently and converge (WebSocket binding)
 
 participant "MUPPET A\n(client 1, key P)" as a
-participant "Host\n(branch main)" as t
+participant "Host\n(session main)" as t
 participant "MUPPET B\n(client 2, key Q)" as b
 
 note over a, b : Both start from the same state vector {1:7, 2:4}

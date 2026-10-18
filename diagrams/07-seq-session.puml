@@ -1,6 +1,6 @@
-@startuml 07-seq-branch
+@startuml 07-seq-session
 !include _style.iuml
-title Branches: fork, preview, merge
+title Sessions: fork, preview, merge
 
 actor "Author" as au
 participant "Author's\nMUPPET" as am
@@ -12,10 +12,10 @@ actor "Reviewer" as rv
 au -> am : propose an edit\n(or undo to an earlier point)
 am -> main : fork at state vector SV
 main -> b1 ** : create @sketch\nparent=@main, fork=SV
-b1 --> am : branch @sketch ready
+b1 --> am : session @sketch ready
 am -> b1 : XTXP ops on @sketch
 rv -> sm : view @sketch
-sm -> b1 : branch state
+sm -> b1 : session state
 sm -> main : parent state
 sm --> rv : onion skin (@sketch over main)\nand redline (who changed what)
 rv -> sm : accept
@@ -27,7 +27,7 @@ main -> main : fan out to all peers
 b1 -> b1 : stays as history
 
 note over main, b1
-  A branch is identified by its address.
+  A session is identified by its address.
   It records its parent and the point
   where it was forked. Going back in
   history, proposals and previews are

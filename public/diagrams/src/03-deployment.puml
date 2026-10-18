@@ -20,17 +20,17 @@ node "Phone" {
   component "XMPP client\n(Conversations-style)" as phone
 }
 
-cloud "Edge (Cloudflare or similar)" {
-  component "xtxp.link gateway\ncontent negotiation" as gw
+cloud "Muppet disco (future milestone)" {
+  component "xtxp.link\nfinds hosts; serves no sessions" as gw
 }
 
-node "Hosting server: headless MUPPETs\none binary, or one Durable Object per branch" {
+node "Hosting server: headless MUPPETs\none binary, or one Durable Object per session" {
   component "WebSocket endpoint" as ws
   component "Server MUPPET\n(renders for no-JS)" as m3
   component "Host: @main\n(headless MUPPET)" as t0
   component "Host: @sketch\n(headless MUPPET)" as t1
   component "Host: @review\n(headless MUPPET)" as t2
-  database "Branch storage\n(append + compact)" as store
+  database "Session storage\n(append + compact)" as store
 }
 
 node "XMPP bridge (from M4)" {
@@ -39,8 +39,8 @@ node "XMPP bridge (from M4)" {
 
 cloud "XMPP federation" as xf
 
-html --> gw : HTTPS
-gw --> m3
+html --> m3 : HTTPS
+html ..> gw : lookup, then\nredirect to the host
 m1 --> ws : WebSocket (TLS)
 m2 --> ws : WebSocket (TLS)
 m3 --> ws : in process

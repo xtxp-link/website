@@ -10,12 +10,14 @@ XTXP (XML to XML Protocol) lets many people edit one XML document at once, with 
 
 1. [What is XTXP?](https://xtxp.link/overview/what-is-xtxp/) and [North star](https://xtxp.link/overview/north-star/)
 2. [Architecture](https://xtxp.link/overview/architecture/)
-3. [The Math](https://xtxp.link/spec/math/), [The Wire](https://xtxp.link/spec/wire/), [Identity and access](https://xtxp.link/spec/identity/), [Branches and history](https://xtxp.link/spec/branches/)
+3. [The Math](https://xtxp.link/spec/math/), [The Wire](https://xtxp.link/spec/wire/), [Identity and access](https://xtxp.link/spec/identity/), [Sessions and history](https://xtxp.link/spec/sessions/)
 4. [Verification](https://xtxp.link/build/verification/), [Milestones](https://xtxp.link/build/milestones/), [The Inkscape fork](https://xtxp.link/build/inkscape-fork/)
 5. [Decision log](https://xtxp.link/discussion/decisions/) and [Open questions](https://xtxp.link/discussion/open-questions/)
 6. [Prior art](https://xtxp.link/discussion/prior-art/): read the Yrs, Wallace, y-sweet, Yjs sync protocol, Inkscape undo and Inkboard entries before designing the matching parts
 
 ## 2. Ground rules
+
+- **Vocabulary.** A line of a document's history is a **session** (a branch, in git's terms), down to one user's private state. xtxp.link is a **muppet disco**: it finds hosts and hosts nothing. Both are on the spec site (decisions 17 and 18).
 
 - **Behaviour first.** Write Gherkin `.feature` files and JSON test vectors before implementation code. The vectors are the contract.
 - **Pure core.** Xmesh has no networking, no file access, no clocks and no threads. Everything that touches the world is an adapter.
@@ -59,7 +61,7 @@ A new implementation repository (name to agree with David, for example `xtxp-lin
 ```
 crates/xmesh          pure core: schema on Yrs, moves, XML Patch subset, canonical XML
 crates/xtxp-wire      message types and framing
-crates/muppet-host    headless MUPPET hosting a branch over WebSocket
+crates/muppet-host    headless MUPPET hosting a session over WebSocket
 crates/xtxp-cli       CLI peer: replays a vector stream, can drop and reconnect
 tools/fuzzer          generates JSON vectors from the feature files' behaviours
 features/             Gherkin feature files
@@ -74,7 +76,7 @@ vectors/              generated and hand-written JSON vectors
 - **Canonical XML:** pick one deterministic serialisation for hashing and document it on the Math page.
 - **Wire:** Yjs sync step 1 and 2 plus updates; `hello`, `challenge`, `prove`, `bind`; `grant` and `revoke` for write access.
 - **Identity:** Ed25519 keys loaded from files. Sign-in to fetch keys is out of scope for M1.
-- **Branches:** a single branch, `@main`. Fork, merge and trust come later.
+- **Sessions:** a single session, `@main`. Fork, merge and trust come later.
 - **Storage:** append updates, compact periodically.
 
 ### Done when
@@ -95,7 +97,7 @@ vectors/              generated and hand-written JSON vectors
 - **Xmesh C interface**, linked into an Inkscape fork. The fork's build needs a Rust toolchain.
 - **Inkscape adapter:** start from Inkboard's code (`src/jabber_whiteboard/` in Inkscape 0.46). Capture edits at Inkscape's undo transaction commit, so each action becomes one batch of operations. Apply incoming operations outside the local undo stack. Test the known Inkboard pitfalls: automatically named gradients and patterns, `defs` and metadata, and new windows.
 - **Server-side MUPPET:** renders the drawing as HTML and SVG, accepts edits as form POSTs, redirects, and serves `ETag`/`304` for meta-refresh polling (see the no-JS edit diagram on the Addressing page).
-- **Addressing:** `{host}/{path}@{ref}` for native documents, with bare URLs redirecting to `@main`.
+- **Addressing:** the host serves its own sessions at `https://{host}/{path}@{ref}`, with bare URLs redirecting to `@main`. No muppet disco: xtxp.link doesn't serve documents.
 
 ### Done when
 
@@ -113,14 +115,14 @@ From the [open questions](https://xtxp.link/discussion/open-questions/) page:
 
 From the spec review (`handover/review-decisions.md`, section A for M1 and B for M2), *pending review*:
 
-- **M1:** snapshots rather than state vectors to name points in history (A1); refusing whole client IDs, with previews in separate documents (A2); a fresh client ID per branch per session (A3); the move algorithm as numbered pseudocode (A4); tree schema details, including position on the edge, deletion, text nodes and namespaces (A5); canonical form v0 (A6); one wire format (A7); handshake domain separation (A8); the smallest M1 (A9).
-- **M2:** the Inkscape adapter contract (B1); the no-JS editing model (B2); SVG sanitising, CSP, a separate content origin and CSRF (B3); device keys for no-JS users (B4); native documents only at the gateway (B5).
+- **M1:** snapshots rather than state vectors to name points in history (A1); refusing whole client IDs, with previews in separate documents (A2); a fresh client ID per session per connection (A3); the move algorithm as numbered pseudocode (A4); tree schema details, including position on the edge, deletion, text nodes and namespaces (A5); canonical form v0 (A6); one wire format (A7); handshake domain separation (A8); the smallest M1 (A9).
+- **M2:** the Inkscape adapter contract (B1); the no-JS editing model (B2); SVG sanitising, CSP, a separate content origin and CSRF (B3); device keys for no-JS users (B4); native documents only (B5).
 
 Everything else can wait until after M2.
 
 ## 8. Out of scope for the MVP
 
-Ledger and keyframes, the XMPP bridge, live web branching and the xtxp.link gateway for websites (open question 9), the Wasm MUPPET (M3), sign-in to fetch keys, branches on other hosts and trust between them, signed hash chains, native C++ and Elixir/BEAM.
+Ledger and keyframes, the XMPP bridge, the muppet disco (xtxp.link as discovery, the bouncer, federation), live web branching (open question 9), the sketch-level [use cases](https://xtxp.link/overview/use-cases/), the Wasm MUPPET (M3), sign-in to fetch keys, sessions on other hosts and trust between them, signed hash chains, native C++ and Elixir/BEAM.
 
 ## 9. Pending decisions
 

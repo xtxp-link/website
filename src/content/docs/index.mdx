@@ -19,7 +19,7 @@ import Diagram from '../../components/Diagram.astro';
 
 <Aside type="note" title="Draft, under discussion">
 This site exists so the design can be argued about in public. Nothing here is final.
-Pages mark each point as <span class="status status--decided">decided</span>, <span class="status status--draft">draft</span> or <span class="status status--open">open</span>.
+Pages mark each point as <span class="status status--decided">decided</span>, <span class="status status--draft">draft</span>, <span class="status status--open">open</span> or <span class="status status--sketch">sketch</span>.
 </Aside>
 
 ## Three named parts
@@ -32,11 +32,11 @@ Pages mark each point as <span class="status status--decided">decided</span>, <s
     The CRDT engine that resolves concurrent edits on an XML tree. A thin, pure layer on Yrs, the Rust port of Yjs, that adds cycle-safe tree moves. No I/O, no clocks, no threads: everything else is an adapter around it.
   </Card>
   <Card title="MUPPET: the executor" icon="pencil">
-    Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns every view: the canvas, spatial chat and comments, onion skin and redline. Any MUPPET can host branches: admitting edits against their grants, routing them and storing them. On a server it runs headless.
+    Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns every view: the canvas, spatial chat and comments, onion skin and redline. Any MUPPET can host sessions: admitting edits against their grants, routing them and storing them. On a server it runs headless.
   </Card>
 </CardGrid>
 
-<Diagram name="01-context" alt="System context: designers, browser users with and without JavaScript, and mobile users connect to a mesh of peers and hosts over WebSocket, the xtxp.link gateway and an XMPP bridge." />
+<Diagram name="01-context" alt="System context: designers, browser users with and without JavaScript, and mobile users connect to a mesh of peers and hosts over WebSocket, an XMPP bridge and, from a host's server MUPPET, plain HTML; a muppet disco such as xtxp.link helps them find sessions." />
 
 ## Where to start
 

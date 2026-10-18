@@ -1,6 +1,6 @@
 ---
 title: 'Views: onion skin and redline'
-description: Seeing edits before they merge. Onion skin, redline, paused queues and branch previews, all owned by MUPPET.
+description: Seeing edits before they merge. Onion skin, redline, paused queues and session previews, all owned by MUPPET.
 ---
 
 <span class="status status--decided">decided</span> as a requirement, <span class="status status--draft">draft</span> in detail.
@@ -10,22 +10,22 @@ Collaborators need to see edits **before they merge**. Neither the original desi
 ## The views
 
 **Onion skin**
-: A translucent overlay of another state drawn over the current one: a branch over its parent, a paused queue over the live document, or a peer's in-flight edits.
+: A translucent overlay of another state drawn over the current one: a session over its parent, a paused queue over the live document, or a peer's in-flight edits.
 
 **Redline**
-: A per-author tracked-changes view. For a branch, it is the set of operations that a merge would replay, coloured by who made them.
+: A per-author tracked-changes view. For a session, it is the set of operations that a merge would replay, coloured by who made them.
 
 **Paused queue**
-: A local branch whose automatic merge is switched off. Its edits show as a translucent preview over the live document, and releasing it is an ordinary [merge](/spec/branches/#fork-preview-merge).
+: A local session whose automatic merge is switched off. Its edits show as a translucent preview over the live document, and releasing it is an ordinary [merge](/spec/sessions/#fork-preview-merge).
 
-**Branch preview**
-: Any branch rendered on its own or over its parent, for review before merging.
+**Session preview**
+: Any session rendered on its own or over its parent, for review before merging.
 
 **Prior art:** onion skinning comes from traditional animation, and the redline from word processors' tracked changes ([prior art](/discussion/prior-art/#seeing-edits-before-they-merge)).
 
 ## Who renders them
 
-All views belong to **MUPPET**. They are ephemeral changes to the displayed tree and never change the state of the branch being viewed.
+All views belong to **MUPPET**. They are ephemeral changes to the displayed tree and never change the state of the session being viewed.
 
 That holds wherever a MUPPET runs:
 
@@ -38,7 +38,7 @@ Because server-side rendering is just a server-side MUPPET, the no-JS view and t
 ## What the engine must provide
 
 - **Authorship on every operation**, kept after merging, so a redline can say who changed what.
-- **A state per branch**, so a preview has something to overlay.
+- **A state per session**, so a preview has something to overlay.
 - **Cheap diffs between two states**, so a redline can be computed on demand.
 
 ## Still open

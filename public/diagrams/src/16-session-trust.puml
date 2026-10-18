@@ -1,6 +1,6 @@
-@startuml 16-branch-trust
+@startuml 16-session-trust
 !include _style.iuml
-title Branches on different hosts, linked by trust (draft)
+title Sessions on different hosts, linked by trust (draft)
 
 node "Server: xtxp.example.org" {
   component "drawing@main" as main
@@ -23,9 +23,9 @@ sketch <.. main : sketch trusts main:\nstays current
 sketch ..> main : on release:\nmain trusts sketch\n(an ordinary merge)
 
 note bottom of main
-  Each branch lives on exactly one host,
+  Each session lives on exactly one host,
   and only that host admits edits to it.
-  Trust between branches decides which
+  Trust between sessions decides which
   changes merge in automatically.
   Merges commute, so two-way trust
   can't loop or diverge.

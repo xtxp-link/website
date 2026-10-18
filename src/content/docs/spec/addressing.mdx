@@ -1,6 +1,6 @@
 ---
-title: Addressing and the gateway
-description: The xtxp:// URI scheme and the xtxp.link HTTP gateway, with content negotiation, deep links and short links.
+title: Addressing and discovery
+description: The xtxp:// URI scheme, https addresses served by the hosting MUPPET, xtxp.link as a muppet disco, content negotiation, deep links and short links.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -14,34 +14,44 @@ import Diagram from '../../../components/Diagram.astro';
 xtxp://{host}/{path}@{ref}
 ```
 
-Used by native desktop clients, terminal interfaces and automated nodes exchanging raw patch streams. Whether it names the [WebSocket binding](/spec/wire/#bindings) directly or resolves to it through the gateway is [still open](/discussion/open-questions/).
+Used by native desktop clients, terminal interfaces and automated nodes exchanging raw patch streams. Whether it names the [WebSocket binding](/spec/wire/#bindings) directly or resolves to it through a [muppet disco](/spec/disco/) is [still open](/discussion/open-questions/).
 
-## `https://xtxp.link/` — the web gateway
+## `https://` — served by the hosting MUPPET
+
+```
+https://{host}/{path}@{ref}
+```
+
+A MUPPET that hosts a session serves it to ordinary browsers itself, through its server-side MUPPET. This is all the MVP needs.
+
+## `https://xtxp.link/` — a muppet disco
 
 ```
 https://xtxp.link/{host}/{path}@{ref}
 ```
 
-A universal HTTP bridge and directory. It exposes any XTXP document to an ordinary browser and routes requests to whichever node hosts it.
+<span class="status status--sketch">sketch</span> · a future milestone
 
-### One address form
+xtxp.link doesn't host or serve documents. It is a [muppet disco](/spec/disco/): it finds the MUPPETs hosting the sessions behind an address, and only those the asking key may see, then hands the client on to them. Anyone can run a disco; xtxp.link is one.
 
-`{host}` can be an XTXP node hosting native documents, or an **ordinary website**. There is no separate proxy mode. A website is simply a document whose [upstream peer](/spec/web-overlay/#the-origin-site-is-a-peer) is the origin site, and everything else about it is branching.
+## One address form
+
+`{host}` can be a MUPPET hosting native documents, or an **ordinary website**. There is no separate proxy mode. A website is simply a document whose [upstream peer](/spec/web-overlay/#the-origin-site-is-a-peer) is the origin site, and everything else about it is branching.
 
 The `@{ref}` suffix says which version you mean:
 
 | Ref | Meaning |
 | --- | --- |
-| `@origin` | The website's authoritative version, as served by its origin server: the upstream peer's branch. Websites only, read-only. |
-| `@main` | The shared collaborative branch. The default for native documents. |
-| `@{branch}` | A named branch on this host: a proposed edit, an undo fork, someone's overlay. A branch on another host is addressed through that host: `xtxp.link/{other-host}/{path}@{branch}`. |
+| `@origin` | The website's authoritative version, as served by its origin server: the upstream peer's session. Websites only, read-only. |
+| `@main` | The shared collaborative session. The default for native documents. |
+| `@{session}` | A named session on this host: a proposed edit, an undo fork, someone's overlay. A session on another host is addressed through that host: `xtxp.link/{other-host}/{path}@{session}`. |
 | `@{state vector}` | An exact point in history. *Syntax open.* |
 
 Examples:
 
 ```
 xtxp.link/en.wikipedia.org/wiki/Browser@origin      Wikipedia's page, unedited
-xtxp.link/en.wikipedia.org/wiki/Browser@notes     an edited branch of it
+xtxp.link/en.wikipedia.org/wiki/Browser@notes     an edited session of it
 xtxp.link/my-laptop.lan/drawing@sketch            a fork, living on a laptop
 xtxp.link/xtxp.example.org/drawing@main           a native document
 xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
@@ -49,41 +59,41 @@ xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 
 **Prior art:** the `@` reads like npm's `package@version`, and `origin` follows both git's authoritative remote and HTTP's *origin server* ([prior art](/discussion/prior-art/#addressing-and-branching)).
 
-### Parsing rules
+## Parsing rules
 
 1. **The last `@` starts the ref.** Every other `@` belongs to the path, so origin paths like Medium's `/@user` need no escaping.
-2. **Links the gateway generates always carry a ref.** That includes every link it rewrites inside a page, so the last `@` is never ambiguous.
+2. **Generated links always carry a ref.** That includes every link it rewrites inside a page, so the last `@` is never ambiguous.
 3. **Bare URLs** (typed or pasted from elsewhere):
    - with no `@` at all, redirect to the default ref (`@origin` for websites, `@main` for native documents)
    - with an `@` whose text doesn't resolve to a ref, as in `medium.com/@campey`, treat it as part of the path and redirect to `…/@campey@origin`
-4. **A first path segment without a dot is a keyword**, reserved for the gateway's own pages (such as `/d/` for diagrams). Hostnames always contain a dot, so the two never collide.
+4. **A first path segment without a dot is a keyword**, reserved for the disco's own pages (such as `/d/` for diagrams). Hostnames always contain a dot, so the two never collide.
 
-### The ref is the honesty signal
+## The ref is the honesty signal
 
-`@origin` means unedited. Any other ref means a branch that may contain other people's edits, and the page frame says so, with links to `@origin` and to the original site. The ref travels with every shared link, so a reader can tell what they're looking at before they click. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
+`@origin` means unedited. Any other ref means a session that may contain other people's edits, and the page frame says so, with links to `@origin` and to the original site. The ref travels with every shared link, so a reader can tell what they're looking at before they click. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
 
-<Diagram name="11-seq-negotiation" alt="Sequence: a client requests a document from xtxp.link; the gateway asks the directory which node hosts it; with Accept application/xtxp+xml it opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client. The ref after the last @ picks @origin, @main, another branch or a state vector." />
+<Diagram name="11-seq-negotiation" alt="Sequence: a client asks the xtxp.link disco for an address, and the disco finds the MUPPET hosting the session and redirects there; with Accept application/xtxp+xml the host opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client. The ref after the last @ picks @origin, @main, another session or a state vector." />
 
-### Content negotiation
+## Content negotiation
 
 | Request | Response |
 | --- | --- |
 | `Accept: application/xtxp+xml` | The raw CRDT patch stream, for automated nodes. |
-| `Accept: text/html` | The current state rendered as HTML, with forms that POST edits. Served by a server-side MUPPET. |
+| `Accept: text/html` | The current state rendered as HTML, with forms that POST edits. Served by the host's server-side MUPPET. |
 | A person who wants their native client | A plain link to `xtxp://{host}/{path}@{ref}`. |
 
 <Aside type="caution" title="Native hand-off">
 The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp://`. A server can't tell whether a protocol handler is installed, and a refresh to a missing handler fails silently. A visible link always works, and it needs no JavaScript.
 </Aside>
 
-### The no-JS edit loop
+## The no-JS edit loop
 
-<Diagram name="04-seq-nojs-edit" alt="Sequence: the browser POSTs a form; the gateway hands it to the server MUPPET, which makes CRDT ops and sends them to the host; the host fans them out to Inkscape; the browser is redirected and GETs the new HTML; later meta-refresh polls get 304 Not Modified unless someone edited." />
+<Diagram name="04-seq-nojs-edit" alt="Sequence: the browser POSTs a form to the hosting instance, which hands it to its server MUPPET, which makes CRDT ops and sends them to the host; the host fans them out to Inkscape; the browser is redirected and GETs the new HTML; later meta-refresh polls get 304 Not Modified unless someone edited." />
 
-### Deep links and short links
+## Deep links and short links
 
 - **Vector snapshots**: `@{state vector}` names a document at an exact point in history, so a historical state can be shared exactly. How a state vector is written in a URL is <span class="status status--open">open</span>.
-- **Node resolution**: the gateway routes a session to the federated node currently hosting a document.
+- **Discovery**: a [muppet disco](/spec/disco/) resolves an address to the MUPPET currently hosting the session.
 - **Short links**: short, low-density URLs that make easily scanned QR codes, for bridging paper and screens.
 
 ## Media types
