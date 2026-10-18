@@ -243,6 +243,9 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
     align-items: center;
     justify-content: flex-end;
     gap: 0.75rem;
+    /* The button takes 1.75rem + the gap on the right; leave the same on the left so the slider is centred on the logo. */
+    padding-left: calc(1.75rem + 0.75rem);
+    box-sizing: border-box;
     animation: xtxp-ctl-in 0.5s ease-out var(--ctl-delay) both;
   }
   .xtxp-ctl:focus-within {
