@@ -2,18 +2,20 @@
 // The animated XTXP logo, inline so it can use the theme's colours (see src/styles/logo.generated.css).
 //   mode="loop"  builds, holds, reverses and repeats (the hero)
 //   mode="title" still, until something adds .xtxp-logo--run (the site title)
-import { glyphs, VIEWBOX } from '../brand/logo.mjs';
+//   centre="plus" makes the red + the horizontal centre of the box, so centring the box centres the +
+import { glyphs, VIEWBOX, HERO_VIEWBOX } from '../brand/logo.mjs';
 
 interface Props {
   mode?: 'loop' | 'title';
+  centre?: 'plus';
   class?: string;
 }
-const { mode = 'loop', class: className } = Astro.props;
+const { mode = 'loop', centre, class: className } = Astro.props;
 ---
 
 <svg
   class:list={['xtxp-logo', mode === 'loop' && 'xtxp-logo--loop', className]}
-  viewBox={VIEWBOX}
+  viewBox={centre === 'plus' ? HERO_VIEWBOX : VIEWBOX}
   aria-hidden="true"
   focusable="false"
   set:html={glyphs()}

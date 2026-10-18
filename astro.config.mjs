@@ -13,6 +13,10 @@ export default defineConfig({
       description:
         'XTXP, the XML to XML Protocol: a draft specification for collaborative, branchable editing of XML documents, from Inkscape to a browser with no JavaScript.',
       favicon: '/favicon.svg',
+      head: [
+        { tag: 'link', attrs: { rel: 'alternate icon', href: '/favicon.ico', sizes: '32x32' } },
+        { tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
+      ],
       components: {
         Hero: './src/components/Hero.astro',
         SiteTitle: './src/components/SiteTitle.astro',

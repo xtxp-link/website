@@ -77,3 +77,23 @@
   color: var(--sl-color-gray-2);
   outline: 1px dashed var(--sl-color-gray-4);
 }
+
+/* Hero logo: a short fade in, and the pause control arriving after the first build. */
+@keyframes xtxp-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes xtxp-ctl-in {
+  from {
+    opacity: 0;
+    pointer-events: none;
+  }
+  to {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
