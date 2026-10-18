@@ -1,0 +1,44 @@
+---
+// The logo's > and < as a button icon, in place of Starlight's little arrows.
+//   dir="fwd"  is the > (the play / next chevron), dir="rev" is the <
+//   tone="solid"   draws it in the surrounding text colour. Use it on the red primary button, where the red tip
+//                  of the accented version would disappear.
+//   tone="accent"  draws it in the logo's colours: white (black in light mode) with the tip fading to red.
+interface Props {
+  dir?: 'fwd' | 'rev';
+  tone?: 'solid' | 'accent';
+}
+const { dir = 'fwd', tone = 'accent' } = Astro.props;
+const d = dir === 'fwd' ? 'M7 3.8L14.2 10L7 16.2' : 'M13 3.8L5.8 10L13 16.2';
+const id = `xtxp-chev-${dir}`;
+// The gradient runs from the open end to the tip.
+const [x1, x2] = dir === 'fwd' ? [5, 15] : [15, 5];
+---
+
+<svg class="xtxp-btn-chev" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+  {
+    tone === 'accent' && (
+      <defs>
+        <linearGradient id={id} gradientUnits="userSpaceOnUse" x1={x1} y1="0" x2={x2} y2="0">
+          <stop offset="0" stop-color="var(--sl-color-white)" />
+          <stop offset="0.55" stop-color="var(--sl-color-white)" />
+          <stop offset="1" stop-color="#ff5436" />
+        </linearGradient>
+      </defs>
+    )
+  }
+  <path d={d} stroke={tone === 'solid' ? 'currentColor' : `url(#${id})`}></path>
+</svg>
+
+<style>
+  .xtxp-btn-chev {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: none;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+</style>

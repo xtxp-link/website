@@ -9,6 +9,7 @@
 import DraftContentNotice from 'virtual:starlight/components/DraftContentNotice';
 import { LinkButton } from '@astrojs/starlight/components';
 import Logo from './Logo.astro';
+import Chevron from './Chevron.astro';
 import { TF, TOTAL, HOLD, R0, HERO_DELAY } from '../brand/logo.mjs';
 
 const { data } = Astro.locals.starlightRoute.entry;
@@ -67,12 +68,20 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
       actions.length > 0 && (
         <div class="sl-flex actions">
           {actions.map(
-            ({ attrs: { class: className, ...attrs } = {}, icon, link: href, text, variant }) => (
-              <LinkButton {href} {variant} icon={icon?.name} class:list={[className]} {...attrs}>
-                {text}
-                {icon?.html && <Fragment set:html={icon.html} />}
-              </LinkButton>
-            )
+            ({ attrs: { class: className, ...attrs } = {}, icon, link: href, text, variant = 'primary' }) =>
+              icon?.name === 'right-arrow' || icon?.name === 'left-arrow' ? (
+                // Starlight's little arrows become the logo's chevrons. Buttons without an icon are left alone.
+                <a {href} class:list={['sl-link-button not-content', variant, className]} {...attrs}>
+                  {icon.name === 'left-arrow' && <Chevron dir="rev" tone={variant === 'primary' ? 'solid' : 'accent'} />}
+                  {text}
+                  {icon.name === 'right-arrow' && <Chevron dir="fwd" tone={variant === 'primary' ? 'solid' : 'accent'} />}
+                </a>
+              ) : (
+                <LinkButton {href} {variant} icon={icon?.name} class:list={[className]} {...attrs}>
+                  {text}
+                  {icon?.html && <Fragment set:html={icon.html} />}
+                </LinkButton>
+              )
           )}
         </div>
       )
