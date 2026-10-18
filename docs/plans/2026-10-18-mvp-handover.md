@@ -109,7 +109,7 @@ vectors/              generated and hand-written JSON vectors
 
 ### Done when
 
-1. Every vector converges under many shuffled delivery orders: same SHA-256 of canonical XML, no cycles, idempotent re-delivery.
+1. Every vector converges under many shuffled delivery orders: same SHA-256 of canonical XML, no cycles, idempotent re-delivery. The known move gaps run as expected failures.
 2. Three CLI peers, one of them a late joiner, connected to one host over WebSocket through the chaos proxy, end with identical hashes.
 3. A late joiner loads the full state in one update.
 4. A key without a write grant has its session refused: never merged into `@main`, and the other peers keep converging.
