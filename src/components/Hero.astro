@@ -1,21 +1,55 @@
 ---
 // Splash hero. Same as Starlight's, except the H1 is the animated logo (the title text stays for readers
-// and search engines) and there is no image column.
+// and search engines) and there is no image column. Everything is centred on the page's centre line, which the
+// logo's red + sits on. The paragraph is a centred block with left-aligned text.
+//
+// A small control sits under the logo's right edge: a pause/play button (WCAG 2.2.2: the loop would otherwise run
+// forever) and, on hover or focus, a speed slider. The button is in the page and keyboard-focusable from the start,
+// and fades in once the first build has finished, about 2.7 seconds in, inside the five seconds the criterion allows.
 import DraftContentNotice from 'virtual:starlight/components/DraftContentNotice';
 import { LinkButton } from '@astrojs/starlight/components';
 import Logo from './Logo.astro';
+import { TF, TOTAL, HOLD, HERO_DELAY } from '../brand/logo.mjs';
 
 const { data } = Astro.locals.starlightRoute.entry;
 const { title = data.title, tagline, actions = [] } = data.hero || {};
+
+const showControlAt = +(HERO_DELAY + TF + 0.3).toFixed(2); // seconds after load
+// With no JavaScript there is no control, so the loop plays the build once and stops on the full logo.
+const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
 ---
 
 <div class="hero">
   <div class="sl-flex stack">
     <div class="sl-flex copy">
-      <h1 id="_top" data-page-title>
-        <Logo mode="loop" class="xtxp-hero-logo" />
-        <span class="sr-only" set:html={title} />
-      </h1>
+      <div class="logo-block" style={`--ctl-delay:${showControlAt}s;--hero-delay:${HERO_DELAY}s`}>
+        <h1 id="_top" data-page-title>
+          <Logo mode="loop" centre="plus" class="xtxp-hero-logo" />
+          <span class="sr-only" set:html={title} />
+        </h1>
+        <div class="xtxp-ctl">
+          <label class="sr-only" for="xtxp-rate">Logo animation speed</label>
+          <input id="xtxp-rate" type="range" min="-2" max="2" step="0.01" value="0" aria-valuetext="1x" />
+          <output id="xtxp-rate-read" for="xtxp-rate">1x</output>
+          <button type="button" class="xtxp-play" aria-label="Pause logo animation" aria-pressed="false">
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="xtxp-edge" gradientUnits="userSpaceOnUse" x1="5" y1="0" x2="15" y2="0">
+                  <stop offset="0" stop-color="var(--sl-color-white)"></stop>
+                  <stop offset="0.55" stop-color="var(--sl-color-white)"></stop>
+                  <stop offset="1" stop-color="#ff5436"></stop>
+                </linearGradient>
+              </defs>
+              <!-- Playing: pause bars, the right one accented. Paused: the logo's > chevron, its right edge accented. -->
+              <g class="icon-pause" fill="none" stroke-width="2.6" stroke-linecap="round">
+                <path d="M7 4.5V15.5" stroke="var(--sl-color-white)"></path>
+                <path d="M13 4.5V15.5" stroke="#ff5436"></path>
+              </g>
+              <path class="icon-play" d="M7 3.8L14.2 10L7 16.2" fill="none" stroke="url(#xtxp-edge)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
       {data.draft && <DraftContentNotice />}
       {tagline && <div class="tagline" set:html={tagline} />}
     </div>
@@ -36,54 +70,212 @@ const { title = data.title, tagline, actions = [] } = data.hero || {};
   </div>
 </div>
 
+<noscript>
+  <style
+    set:html={`.xtxp-hero-logo *{animation-iteration-count:${noJsIterations}!important}.xtxp-ctl{display:none}`}
+  ></style>
+</noscript>
+
+<script>
+  const block = document.querySelector<HTMLElement>('.logo-block');
+  const logo = block?.querySelector<SVGElement>('.xtxp-logo');
+  const button = block?.querySelector<HTMLButtonElement>('.xtxp-play');
+  const range = block?.querySelector<HTMLInputElement>('#xtxp-rate');
+  const read = block?.querySelector<HTMLOutputElement>('#xtxp-rate-read');
+
+  if (block && logo && button && range && read) {
+    let rate = 1;
+    let userPaused = false;
+    let onScreen = true;
+
+    const apply = () => {
+      const paused = userPaused || !onScreen;
+      logo.getAnimations({ subtree: true }).forEach((a) => {
+        a.updatePlaybackRate(rate);
+        if (paused) a.pause();
+        else a.play();
+      });
+    };
+
+    button.addEventListener('click', () => {
+      userPaused = !userPaused;
+      button.dataset.paused = String(userPaused);
+      button.setAttribute('aria-pressed', String(userPaused));
+      button.setAttribute('aria-label', userPaused ? 'Play logo animation' : 'Pause logo animation');
+      apply();
+    });
+
+    // Logarithmic: 0.25x to 4x, with 1x in the middle.
+    range.addEventListener('input', () => {
+      rate = 2 ** parseFloat(range.value);
+      const text = `${Math.round(rate * 100) / 100}x`;
+      read.textContent = text;
+      range.setAttribute('aria-valuetext', text);
+      apply();
+    });
+
+    // Don't spend battery on a logo nobody can see.
+    new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      apply();
+    }).observe(logo);
+  }
+</script>
+
 <style>
   .hero {
     display: grid;
     grid-template-columns: 100%;
     padding-block: clamp(2rem, calc(1rem + 8vmin), 7rem);
+    min-height: 0;
   }
   .stack {
     flex-direction: column;
+    align-items: center;
     gap: clamp(1.5rem, calc(1.5rem + 1vw), 2rem);
-    text-align: center;
   }
   .copy {
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1rem;
     align-items: center;
+    width: 100%;
   }
   .copy > * {
     max-width: 50ch;
   }
-  h1 {
+
+  .logo-block {
+    position: relative;
+    width: min(34rem, 100%);
+    max-width: none;
+    margin-inline: auto;
+    padding-bottom: 2rem; /* room for the control, so nothing shifts when it appears */
+  }
+  /* Galaxy fades the H1 up from 30px below; keep only a short fade, no slide. */
+  .hero h1[data-page-title] {
     margin: 0;
     line-height: 1;
     max-width: none;
+    width: 100%;
+    animation: xtxp-fade 0.4s ease-out both;
   }
   h1 :global(.xtxp-hero-logo) {
     display: block;
-    width: min(26rem, 80vw);
+    width: 100%;
     height: auto;
+    margin-inline: auto;
     overflow: visible;
   }
+  /* The loop waits for the fade to finish. */
+  h1 :global(.xtxp-logo--loop.xtxp-hero-logo *) {
+    animation-delay: var(--hero-delay);
+  }
+
+  /* Pause / speed control */
+  .xtxp-ctl {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: xtxp-ctl-in 0.5s ease-out var(--ctl-delay) both;
+  }
+  .xtxp-ctl:focus-within {
+    animation: none;
+    opacity: 1;
+  }
+  .xtxp-ctl input[type='range'] {
+    width: 0;
+    opacity: 0;
+    margin: 0;
+    accent-color: var(--sl-color-accent);
+    transition: width 0.25s ease, opacity 0.2s ease;
+  }
+  .xtxp-ctl output {
+    display: none;
+    min-width: 3.2ch;
+    font: 0.75rem var(--sl-font-mono);
+    color: var(--sl-color-gray-4);
+    text-align: end;
+  }
+  .xtxp-ctl:hover input[type='range'],
+  .xtxp-ctl:focus-within input[type='range'] {
+    width: 7rem;
+    opacity: 1;
+  }
+  .xtxp-ctl:hover output,
+  .xtxp-ctl:focus-within output {
+    display: block;
+  }
+  .xtxp-play {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+  }
+  .xtxp-ctl:hover .xtxp-play,
+  .xtxp-play:focus-visible {
+    opacity: 1;
+    border-color: var(--sl-color-gray-5);
+  }
+  .xtxp-play:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  .xtxp-play svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  .xtxp-play .icon-play {
+    display: none;
+  }
+  .xtxp-play[data-paused='true'] .icon-play {
+    display: inline;
+  }
+  .xtxp-play[data-paused='true'] .icon-pause {
+    display: none;
+  }
+  /* No hover on touch: show the slider while the control has focus (after a tap). */
+  @media (prefers-reduced-motion: reduce) {
+    .xtxp-ctl {
+      display: none;
+    }
+    .hero h1[data-page-title] {
+      animation: none;
+    }
+  }
+
   .tagline {
+    text-align: start;
+    max-width: 42ch;
+    text-wrap: pretty;
     font-size: clamp(var(--sl-text-base), calc(0.0625rem + 2vw), var(--sl-text-xl));
-    color: var(--sl-color-gray-2);
+    color: var(--sl-color-gray-4);
+    margin-block: 0;
+  }
+  .tagline :global(strong) {
+    color: var(--sl-color-white);
+    font-weight: 600;
   }
   .actions {
     gap: 1rem 2rem;
     flex-wrap: wrap;
     justify-content: center;
   }
-  @media (min-width: 50rem) {
-    .stack {
-      text-align: start;
-    }
-    .copy {
-      align-items: flex-start;
-    }
-    .actions {
-      justify-content: flex-start;
+
+  /* Galaxy pads the hero by 2rem+ each side on top of the page's own gutter, which leaves a phone's copy column narrow. */
+  @media (max-width: 50rem) {
+    .hero {
+      padding-inline: 0;
     }
   }
 </style>

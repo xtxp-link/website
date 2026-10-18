@@ -43,10 +43,6 @@
   --fb-level-2-bg: #232326;
   --fb-sidebar-color-current-bg: #2a2a2d;
   --fb-sidebar-color-current-hover: #202022;
-
-  /* Primary buttons: red to a deeper red, not red to pink. */
-  --galaxy-button-primary-gradient: linear-gradient(135deg, #ff5436 0%, #e0301a 100%);
-  --galaxy-button-primary-gradient-hover: linear-gradient(135deg, #e0301a 0%, #ff5436 100%);
 }
 
 /* Light */
@@ -95,4 +91,26 @@
   --galaxy-aside-bg: color-mix(in srgb, var(--sl-color-white) 5%, transparent);
   --galaxy-aside-border: color-mix(in srgb, var(--sl-color-white) 18%, transparent);
   --galaxy-aside-code-bg: color-mix(in srgb, var(--sl-color-white) 8%, transparent);
+}
+
+/* Buttons: flat red, square-ish corners, no glow. */
+:root,
+::backdrop {
+  --galaxy-button-border-radius: 0.25rem;
+  --galaxy-button-primary-gradient: var(--sl-color-accent);
+  --galaxy-button-primary-gradient-hover: color-mix(in srgb, var(--sl-color-accent) 85%, #000);
+  --galaxy-button-shadow-primary: none;
+  --galaxy-button-shadow-primary-hover: none;
+}
+.sl-link-button.primary,
+:root[data-theme='light'] .sl-link-button.primary {
+  box-shadow: none;
+  border-color: transparent;
+}
+.sl-link-button.primary::before {
+  display: none;
+}
+.sl-link-button.primary:hover {
+  transform: none;
+  border-color: color-mix(in srgb, var(--sl-color-accent) 60%, #000);
 }
