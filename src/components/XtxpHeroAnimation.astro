@@ -1,0 +1,708 @@
+---
+// The "what is XTXP" explainer animation: one drawing edited live in a browser, Inkscape, Android (Conversations)
+// and a no-JS browser through a relay, ending with the four of them building the XTXP logo through the Xmesh.
+// Self-contained: the script builds the SVG and drives it from a timeline (the STORYBOARD section).
+// Debug on any page that includes it: ?t=24.5 freezes on that second, ?speed=0.5 slows it down.
+// Plays once and rests on the final frame; click to pause/resume, or to replay once finished.
+---
+
+<div class="xtxp-hero not-content" id="xtxp-hero" role="img" aria-label="Animation: one drawing edited live across a browser, Inkscape, an Android chat app and a no-JavaScript browser, all synced through Xmesh"></div>
+
+<style is:global>
+  .xtxp-hero { margin-block: 1.5rem; }
+  .xtxp-hero svg {
+    display: block; width: 100%; height: auto; border-radius: 12px; cursor: pointer;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+</style>
+
+<script is:inline>
+(() => {
+const SHOW_CAPTIONS = true;
+const END = 45.4; // plays once, then rests on the final frame while updates keep flowing
+const NS = 'http://www.w3.org/2000/svg';
+// Brand: black, white and one red (xtxp-link/website: src/styles/theme.css, src/brand/logo.mjs).
+// Blue and gray appear only as colours the drawing is painted with.
+const C = { ink:'#11151f', red:'#ff5436', blue:'#3347ff', gray:'#8a8a90', white:'#ffffff', accent:'#eceff7', mute:'#a3a3a8', line:'#11151f', bg:'#121213' };
+const URL_ = 'xtxp.link/acme.dev/hello.svg@jam';
+
+/* ---------- glyph: asymmetric X (node handle on one arm so rotation reads) ---------- */
+/* ---------- glyph: the XTXP logo's x (src/brand/logo.mjs), drawn at 4x ---------- */
+const XPATH = 'M-14 -14L14 14M14 -14L-14 14';
+const glyph = (col = C.ink) =>
+  `<g transform="scale(4)" fill="none" stroke-linecap="round"><path d="${XPATH}" stroke="${C.line}" stroke-width="7.6"/>` +
+  `<path class="xb" d="${XPATH}" stroke="${col}" stroke-width="6"/></g>`;
+
+/* The full logo, morphable: x -> + -> +++ -> x+x -> <+> -> xtxp. Origin = centre of the first x; the + sits at 32. */
+const LOGO_LIGHT = { x:'#11151f', t:'#ff5436', p:'#8a8a90' };
+const LOGO_DARK  = { x:'#eceff7', t:'#ff5436', p:'#7d7d83' };
+const logoSVG = (id, hidden = true) => `<g id="xh-${id}" fill="none" stroke-linecap="round" stroke-linejoin="round"${hidden ? ' style="display:none"' : ''}>
+  <path class="c" d="${XPATH}"/>
+  <g class="l"><path d="M14 -14L0 0L14 14"/><path class="ol" pathLength="1" stroke-dasharray="1 2" d="M0 0L-14 -14"/><path class="ol" pathLength="1" stroke-dasharray="1 2" d="M0 0L-14 14"/></g>
+  <g class="r"><path d="M-14 -14L0 0L-14 14"/><path class="ol" pathLength="1" stroke-dasharray="1 2" d="M0 0L14 -14"/><path class="ol" pathLength="1" stroke-dasharray="1 2" d="M0 0L14 14"/></g>
+  <path class="p" pathLength="1" stroke-dasharray="1 2" stroke-width="6" transform="translate(92 0)" d="M0 -14V28M0 0A14 14 0 1 1 28 0A14 14 0 1 1 0 0"/>
+</g>`;
+
+const hexPath = r => 'M' + [0,1,2,3,4,5].map(i => { const a = Math.PI/180*(60*i-90); return `${(r*Math.cos(a)).toFixed(1)},${(r*Math.sin(a)).toFixed(1)}`; }).join('L') + 'Z';
+
+/* ---------- cursors ---------- */
+const cursor = id => `
+<g id="xh-${id}-ring" opacity="0"><circle r="9" fill="none" stroke="#fff" stroke-width="2.5"/><circle r="9" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="1"/></g>
+<g id="xh-${id}-cur" opacity="0">
+  <g class="k" data-k="arrow"><path d="M0,0 L0,24 L6.5,18.5 L10.5,27.5 L14.5,25.8 L10.6,17 L18,17 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></g>
+  <g class="k" data-k="hand" transform="translate(-6,-1)"><path d="M3,4.5 C3,2.8 4.3,1.5 6,1.5 C7.7,1.5 9,2.8 9,4.5 V12.5 C9.6,10.9 12.8,11 13.2,13 C13.8,11.3 17,11.5 17.4,13.8 C18.2,12.4 21.4,13 21.4,15.4 V22 C21.4,27.5 18.4,31 13.8,31 H11.6 C9,31 7.2,29.7 5.8,27.6 L1.3,20.6 C0.2,18.9 2.4,16.7 4.1,18.2 L3,16 Z" fill="#fff" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></g>
+  <g class="k" data-k="rotate"><path d="M-7,-7 A10,10 0 1 1 -8,6" fill="none" stroke="#000" stroke-width="5.5" stroke-linecap="round"/><path d="M-7,-7 A10,10 0 1 1 -8,6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M-13,-12 L-2,-10 L-9,-1 Z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></g>
+  <g class="k" data-k="bucket"><path d="M3,-12 L12,-21 L22,-11 L13,-2 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/><path d="M3,-12 C-1,-6 -1,-1 1,0 C3,1 4.5,-3 4.5,-8 Z" fill="#ff5436" stroke="#000" stroke-width="1"/></g>
+</g>`;
+
+/* ---------- devices ---------- */
+const browserSVG = `
+<g id="xh-browser" opacity="0">
+  <rect x="-280" y="-180" width="560" height="360" rx="14" fill="#f8fafc" filter="url(#xh-sh)"/>
+  <path d="M-280,-136 V-166 a14,14 0 0 1 14,-14 H266 a14,14 0 0 1 14,14 V-136 Z" fill="#e2e8f0"/>
+  <circle cx="-258" cy="-158" r="5.5" fill="#f87171"/><circle cx="-240" cy="-158" r="5.5" fill="#fbbf24"/><circle cx="-222" cy="-158" r="5.5" fill="#34d399"/>
+  <rect x="-190" y="-170" width="380" height="24" rx="12" fill="#fff"/>
+  <path d="M-172,-157 v-3 a4,4 0 0 1 8,0 v3" fill="none" stroke="#64748b" stroke-width="1.6"/><rect x="-174" y="-157" width="12" height="9" rx="2" fill="#64748b"/>
+  <text x="-154" y="-153" font-size="13" fill="#334155">${URL_}</text>
+  <path d="M-280,-136 H280 V166 a14,14 0 0 1 -14,14 H-266 a14,14 0 0 1 -14,-14 Z" fill="url(#xh-dots)"/>
+  <rect x="-264" y="-120" width="36" height="128" rx="10" fill="#fff" stroke="#e2e8f0"/>
+  <rect x="-259" y="-115" width="26" height="26" rx="7" fill="#fde4df"/>
+  <path d="M-251,-109 v13 l3.5,-3 l2.5,5 l2.5,-1 l-2.5,-5 h4.5 z" fill="#d4301b"/>
+  <rect x="-253" y="-78" width="14" height="11" rx="2" fill="none" stroke="#64748b" stroke-width="2"/>
+  <circle cx="-246" cy="-42" r="7" fill="none" stroke="#64748b" stroke-width="2"/>
+  <path d="M-253,-6 l12,-12 m-12,12 l2,-6 m-2,6 l6,-2" stroke="#64748b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <g id="xh-browser-x">${glyph()}</g>${logoSVG('browser-logo')}
+  ${cursor('browser')}
+</g>`;
+
+const PAL = ['#000000','#ffffff','#9ca3af','#ff5436','#f97316','#facc15','#22c55e','#14b8a6','#3347ff','#6366f1','#a855f7','#ec4899','#78350f','#475569','#fde68a','#bbf7d0'];
+const toolY = i => -104 + i * 30;
+const inkTools = [
+  y => `<path d="M-266,${y-8} v14 l3.5,-3 l2.5,5 l2,-1 l-2.5,-5 h4.5 z" fill="#e4e4e7"/>`,
+  y => `<path d="M-268,${y+6} C-264,${y-8} -258,${y+8} -254,${y-6}" fill="none" stroke="#e4e4e7" stroke-width="1.8"/><rect x="-270" y="${y+4}" width="4" height="4" fill="#e4e4e7"/><rect x="-256" y="${y-8}" width="4" height="4" fill="#e4e4e7"/>`,
+  y => `<rect x="-268" y="${y-6}" width="14" height="11" fill="none" stroke="#e4e4e7" stroke-width="1.8"/>`,
+  y => `<ellipse cx="-261" cy="${y}" rx="7.5" ry="6" fill="none" stroke="#e4e4e7" stroke-width="1.8"/>`,
+  y => `<path d="M-268,${y+7} L-256,${y-5} M-268,${y+7} l1.5,-5 m-1.5,5 l5,-1.5" fill="none" stroke="#e4e4e7" stroke-width="1.8" stroke-linecap="round"/>`,
+  y => `<text x="-261" y="${y+6}" text-anchor="middle" font-size="16" font-weight="700" fill="#e4e4e7" font-family="Georgia,serif">A</text>`,
+  y => `<path d="M-268,${y-1} L-261,${y-8} L-253,${y} L-260,${y+7} Z" fill="none" stroke="#e4e4e7" stroke-width="1.8" stroke-linejoin="round"/><path d="M-268,${y-1} c-2.5,4 -2,7 0,7 c1.5,0 2,-3 0,-7" fill="#e4e4e7"/>`
+];
+const rotHandle = a => `<g transform="rotate(${a}) translate(6,-6)"><path d="M58,-80 Q84,-84 80,-58" fill="none" stroke="${C.blue}" stroke-width="4" stroke-linecap="round"/><path d="M50,-80 L60,-87 L60,-73 Z" fill="${C.blue}"/><path d="M80,-50 L73,-60 L87,-60 Z" fill="${C.blue}"/></g>`;
+const inkSVG = `
+<g id="xh-ink" opacity="0">
+  <rect x="-280" y="-180" width="560" height="360" rx="10" fill="#2b2d31" filter="url(#xh-sh)"/>
+  <circle cx="254" cy="-166" r="5" fill="#52525b"/><circle cx="236" cy="-166" r="5" fill="#52525b"/><circle cx="218" cy="-166" r="5" fill="#52525b"/>
+  <text x="0" y="-161" text-anchor="middle" font-size="13" fill="#d4d4d8">hello.svg — Inkscape</text>
+  <rect x="-280" y="-152" width="560" height="30" fill="#36393f"/>
+  ${[0,1,2,3,4,5,6,7,8].map(i => `<rect x="${-268 + i*28 + (i>3?14:0)}" y="-145" width="18" height="16" rx="3" fill="#4b4f57"/>`).join('')}
+  <rect x="-280" y="-122" width="38" height="272" fill="#36393f"/>
+  <rect id="xh-ink-toolhl" x="-275" y="-117" width="28" height="26" rx="5" fill="#4f6bed"/>
+  ${inkTools.map((f,i) => f(toolY(i))).join('')}
+  <rect x="-242" y="-122" width="522" height="272" fill="#e4e4e7"/>
+  <rect x="-176" y="-100" width="396" height="236" fill="#000" opacity=".18"/>
+  <rect x="-180" y="-104" width="396" height="236" fill="#fff"/>
+  <path d="M-280,150 H280 V170 a10,10 0 0 1 -10,10 H-270 a10,10 0 0 1 -10,-10 Z" fill="#36393f"/>
+  ${PAL.map((c,i) => `<rect x="${-236 + i*30}" y="156" width="26" height="18" rx="2" fill="${c}" stroke="#18181b" stroke-width="1"/>`).join('')}
+  <rect id="xh-ink-sw" x="-239" y="153" width="32" height="24" rx="4" fill="none" stroke="#facc15" stroke-width="2.5" opacity="0"/>
+  <g id="xh-ink-x">${glyph()}
+    <g id="xh-ink-sel" opacity="0">
+      <rect x="-74" y="-74" width="148" height="148" fill="none" stroke="#111" stroke-width="1.6" stroke-dasharray="6 4"/>
+      ${[0,90,180,270].map(a => `<path transform="rotate(${a})" d="M86,-86 L72,-86 L86,-72 Z" fill="#111"/>`).join('')}
+    </g>
+    <g id="xh-ink-rot" opacity="0">
+      <rect x="-74" y="-74" width="148" height="148" fill="none" stroke="#111" stroke-width="1.6" stroke-dasharray="6 4"/>
+      ${[0,90,180,270].map(rotHandle).join('')}
+    </g>
+  </g>
+  ${logoSVG('ink-logo')}
+  ${cursor('ink')}
+</g>`;
+
+const phoneSVG = `
+<g id="xh-phone" opacity="0">
+  <rect x="-85" y="-170" width="170" height="340" rx="26" fill="#1f2937" stroke="#475569" stroke-width="2" filter="url(#xh-sh)"/>
+  <clipPath id="xh-scr"><rect x="-77" y="-160" width="154" height="320" rx="18"/></clipPath>
+  <g clip-path="url(#xh-scr)">
+    <rect x="-77" y="-160" width="154" height="320" fill="#f1f5f9"/>
+    <rect x="-77" y="-160" width="154" height="44" fill="#1c1c1e"/>
+    <text x="-66" y="-148" font-size="8" fill="#a3a3a8">12:19</text>
+    <path d="M-64,-128 l-5,4 l5,4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="-48" cy="-124" r="8" fill="${C.red}"/>
+    <text x="-36" y="-127" font-size="10.5" font-weight="600" fill="#fff">Design crew</text>
+    <text x="-36" y="-117" font-size="7.5" fill="#a3a3a8">Conversations</text>
+    <rect x="-70" y="-106" width="96" height="22" rx="8" fill="#fff"/><text x="-63" y="-92" font-size="8.5" fill="#334155">Can we tweak the X?</text>
+    <rect x="-6" y="-78" width="76" height="22" rx="8" fill="#fde4df"/><text x="1" y="-64" font-size="8.5" fill="#a32312">On it — sharing</text>
+    <g id="xh-phone-card" opacity="0">
+      <rect x="-70" y="-48" width="110" height="112" rx="10" fill="#fff" stroke="#e2e8f0"/>
+      <rect x="-64" y="-42" width="98" height="78" rx="6" fill="url(#xh-dots)" stroke="#e2e8f0"/>
+      <g id="xh-phone-xc">${glyph()}</g>
+      <text x="-63" y="52" font-size="8.5" font-weight="600" fill="#334155">hello.svg@jam</text>
+      <text x="-63" y="61" font-size="7" fill="#94a3b8">live drawing · tap to open</text>
+    </g>
+    <rect x="-77" y="136" width="154" height="24" fill="#fff"/><text x="-66" y="152" font-size="8.5" fill="#94a3b8">Message</text>
+    <g id="xh-phone-full" opacity="0">
+      <rect x="-77" y="-160" width="154" height="320" fill="url(#xh-dots)"/>
+      <rect x="-77" y="-160" width="154" height="32" fill="#111827"/>
+      <path d="M-64,-144 l-5,4 l5,4" transform="translate(0,-4)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="-52" y="-140" font-size="10" font-weight="600" fill="#fff">hello.svg</text>
+      <g transform="translate(56,-144)"><path d="M-6,-1 A6.5,6.5 0 1 1 -3,5.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M-10,-4 L-6,2 L-2,-4 Z" fill="#fff" transform="rotate(-20,-6,-1)"/></g>
+      <g id="xh-phone-xf">${glyph()}</g>${logoSVG('phone-logo')}
+      <rect x="-77" y="124" width="154" height="36" fill="#fff"/>
+      <circle cx="-45" cy="142" r="9" fill="${C.red}"/><circle cx="-15" cy="142" r="9" fill="${C.blue}"/><circle cx="-15" cy="142" r="13" fill="none" stroke="${C.blue}" stroke-width="2"/><circle cx="15" cy="142" r="9" fill="${C.gray}"/><circle cx="45" cy="142" r="9" fill="#111827"/>
+    </g>
+    <g id="xh-touch" opacity="0"><circle r="10" fill="#0f172a" fill-opacity=".25"/><circle class="tr" r="10" fill="none" stroke="#0f172a" stroke-opacity=".5" stroke-width="2"/></g>
+  </g>
+  <g id="xh-undo-pop" opacity="0">
+    <circle r="46" fill="${C.bg}" stroke="${C.accent}" stroke-width="3"/>
+    <g transform="translate(3,-2)" fill="none" stroke="${C.accent}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-6,22 H6 A15,15 0 0 0 6,-8 H-16"/><path d="M-6,-18 L-18,-8 L-6,2"/>
+    </g>
+  </g>
+</g>`;
+
+const legacySVG = `
+<g id="xh-legacy" opacity="0">
+  <rect x="-280" y="-180" width="560" height="360" fill="#c0c0c0" filter="url(#xh-sh)"/>
+  <path d="M-280,180 V-180 H280" fill="none" stroke="#fff" stroke-width="3"/><path d="M-280,180 H280 V-180" fill="none" stroke="#404040" stroke-width="3"/>
+  <rect x="-274" y="-174" width="548" height="26" fill="url(#xh-title)"/>
+  <text x="-266" y="-156" font-size="13" font-weight="700" fill="#fff" font-family="Tahoma,Verdana,sans-serif">hello.svg — no JavaScript</text>
+  ${[0,1,2].map(i => `<rect x="${222 + i*16}" y="-170" width="14" height="14" fill="#c0c0c0" stroke="#404040"/>`).join('')}
+  ${[['Back',-272,52],['Fwd',-214,48]].map(([t,x,w]) => `<rect x="${x}" y="-142" width="${w}" height="26" fill="#c0c0c0" stroke="#808080"/><text x="${x+w/2}" y="-124" text-anchor="middle" font-size="12" fill="#808080" font-family="Tahoma,Verdana,sans-serif">${t}</text>`).join('')}
+  <rect x="-160" y="-142" width="70" height="26" fill="#c0c0c0" stroke="#404040"/>
+  <g id="xh-legacy-spin" transform="translate(-145,-129)"><path d="M-5,-4 A6.5,6.5 0 1 1 -6,3" fill="none" stroke="#000" stroke-width="2"/><path d="M-9,-8 L-3,-6 L-7,-1 Z" fill="#000"/></g>
+  <text x="-133" y="-124" font-size="12" fill="#000" font-family="Tahoma,Verdana,sans-serif">Reload</text>
+  <rect x="-82" y="-141" width="352" height="24" fill="#fff" stroke="#808080"/>
+  <text x="-76" y="-124" font-size="12" fill="#000" font-family="Courier New,monospace">http://${URL_}</text>
+  <rect x="-274" y="-110" width="548" height="284" fill="#fff" stroke="#808080"/>
+  <text id="xh-legacy-ph" x="0" y="36" text-anchor="middle" font-size="16" font-style="italic" fill="#808080" font-family="Times New Roman,serif">Press Reload to load the drawing</text>
+  <g id="xh-legacy-page" opacity="0">
+    <text x="-262" y="-84" font-size="18" font-weight="700" fill="#000" font-family="Times New Roman,serif">hello.svg</text>
+    <text x="-262" y="-66" font-size="12" fill="#0000ee" text-decoration="underline" font-family="Times New Roman,serif">click the drawing to edit</text>
+    <rect x="-150" y="-60" width="300" height="200" fill="#fff" stroke="#808080"/>
+    <g id="xh-legacy-x">${glyph()}</g>${logoSVG('legacy-logo')}
+  </g>
+  <rect id="xh-legacy-dim" x="-273" y="-109" width="546" height="282" fill="#fff" opacity="0"/>
+  <g id="xh-legacy-dlg" opacity="0">
+    <rect x="-248" y="-88" width="224" height="160" fill="#c0c0c0" stroke="#000" stroke-width="1.5"/>
+    <rect x="-245" y="-85" width="218" height="22" fill="url(#xh-title)"/>
+    <text x="-239" y="-69" font-size="12" font-weight="700" fill="#fff" font-family="Tahoma,Verdana,sans-serif">Edit shape</text>
+    <text x="-238" y="-46" font-size="12" fill="#000" font-family="Tahoma,Verdana,sans-serif">Fill colour:</text>
+    ${[['Red',-30],['Gray',-6],['Blue',18]].map(([t,y]) => `<circle cx="-230" cy="${y}" r="6.5" fill="#fff" stroke="#404040" stroke-width="1.4"/><text x="-218" y="${y+4}" font-size="12" fill="#000" font-family="Tahoma,Verdana,sans-serif">${t}</text>`).join('')}
+    <circle id="xh-legacy-radio" cx="-230" cy="-30" r="3" fill="#000"/>
+    <rect x="-120" y="34" width="64" height="26" fill="#c0c0c0" stroke="#000"/><path d="M-119,59 V35 H-57" fill="none" stroke="#fff" stroke-width="1.5"/>
+    <text x="-88" y="51" text-anchor="middle" font-size="12" fill="#000" font-family="Tahoma,Verdana,sans-serif">Save</text>
+  </g>
+  ${cursor('legacy')}
+</g>`;
+
+const hexSVG = `
+<g id="xh-hex" opacity="0">
+  <circle id="xh-hex-pulse" r="24" fill="none" stroke="${C.accent}" stroke-width="2" opacity="0"/>
+  <path d="${hexPath(23)}" fill="#1c1c1e" stroke="${C.mute}" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M-8,-4 H7 M3,-8 L7,-4 L3,0 M8,4 H-7 M-3,0 L-7,4 L-3,8" stroke="${C.accent}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</g>`;
+
+const meshSVG = `
+<g id="xh-mesh" opacity="0">
+  <ellipse id="xh-mesh-glow" rx="74" ry="74" fill="${C.accent}" opacity=".06"/>
+  <circle id="xh-mesh-ring" r="54" fill="#1c1c1e" stroke="${C.accent}" stroke-width="2.5"/>
+  ${logoSVG('mesh-logo', false)}
+</g>`;
+
+const LABELS = { browser:'Browser · Wasm', ink:'Inkscape', phone:'Android · Conversations', legacy:'Legacy browser · no JS', hex:'relay', mesh:'Xmesh' };
+
+/* ---------- build svg ---------- */
+const host = document.getElementById('xtxp-hero');
+host.innerHTML = `<svg xmlns="${NS}" viewBox="0 0 1200 675" role="img">
+<defs>
+  <pattern id="xh-dots" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#fff"/><circle cx="10" cy="10" r="1.1" fill="#cbd5e1"/></pattern>
+  <pattern id="xh-grid" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="14" cy="14" r="1.1" fill="#fff" fill-opacity=".07"/></pattern>
+  <radialGradient id="xh-bgg" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="#1c1c1e"/><stop offset="1" stop-color="#121213"/></radialGradient>
+  <linearGradient id="xh-title" x1="0" x2="1"><stop offset="0" stop-color="#000080"/><stop offset="1" stop-color="#1084d0"/></linearGradient>
+  <filter id="xh-sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity=".45"/></filter>
+  <filter id="xh-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1200" height="675" fill="url(#xh-bgg)"/>
+<rect width="1200" height="675" fill="url(#xh-grid)"/>
+<g id="xh-root">
+  <g id="xh-links" opacity="0"></g>
+  ${legacySVG}${browserSVG}${inkSVG}${phoneSVG}${hexSVG}${meshSVG}
+  <g id="xh-arrows" filter="url(#xh-glow)"></g>
+  <g id="xh-labels" opacity="0">${Object.entries(LABELS).map(([k,t]) => `<text id="xh-lab-${k}" text-anchor="middle" font-size="${k==='mesh'?17:14}" font-weight="${k==='mesh'?700:500}" fill="${k==='mesh'?C.accent:'#a3a3a8'}">${t}</text>`).join('')}</g>
+  <text id="xh-cap" x="600" y="652" text-anchor="middle" font-size="19" font-weight="500" fill="#d9d9db" opacity="0"></text>
+</g>
+</svg>`;
+const svg = host.querySelector('svg');
+const $ = id => document.getElementById('xh-' + id);
+
+/* ---------- state ---------- */
+const xm0 = () => ({ dx:0, dy:0, rot:0, c:C.ink });
+const cur0 = (x,y) => ({ x, y, o:0, k:'arrow', down:0, ring:1 });
+const init = () => ({
+  g:{ o:1 },
+  dev:{
+    browser:{ x:600, y:338, s:1, o:0 },
+    ink:{ x:900, y:338, s:.7, o:0 },
+    phone:{ x:900, y:760, s:.72, o:0 },
+    legacy:{ x:120, y:338, s:.42, o:0 },
+    hex:{ x:355, y:338, s:.3, o:0, pulse:1 },
+    mesh:{ x:600, y:338, s:.3, o:0, pulse:1 },
+  },
+  x:{ browser:xm0(), ink:xm0(), phone:xm0(), legacy:xm0() },
+  cur:{ browser:cur0(190,130), ink:cur0(200,110), legacy:cur0(60,60) },
+  touch:{ x:0, y:0, p:1 },
+  ink:{ sel:0, rot:0, tool:0, swatch:-1 },
+  phone:{ card:0, full:0, undo:0 },
+  legacy:{ loaded:0, dialog:0, radio:0, spin:0, dim:0 },
+  arrows:{}, links:0, labels:0,
+  logo:{ browser:0, ink:0, phone:0, legacy:0, mesh:0 }, logoMode:0,
+  cap:{ text:'', o:0 },
+});
+
+/* ---------- timeline helpers ---------- */
+const hex2 = h => [1,3,5].map(i => parseInt(h.slice(i,i+2),16));
+const mix = (a,b,p) => { const A = hex2(a), B = hex2(b); return '#' + A.map((v,i) => Math.round(v+(B[i]-v)*p).toString(16).padStart(2,'0')).join(''); };
+const E = { io:p => p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2, out:p => 1-Math.pow(1-p,3), lin:p => p,
+  back:p => { const c1 = 1.70158, c3 = c1+1; return 1 + c3*Math.pow(p-1,3) + c1*Math.pow(p-1,2); } };
+const TL = [];
+const tw = (t,d,fn,e=E.io) => TL.push({ t, d, fn, e });
+const at = (t,fn) => TL.push({ t, d:0, fn, e:E.lin });
+const to = (t,d,get,props,e) => tw(t,d,(s,p) => { const o = get(s); for (const k in props) { const v = props[k]; o[k] = typeof v === 'string' ? mix(o[k],v,p) : o[k] + (v-o[k])*p; } }, e);
+const dev = n => s => s.dev[n], xm = n => s => s.x[n], cu = n => s => s.cur[n];
+const move = (n,t,d,x,y,e) => to(t,d,cu(n),{ x, y },e);
+const kind = (n,t,k) => at(t, s => { s.cur[n].k = k; });
+const press = (n,t) => to(t,.1,cu(n),{ down:1 });
+const release = (n,t) => to(t,.1,cu(n),{ down:0 });
+const click = (n,t) => { tw(t,.18,(s,p) => { s.cur[n].down = Math.sin(p*Math.PI); },E.lin); tw(t,.5,(s,p) => { s.cur[n].ring = p; },E.out); };
+const tap = (t,x,y) => { at(t, s => { s.touch.x = x; s.touch.y = y; }); tw(t,.55,(s,p) => { s.touch.p = p; },E.out); };
+const color = (n,t,c,d=.3) => to(t,d,xm(n),{ c });
+const pulseHex = t => tw(t,.7,(s,p) => { s.dev.hex.pulse = p; },E.out);
+const cap = (t,t2,text) => { at(t, s => { s.cap.text = text; }); tw(t,.35,(s,p) => { s.cap.o = p; }); tw(t2-.35,.35,(s,p) => { s.cap.o = 1-p; }); };
+const arrow = (t,id,a,b,col,{ d=.7, bend=0, hold=.35, fade=.4 }={}) => {
+  at(t, s => { s.arrows[id] = { a, b, col, bend, p:0, o:1 }; });
+  tw(t,d,(s,p) => { s.arrows[id].p = p; });
+  tw(t+d+hold,fade,(s,p) => { s.arrows[id].o = 1-p; });
+};
+const retract = (t,id,a,b,col,{ d=.8, bend=0 }={}) => {
+  at(t, s => { s.arrows[id] = { a, b, col, bend, p:1, o:1 }; });
+  tw(t,d,(s,p) => { s.arrows[id].p = 1-p; },E.io);
+  at(t+d, s => { s.arrows[id].o = 0; });
+};
+
+/* canvas anchors per device: [cx, cy, k] */
+const ANCH = { browser:[0,22,.9], ink:[18,14,.75], legacy:[0,40,.7], phoneFull:[0,16,.4], phoneCard:[-15,-3,.28] };
+const DX = 70, DY = -20;
+const inkX = ANCH.ink[0] + DX*ANCH.ink[2], inkY = ANCH.ink[1] + DY*ANCH.ink[2];
+const legX = ANCH.legacy[0] + DX*ANCH.legacy[2], legY = ANCH.legacy[1] + DY*ANCH.legacy[2];
+
+/* ================= STORYBOARD ================= */
+// 1. Browser alone — drag the X
+to(0,.6,dev('browser'),{ o:1 });
+cap(.3,3.6,'Draw in the browser…');
+to(.5,.3,cu('browser'),{ o:1 });
+move('browser',.6,.8,0,22);
+press('browser',1.45);
+tw(1.6,1.0,(s,p) => { s.x.browser.dx = DX*p; s.x.browser.dy = DY*p; s.cur.browser.x = DX*.9*p; s.cur.browser.y = 22 + DY*.9*p; });
+release('browser',2.65);
+to(2.8,.3,cu('browser'),{ o:0 });
+
+// 2. Browser zooms left, arrow right, Inkscape appears & receives the drag
+to(3.0,.9,dev('browser'),{ x:300, s:.8 });
+cap(3.8,5.1,'…and it syncs live to Inkscape');
+arrow(3.9,'a1','browser','ink',C.accent,{ d:.8 });
+to(3.9,.55,dev('ink'),{ o:1, s:.8 },E.out);
+to(4.7,.45,xm('ink'),{ dx:DX, dy:DY });
+
+// 3. Inkscape: select, click again for rotate handles, rotate 45° left (x → +)
+cap(5.2,8.7,'Rotate natively in Inkscape: the x becomes a +');
+to(5.2,.2,cu('ink'),{ o:1 });
+move('ink',5.3,.5,inkX,inkY);
+click('ink',5.85); at(5.9, s => { s.ink.sel = 1; });
+click('ink',6.1); at(6.15, s => { s.ink.sel = 0; s.ink.rot = 1; });
+const H = 83*ANCH.ink[2];
+move('ink',6.2,.45,inkX+H,inkY-H);
+press('ink',6.65); kind('ink',6.65,'rotate');
+tw(6.75,.7,(s,p) => {
+  const r = -45*p, a = r*Math.PI/180;
+  s.x.ink.rot = r;
+  s.cur.ink.x = inkX + H*Math.cos(a) + H*Math.sin(a);
+  s.cur.ink.y = inkY + H*Math.sin(a) - H*Math.cos(a);
+});
+release('ink',7.7); kind('ink',7.7,'arrow');
+move('ink',7.8,.5,170,95);
+arrow(7.8,'a2','ink','browser',C.blue,{ d:.7 });
+to(8.3,.3,s => s.ink,{ rot:0 });
+to(8.5,.45,xm('browser'),{ rot:-45 });
+
+// 4. Inkscape bucket fill → red
+cap(8.8,11.9,'…and the + goes red, everywhere');
+move('ink',8.8,.5,-261,toolY(6)); click('ink',9.35); at(9.4, s => { s.ink.tool = 6; });
+move('ink',9.45,.4,-133,165); click('ink',9.9); at(9.95, s => { s.ink.swatch = 3; });
+kind('ink',10.0,'bucket'); move('ink',10.0,.4,inkX,inkY); click('ink',10.45);
+color('ink',10.45,C.red,.25);
+to(10.9,.3,cu('ink'),{ o:0 });
+arrow(10.75,'a3','ink','browser',C.red,{ d:.7 });
+color('browser',11.45,C.red);
+
+// 5. Inkscape slides up, Android below; drawing arrives in a chat
+cap(12.1,15.1,'Shared into a chat on Android');
+to(12.0,.9,dev('ink'),{ y:182, s:.52 });
+at(12.3, s => { Object.assign(s.x.phone,{ dx:DX, dy:DY, rot:-45, c:C.red }); });
+to(12.4,.8,dev('phone'),{ y:488, o:1 },E.out);
+tw(13.4,.45,(s,p) => { s.phone.card = p; },E.out);
+tap(14.2,-15,8);
+tw(14.3,.6,(s,p) => { s.phone.full = p; });
+
+// 6. Tap → blue, propagates to both
+cap(15.2,16.9,'Tap to recolour — every peer updates');
+tap(15.3, ANCH.phoneFull[0]+DX*.4, ANCH.phoneFull[1]+DY*.4);
+color('phone',15.35,C.blue,.25);
+arrow(15.7,'a4','phone','browser',C.blue,{ d:.8, bend:30 });
+arrow(15.7,'a5','phone','ink',C.blue,{ d:.6 });
+color('ink',16.3,C.blue); color('browser',16.5,C.blue);
+
+// 7. Undo → arrows suck back
+cap(17.0,18.4,'Undo is shared, too');
+tap(17.0,56,-144);
+tw(17.08,.32,(s,p) => { s.phone.undo = p; },E.back);
+color('phone',17.15,C.red,.25);
+tw(17.85,.25,(s,p) => { s.phone.undo = 1-p; },E.io);
+retract(17.6,'u1','phone','browser',C.blue,{ d:.75, bend:30 });
+retract(17.6,'u2','phone','ink',C.blue,{ d:.55 });
+color('browser',17.65,C.red); color('ink',17.65,C.red);
+
+// 8. Zoom out; legacy browser + relay hex appear
+cap(18.5,21.5,'Legacy browsers join through a relay');
+to(18.4,1,dev('browser'),{ x:560, s:.55 });
+to(18.4,1,dev('ink'),{ x:950, y:185, s:.5 });
+to(18.4,1,dev('phone'),{ x:950, y:480, s:.5 });
+to(19.0,.6,dev('legacy'),{ x:170, o:1, s:.5 },E.out);
+to(19.4,.45,dev('hex'),{ o:1, s:1 },E.back);
+
+// 9. Legacy: Reload pulls state from the relay
+to(19.9,.2,cu('legacy'),{ o:1 });
+move('legacy',20.0,.5,-125,-128); click('legacy',20.55);
+tw(20.55,.7,(s,p) => { s.legacy.spin = p; },E.out);
+arrow(20.65,'a6','hex','legacy',C.accent,{ d:.6 });
+at(21.25, s => { Object.assign(s.x.legacy,{ dx:DX, dy:DY, rot:-45, c:C.red }); });
+to(21.25,.25,s => s.legacy,{ loaded:1 });
+
+// 10. Legacy: click X → HTML form dialog → Gray → Save
+cap(21.6,25.4,'Edits via plain HTML forms — zero JavaScript');
+kind('legacy',21.6,'hand'); move('legacy',21.6,.5,legX,legY); click('legacy',22.15);
+to(22.25,.15,s => s.legacy,{ dialog:1 });
+move('legacy',22.45,.45,-230,-6); click('legacy',22.95); at(23.0, s => { s.legacy.radio = 1; });
+move('legacy',23.05,.4,-88,47); click('legacy',23.5);
+to(23.55,.1,s => s.legacy,{ dialog:0 });
+to(23.6,.12,s => s.legacy,{ dim:1 }); color('legacy',23.72,C.gray,.01); to(23.8,.25,s => s.legacy,{ dim:0 });
+to(23.9,.3,cu('legacy'),{ o:0 });
+arrow(23.6,'a7','legacy','hex',C.gray,{ d:.45, hold:.2 });
+pulseHex(24.05);
+arrow(24.1,'a8','hex','browser',C.gray,{ d:.5 });
+arrow(24.1,'a9','hex','ink',C.gray,{ d:.85, bend:-110 });
+arrow(24.1,'a10','hex','phone',C.gray,{ d:.85, bend:110 });
+color('browser',24.6,C.gray); color('ink',24.95,C.gray); color('phone',24.95,C.gray);
+
+// 11. Inkscape → white; legacy is stale until its refresh
+cap(25.5,30.1,'No-JS clients catch up on their next refresh');
+at(25.55, s => { s.cur.ink.x = 170; s.cur.ink.y = 95; s.cur.ink.k = 'arrow'; });
+to(25.6,.2,cu('ink'),{ o:1 });
+move('ink',25.7,.4,-193,165); click('ink',26.15); at(26.2, s => { s.ink.swatch = 1; });
+kind('ink',26.25,'bucket'); move('ink',26.25,.4,inkX,inkY); click('ink',26.7);
+color('ink',26.7,C.white,.25);
+to(27.2,.3,cu('ink'),{ o:0 });
+arrow(27.0,'a11','ink','browser',C.white,{ d:.8 });
+arrow(27.0,'a12','ink','phone',C.white,{ d:.5 });
+arrow(27.0,'a13','ink','hex',C.white,{ d:.9, bend:110 });
+pulseHex(27.9);
+color('phone',27.5,C.white); color('browser',27.8,C.white);
+tw(29.0,.7,(s,p) => { s.legacy.spin = p; },E.out);
+to(29.05,.12,s => s.legacy,{ dim:1 });
+arrow(29.1,'a14','hex','legacy',C.white,{ d:.5 });
+color('legacy',29.6,C.white,.01); to(29.62,.25,s => s.legacy,{ dim:0 });
+
+// 12. Final: four clients around the Xmesh
+to(30.3,1.2,dev('browser'),{ x:300, y:190, s:.5 });
+to(30.3,1.2,dev('legacy'),{ x:300, y:486, s:.5 });
+to(30.3,1.2,dev('hex'),{ x:478, y:420 });
+to(30.3,1.2,dev('ink'),{ x:900, y:190, s:.5 });
+to(30.3,1.2,dev('phone'),{ x:900, y:486, s:.5 });
+to(31.0,.7,dev('mesh'),{ o:1, s:1 },E.back);
+to(31.5,.6,s => s,{ links:1 });
+to(31.8,.5,s => s,{ labels:1 });
+cap(32.0,33.2,'Every client speaks XTXP');
+
+// 13. The shared x becomes the XTXP logo, one step per client
+// the mesh hands everyone a fresh lone x (the logo's start pose)
+['browser','ink','phone'].forEach((n,i) => arrow(31.75,'m0'+n,'mesh',n,C.accent,{ d:.45, hold:.15 }));
+arrow(31.75,'m0hex','mesh','hex',C.accent,{ d:.35, hold:.15 });
+arrow(32.1,'m0leg','hex','legacy',C.accent,{ d:.3, hold:.15 });
+['browser','ink','phone'].forEach(n => to(32.2,.45,xm(n),{ dx:0, dy:0, rot:0, c:C.ink }));
+const legacyRecv = (t, L) => {
+  tw(t,.55,(s,p) => { s.legacy.spin = p; },E.out);
+  to(t,.1,s => s.legacy,{ dim:1 });
+  at(t+.12, s => { s.logo.legacy = L; Object.assign(s.x.legacy,{ dx:0, dy:0, rot:0, c:C.ink }); });
+  to(t+.15,.25,s => s.legacy,{ dim:0 });
+};
+legacyRecv(32.4, 0);
+at(32.95, s => { s.logoMode = 1; });
+
+const others = n => ['browser','ink','phone','legacy'].filter(o => o !== n);
+const logoStep = (t, who, L, d = .4) => {
+  if (who === 'legacy') legacyRecv(t, L); else to(t,d,s => s.logo,{ [who]:L });
+  let tm;
+  if (who === 'legacy') { arrow(t+.25,'s'+L+'a','legacy','hex',C.accent,{ d:.3, hold:.15 }); arrow(t+.55,'s'+L+'b','hex','mesh',C.accent,{ d:.35, hold:.15 }); tm = t+.9; }
+  else { arrow(t+.1,'s'+L+'a',who,'mesh',C.accent,{ d:.45, hold:.15 }); tm = t+.55; }
+  to(tm,d,s => s.logo,{ mesh:L });
+  pulseMesh(tm);
+  for (const o of others(who)) {
+    if (o === 'legacy') { arrow(tm+.05,'s'+L+'h','mesh','hex',C.accent,{ d:.35, hold:.15 }); arrow(tm+.4,'s'+L+'l','hex','legacy',C.accent,{ d:.3, hold:.15 }); legacyRecv(tm+.7, L); }
+    else { arrow(tm+.05,'s'+L+o,'mesh',o,C.accent,{ d:.45, hold:.15 }); to(tm+.5,d,s => s.logo,{ [o]:L }); }
+  }
+};
+function pulseMesh(t){ tw(t,.6,(s,p) => { s.dev.mesh.pulse = p; },E.out); }
+
+// Browser: x -> red +
+cap(33.3,35.3,'Browser: x turns into the red +');
+at(33.25, s => { Object.assign(s.cur.browser,{ x:150, y:120, k:'arrow' }); });
+to(33.3,.2,cu('browser'),{ o:1 }); move('browser',33.4,.45,0,22); click('browser',33.9);
+to(34.3,.3,cu('browser'),{ o:0 });
+logoStep(33.95,'browser',1);
+
+// Inkscape: + -> +++
+cap(35.4,37.4,'Inkscape: the + branches out');
+at(35.35, s => { Object.assign(s.cur.ink,{ x:170, y:95, k:'arrow' }); });
+to(35.4,.2,cu('ink'),{ o:1 }); move('ink',35.5,.45,18,14); click('ink',36.0);
+to(36.4,.3,cu('ink'),{ o:0 });
+logoStep(36.05,'ink',2);
+
+// Android: +++ -> x+x
+cap(37.5,39.5,'Android: the outer two grow into x’s');
+tap(38.0,0,16);
+logoStep(38.05,'phone',3);
+
+// Legacy no-JS: x+x -> <+> -> xtxp, via a form post and a reload
+cap(39.6,42.0,'No-JS browser: legs in, p on: xtxp');
+at(39.55, s => { Object.assign(s.cur.legacy,{ x:90, y:110, k:'hand' }); });
+to(39.6,.2,cu('legacy'),{ o:1 }); move('legacy',39.7,.45,0,40); click('legacy',40.2);
+to(40.6,.3,cu('legacy'),{ o:0 });
+logoStep(40.25,'legacy',5,.8);
+
+cap(42.4,9999,'One document. Every client. One protocol.');
+
+TL.sort((a,b) => a.t - b.t);
+const stateAt = T => {
+  const s = init();
+  for (const k of TL) { if (T < k.t) break; const p = k.d ? Math.min(1,(T-k.t)/k.d) : 1; k.fn(s,k.e(p)); }
+  return s;
+};
+
+/* ---------- geometry ---------- */
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const BOX = { browser:[280,180], ink:[280,180], legacy:[280,180], phone:[85,170] };
+const ep = (s,n,tx,ty,m=10) => {
+  const d = s.dev[n]; let vx = tx-d.x, vy = ty-d.y; const L = Math.hypot(vx,vy) || 1; vx /= L; vy /= L;
+  if (n === 'hex') { const r = 25*d.s + m; return [d.x+vx*r, d.y+vy*r]; }
+  if (n === 'mesh') { const b = clamp01(s.logo.mesh-1), rx = (56+100*b)*d.s + m, ry = (56+14*b)*d.s + m; const r = 1/Math.hypot(vx/rx, vy/ry); return [d.x+vx*r, d.y+vy*r]; }
+  const [hw,hh] = BOX[n], sx = hw*d.s, sy = hh*d.s;
+  const t = Math.min(Math.abs(vx) > 1e-6 ? sx/Math.abs(vx) : 1e9, Math.abs(vy) > 1e-6 ? sy/Math.abs(vy) : 1e9);
+  return [d.x+vx*(t+m), d.y+vy*(t+m)];
+};
+const curve = (s,a,b,bend) => {
+  const A = s.dev[a], B = s.dev[b];
+  const vx = B.x-A.x, vy = B.y-A.y, L = Math.hypot(vx,vy) || 1;
+  const cx = (A.x+B.x)/2 - vy/L*bend, cy = (A.y+B.y)/2 + vx/L*bend;
+  const p0 = bend ? ep(s,a,cx,cy) : ep(s,a,B.x,B.y), p1 = bend ? ep(s,b,cx,cy) : ep(s,b,A.x,A.y);
+  return `M${p0[0].toFixed(1)},${p0[1].toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${p1[0].toFixed(1)},${p1[1].toFixed(1)}`;
+};
+
+/* ---------- render ---------- */
+const el = {};
+['root','browser','ink','phone','legacy','hex','mesh','browser-x','ink-x','phone-xf','phone-xc','legacy-x','ink-sel','ink-rot','ink-toolhl','ink-sw',
+ 'phone-card','phone-full','touch','undo-pop','legacy-ph','legacy-page','legacy-spin','legacy-dim','legacy-dlg','legacy-radio','hex-pulse','mesh-glow',
+ 'links','arrows','labels','cap'].forEach(k => el[k] = $(k));
+['browser','ink','legacy'].forEach(n => { el[n+'-cur'] = $(n+'-cur'); el[n+'-ring'] = $(n+'-ring'); });
+
+const setX = (g,m,cx,cy,k) => {
+  g.setAttribute('transform', `translate(${cx+m.dx*k},${cy+m.dy*k}) rotate(${m.rot}) scale(${k})`);
+  g.querySelector('.xb').setAttribute('stroke', m.c);
+};
+const logoEl = id => { const g = $(id); return { g, c:g.querySelector('.c'), l:g.querySelector('.l'), r:g.querySelector('.r'), ols:[...g.querySelectorAll('.ol')], p:g.querySelector('.p') }; };
+const LG = { browser:logoEl('browser-logo'), ink:logoEl('ink-logo'), phone:logoEl('phone-logo'), legacy:logoEl('legacy-logo'), mesh:logoEl('mesh-logo') };
+// L: 0 x, 1 +, 2 +++, 3 x+x, 4 <+>, 5 xtxp. base = scale of the lone x; zEnd = zoom once it has branched.
+function renderLogo(o, L, pal, cx, cy, base, zEnd) {
+  const a = clamp01(L), b = clamp01(L-1), c3 = clamp01(L-2), d = clamp01(L-3), e = clamp01(L-4);
+  const S = base*(1 + (zEnd-1)*E.io(b)), sh = 32 + 21*E.io(e);
+  o.g.setAttribute('transform', `translate(${cx},${cy}) scale(${S}) translate(${-sh},0)`);
+  o.c.setAttribute('transform', `translate(32,0) rotate(${45*a}) scale(${1-.394*a})`);
+  o.c.setAttribute('stroke-width', 6 + 3.9*a);
+  o.c.setAttribute('stroke', mix(pal.x, pal.t, clamp01(a/.4)));
+  [[o.l,-1],[o.r,1]].forEach(([g,dir]) => {
+    g.setAttribute('opacity', b > 0 ? 1 : 0);
+    g.setAttribute('transform', `translate(${32 + dir*32*E.back(b)},0) rotate(${dir*45*(1-c3)}) scale(${.606 + .394*c3})`);
+    g.setAttribute('stroke-width', 9.9 - 3.9*c3);
+    g.setAttribute('stroke', mix(pal.t, pal.x, clamp01(c3/.4)));
+  });
+  o.ols.forEach(q => q.setAttribute('stroke-dashoffset', d - e));
+  o.p.setAttribute('opacity', e > 0 ? 1 : 0);
+  o.p.setAttribute('stroke-dashoffset', 1 - e);
+  o.p.setAttribute('stroke', pal.p);
+}
+
+const arrowEls = {};
+const getArrow = id => {
+  if (!arrowEls[id]) {
+    const g = document.createElementNS(NS,'g');
+    const mk = () => document.createElementNS(NS,'path');
+    const back = mk(), p = mk(), h = mk();
+    back.setAttribute('fill','none'); back.setAttribute('stroke',C.line); back.setAttribute('stroke-width','10'); back.setAttribute('stroke-linecap','round'); back.setAttribute('stroke-opacity','.6');
+    p.setAttribute('fill','none'); p.setAttribute('stroke-width','5'); p.setAttribute('stroke-linecap','round');
+    h.setAttribute('d','M2,0 L-15,-10 L-11,0 L-15,10 Z'); h.setAttribute('stroke',C.line); h.setAttribute('stroke-width','1.5'); h.setAttribute('stroke-linejoin','round');
+    g.append(back,p,h); el.arrows.append(g); arrowEls[id] = { g, back, p, h };
+  }
+  return arrowEls[id];
+};
+
+const LINKS = [['browser','mesh'],['ink','mesh'],['phone','mesh'],['hex','mesh'],['legacy','hex']];
+const linkEls = LINKS.map(() => {
+  const p = document.createElementNS(NS,'path');
+  p.setAttribute('fill','none'); p.setAttribute('stroke',C.mute); p.setAttribute('stroke-width','3'); p.setAttribute('stroke-dasharray','2 10'); p.setAttribute('stroke-linecap','round'); p.setAttribute('stroke-opacity','.75');
+  const dots = [0,1].map(() => { const c = document.createElementNS(NS,'circle'); c.setAttribute('r','5'); c.setAttribute('fill',C.red); return c; });
+  el.links.append(p, ...dots); return { p, dots };
+});
+
+function render(s, T) {
+  el.root.setAttribute('opacity', s.g.o);
+  for (const n of ['browser','ink','phone','legacy','hex','mesh']) {
+    const d = s.dev[n];
+    el[n].setAttribute('transform', `translate(${d.x},${d.y}) scale(${d.s})`);
+    el[n].setAttribute('opacity', d.o);
+  }
+  setX(el['browser-x'], s.x.browser, ...ANCH.browser);
+  setX(el['ink-x'], s.x.ink, ...ANCH.ink);
+  setX(el['legacy-x'], s.x.legacy, ...ANCH.legacy);
+  setX(el['phone-xf'], s.x.phone, ...ANCH.phoneFull);
+  setX(el['phone-xc'], s.x.phone, ...ANCH.phoneCard);
+  const docs = { browser:['browser-x',ANCH.browser], ink:['ink-x',ANCH.ink], phone:['phone-xf',ANCH.phoneFull], legacy:['legacy-x',ANCH.legacy] };
+  for (const n in docs) {
+    const [xid,[cx,cy,k]] = docs[n];
+    el[xid].style.display = s.logoMode ? 'none' : '';
+    LG[n].g.style.display = s.logoMode ? '' : 'none';
+    if (s.logoMode) renderLogo(LG[n], s.logo[n], LOGO_LIGHT, cx, cy, 4*k, .6);
+  }
+  const mb = clamp01(s.logo.mesh-1);
+  renderLogo(LG.mesh, s.logo.mesh, LOGO_DARK, 0, 0, 1.55, 1.3);
+  $('mesh-ring').setAttribute('opacity', 1 - mb);
+  el['mesh-glow'].setAttribute('opacity', .06 - .035*mb);
+  const mp = s.dev.mesh.pulse;
+  el['mesh-glow'].setAttribute('rx', 74 + 80*mb + (mp < 1 ? 14*Math.sin(mp*Math.PI) : 0));
+  el['mesh-glow'].setAttribute('ry', 74 - 4*mb + (mp < 1 ? 10*Math.sin(mp*Math.PI) : 0));
+
+  for (const n of ['browser','ink','legacy']) {
+    const c = s.cur[n], cs = Math.min(1.7, .85/s.dev[n].s);
+    const g = el[n+'-cur'];
+    g.setAttribute('transform', `translate(${c.x},${c.y}) scale(${cs*(1-.15*c.down)})`);
+    g.setAttribute('opacity', c.o);
+    for (const k of g.children) k.style.display = k.dataset.k === c.k ? '' : 'none';
+    const r = el[n+'-ring'];
+    r.setAttribute('transform', `translate(${c.x},${c.y}) scale(${cs*(1+1.8*c.ring)})`);
+    r.setAttribute('opacity', c.ring < 1 ? (1-c.ring)*c.o : 0);
+  }
+
+  el['ink-sel'].setAttribute('opacity', s.ink.sel);
+  el['ink-rot'].setAttribute('opacity', s.ink.rot);
+  el['ink-toolhl'].setAttribute('y', toolY(s.ink.tool) - 13);
+  if (s.ink.swatch < 0) el['ink-sw'].setAttribute('opacity', 0);
+  else { el['ink-sw'].setAttribute('opacity', 1); el['ink-sw'].setAttribute('x', -239 + s.ink.swatch*30); }
+
+  el['phone-card'].setAttribute('opacity', s.phone.card);
+  el['phone-card'].setAttribute('transform', `translate(0,${(1-s.phone.card)*14})`);
+  const f = s.phone.full;
+  el['phone-full'].setAttribute('opacity', Math.min(1, f*2.5));
+  el['phone-full'].setAttribute('transform', `translate(${-15*(1-f)},${8*(1-f)}) scale(${.3+.7*f})`);
+  const u = s.phone.undo;
+  el['undo-pop'].setAttribute('opacity', Math.min(1, u*3));
+  el['undo-pop'].setAttribute('transform', `translate(0,-6) scale(${Math.max(0,u)})`);
+  el.touch.setAttribute('opacity', s.touch.p < 1 ? 1-s.touch.p : 0);
+  el.touch.setAttribute('transform', `translate(${s.touch.x},${s.touch.y})`);
+  el.touch.querySelector('.tr').setAttribute('r', 10 + 18*s.touch.p);
+
+  el['legacy-ph'].setAttribute('opacity', 1 - s.legacy.loaded);
+  el['legacy-page'].setAttribute('opacity', s.legacy.loaded);
+  el['legacy-spin'].setAttribute('transform', `translate(-145,-129) rotate(${s.legacy.spin*360})`);
+  el['legacy-dim'].setAttribute('opacity', s.legacy.dim*.92);
+  el['legacy-dlg'].setAttribute('opacity', s.legacy.dialog);
+  el['legacy-dlg'].style.display = s.legacy.dialog > 0 ? '' : 'none';
+  el['legacy-radio'].setAttribute('cy', -30 + s.legacy.radio*24);
+
+  const hp = s.dev.hex.pulse;
+  el['hex-pulse'].setAttribute('r', 24 + 34*hp);
+  el['hex-pulse'].setAttribute('opacity', hp < 1 ? 1-hp : 0);
+
+  // links (final scene)
+  el.links.setAttribute('opacity', s.links);
+  if (s.links > 0) LINKS.forEach(([a,b],i) => {
+    const A = s.dev[b], B = s.dev[a];
+    const p0 = ep(s,a,A.x,A.y,4), p1 = ep(s,b,B.x,B.y,4);
+    const L = linkEls[i];
+    L.p.setAttribute('d', `M${p0[0]},${p0[1]} L${p1[0]},${p1[1]}`);
+    L.p.setAttribute('stroke-dashoffset', (-T*30).toFixed(1));
+    L.dots.forEach((c,j) => {
+      let u = (T*.45 + j*.5 + i*.17) % 1; if (j === 1) u = 1 - u;   // one pulse each way
+      c.setAttribute('cx', p0[0] + (p1[0]-p0[0])*u); c.setAttribute('cy', p0[1] + (p1[1]-p0[1])*u);
+      c.setAttribute('opacity', Math.sin(u*Math.PI));
+    });
+  });
+
+  // arrows
+  for (const id in arrowEls) arrowEls[id].g.style.display = 'none';
+  for (const id in s.arrows) {
+    const a = s.arrows[id];
+    if (a.o <= 0 || a.p <= .01) continue;
+    const A = getArrow(id);
+    A.g.style.display = ''; A.g.setAttribute('opacity', a.o);
+    const d = curve(s,a.a,a.b,a.bend);
+    A.p.setAttribute('d', d); A.back.setAttribute('d', d);
+    const len = A.p.getTotalLength(), head = len*a.p;
+    const dash = `${Math.max(0, head-10)} ${len+40}`;
+    A.p.setAttribute('stroke-dasharray', dash); A.back.setAttribute('stroke-dasharray', dash);
+    A.p.setAttribute('stroke', a.col); A.h.setAttribute('fill', a.col);
+    const q = A.p.getPointAtLength(head), q0 = A.p.getPointAtLength(Math.max(0, head-4));
+    const ang = Math.atan2(q.y-q0.y, q.x-q0.x)*180/Math.PI;
+    A.h.setAttribute('transform', `translate(${q.x},${q.y}) rotate(${ang})`);
+  }
+
+  // labels
+  el.labels.setAttribute('opacity', s.labels);
+  if (s.labels > 0) for (const n in LABELS) {
+    const d = s.dev[n], t = $('lab-' + n);
+    const below = n === 'hex' ? 42 : n === 'mesh' ? 84 : BOX[n][1]*d.s + 24;
+    t.setAttribute('x', d.x); t.setAttribute('y', d.y + below);
+  }
+
+  el.cap.textContent = s.cap.text;
+  el.cap.setAttribute('opacity', SHOW_CAPTIONS ? s.cap.o : 0);
+}
+
+/* ---------- playback ---------- */
+const q = new URLSearchParams(location.search);
+const fixed = q.has('t') ? +q.get('t') : null;
+const speed = +q.get('speed') || 1;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let elapsed = 0, last = null, playing = true, visible = true;
+svg.addEventListener('click', () => { if (elapsed >= END) { elapsed = 0; playing = true; } else playing = !playing; });
+if ('IntersectionObserver' in window) new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(svg);
+
+if (fixed != null) render(stateAt(fixed), fixed);
+else if (reduce) render(stateAt(END), END);
+else {
+  const frame = now => {
+    if (last != null && playing && visible) elapsed += (now-last)/1000*speed;
+    last = now;
+    render(stateAt(Math.min(elapsed, END)), elapsed);
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+window.xtxpHeroSeek = t => { elapsed = t; };   // console helper while tuning
+})();
+</script>
