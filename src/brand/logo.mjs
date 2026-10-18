@@ -43,10 +43,9 @@ export const HERO_VIEWBOX = '-64 -20 192 54';
 export const RED = '#ff5436';
 export const HERO_DELAY = 0.35; // the hero fades in over this long before the loop starts
 
-// Playing from the full-logo hold: reverse, rest on the +, build again, end on the full logo. Used for the hover
-// animation on the site title.
-export const RUN_SPEED = 1.6;
-export const RUN_COUNT = +((TOTAL + TF) / TOTAL).toFixed(5);
+// The site title's hover is a short blip: from the full logo the legs and the p pull back to <+> and then regrow.
+// Only the legs and the p change over that stretch of the build, so only they animate.
+const BLIP_HOLD = 0.15; // rest on <+> in the middle of the blip
 
 // Forward timeline per part: [seconds, properties changed at that time]. Anything not named carries over.
 const SMALL = 'scale(.606)'; // a + is an x scaled to 0.606 and turned 45 degrees
@@ -149,6 +148,27 @@ const PARTS = [['xl-c', 'c'], ['xl-l', 'l'], ['xl-r', 'r'], ['xl-ol', 'ol'], ['x
   return { cls, n, main: expand(main.map(([t, s, e]) => [t, s, e])), colour: colour && expand(colour) };
 });
 
+// The last stretch of the build (legs regrow, p draws), played backwards, a rest, then forwards: one keyframes set.
+function blipKeyframes(part) {
+  const f = part.main;
+  const t0 = T.regrow0;
+  const win = f.filter(([t]) => t >= t0 && t <= TF);
+  const L = r(TF - t0);
+  const stops = [];
+  for (let i = win.length - 1; i >= 0; i--) {
+    const next = win[i - 1];
+    stops.push([r(TF - win[i][0]), win[i][1], next ? mirror(next[2]) : undefined]);
+  }
+  stops.push([r(L + BLIP_HOLD), win[0][1], win[0][2]]);
+  for (let i = 1; i < win.length; i++) stops.push([r(L + BLIP_HOLD + (win[i][0] - t0)), win[i][1], win[i][2]]);
+  const total = r(L * 2 + BLIP_HOLD);
+  const pc = (t) => `${+((t / total) * 100).toFixed(4)}%`;
+  return {
+    total,
+    css: `@keyframes xl-${part.n}-blip{${stops.map(([t, st, e]) => `${pc(t)}{${decl(st, e)}}`).join('')}}`,
+  };
+}
+
 /** CSS shared by the page and the standalone files. `root` is the svg class. */
 export function logoCss(root = '.xtxp-logo', { animate = true } = {}) {
   const base =
@@ -162,12 +182,12 @@ export function logoCss(root = '.xtxp-logo', { animate = true } = {}) {
       .map((k) => `${k} ${dur}s ${EASE} ${delay}${count} both`)
       .join(',');
   const loop = PARTS.map((p) => `${root}--loop .${p.cls}{animation:${anim(p, TOTAL, '', 'infinite')}}`).join('');
-  const run = PARTS.map(
-    (p) =>
-      `${root}--run .${p.cls}{animation:${anim(p, +(TOTAL / RUN_SPEED).toFixed(3), `${-(R0 / RUN_SPEED).toFixed(3)}s `, RUN_COUNT)}}`
-  ).join('');
+  const blipParts = PARTS.filter((p) => p.n === 'ol' || p.n === 'p');
+  const blips = blipParts.map((p) => ({ p, ...blipKeyframes(p) }));
+  const blip = blips.map((b) => b.css).join('') +
+    blips.map((b) => `${root}--blip .${b.p.cls}{animation:xl-${b.p.n}-blip ${b.total}s ${EASE} 1 both}`).join('');
   const still = `@media (prefers-reduced-motion:reduce){${root} *{animation:none!important}}`;
-  return base + frames + loop + run + still;
+  return base + frames + loop + blip + still;
 }
 
 /**

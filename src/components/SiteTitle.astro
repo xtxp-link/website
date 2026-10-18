@@ -1,6 +1,6 @@
 ---
-// Site title: the small logo. Still until hovered or focused, then it plays the reverse-and-rebuild once.
-// Moving away lets it finish, so it always lands on the full logo.
+// Site title: the small logo. Still until hovered or focused, then the legs and the p pull back to <+> and regrow,
+// once. Moving away lets it finish, so it always lands on the full logo.
 // On the home page the hero already shows the big logo, so this one stays tucked away until the hero scrolls out of view.
 import Logo from './Logo.astro';
 const { siteTitle, siteTitleHref, entry } = Astro.locals.starlightRoute;
@@ -28,11 +28,11 @@ const tuck = entry.data.template === 'splash';
     if (!logo) return;
 
     if (!reduce) {
-      const start = () => logo.classList.add('xtxp-logo--run');
+      const start = () => logo.classList.add('xtxp-logo--blip');
       link.addEventListener('pointerenter', start);
       link.addEventListener('focus', start);
       logo.addEventListener('animationend', (e) => {
-        if ((e as AnimationEvent).animationName === 'xl-p') logo.classList.remove('xtxp-logo--run');
+        if ((e as AnimationEvent).animationName === 'xl-p-blip') logo.classList.remove('xtxp-logo--blip');
       });
     }
 
