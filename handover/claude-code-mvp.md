@@ -1,6 +1,6 @@
 # Handover to Claude Code: XTXP MVP (M1, then M2)
 
-**Status:** draft for David's review, 2026-10-18. Items marked *pending review* depend on decisions David makes after reading the spec review (see "Pending decisions" below).
+**Status:** ready to start, 2026-10-18. Every review item that blocks M1 or M2 has been decided (decisions 17 to 23 on the spec site).
 
 ## 1. What this is
 
@@ -15,94 +15,112 @@ XTXP (XML to XML Protocol) lets many people edit one XML document at once, with 
 5. [Decision log](https://xtxp.link/discussion/decisions/) and [Open questions](https://xtxp.link/discussion/open-questions/)
 6. [Prior art](https://xtxp.link/discussion/prior-art/): read the Yrs, Wallace, y-sweet, Yjs sync protocol, Inkscape undo and Inkboard entries before designing the matching parts
 
-## 2. Ground rules
+## 2. Where each milestone runs
 
-- **Vocabulary.** A line of a document's history is a **session** (a branch, in git's terms), down to one user's private state. xtxp.link is a **muppet disco**: it finds hosts and hosts nothing. Both are on the spec site (decisions 17 and 18).
+| Stage | Where | Why |
+| --- | --- | --- |
+| Step 0 and M1 | **A cloud Claude Code session** | Pure Rust, headless, no UI. Needs only GitHub and crates.io. |
+| M2 | **Claude Code on David's own machine** | Building Inkscape needs its full native toolchain and a desktop to run it on. |
 
+**Before the M1 session:** create the implementation repository (suggested name `xtxp-link/xtxp`, empty) and attach it to the session along with `xtxp-link/website`, so spec updates can land in the same piece of work.
+
+**Before the M2 session:** check out both repositories locally, install a Rust toolchain, and follow Inkscape's own build instructions for the platform until a stock Inkscape builds and runs. The fork is created from there.
+
+## 3. Ground rules
+
+- **Vocabulary.** A line of a document's history is a **session** (a branch, in git's terms), down to one user's private state. xtxp.link is a **muppet disco**: it finds hosts and hosts nothing, and it's a later milestone.
 - **Behaviour first.** Write Gherkin `.feature` files and JSON test vectors before implementation code. The vectors are the contract.
 - **Pure core.** Xmesh has no networking, no file access, no clocks and no threads. Everything that touches the world is an adapter.
 - **One language for the MVP: Rust.** Xmesh is a thin layer on Yrs. Hosting is a small Rust server.
 - **Reuse before writing.** Check Yrs, `yrs_tree`, y-sweet and the Yjs sync protocol first. Look at Inkboard's code before writing the Inkscape adapter.
 - **No-JS test.** Every user-facing decision must still work in a browser with JavaScript off.
-- **Keep the spec current.** When a decision is made or changed, update the relevant spec page and the decision log in `xtxp-link/website` in the same piece of work. The log lists only decisions in force; don't narrate reversals.
-- **Don't build roadmap items** (ledger, keyframes, native C++, Elixir/BEAM, signed hash chains) or later milestones early.
+- **Keep the spec current.** When a decision is made or changed, update the relevant spec page and the decision log in `xtxp-link/website` in the same piece of work. The log lists only decisions in force; don't narrate reversals. Decisions are David's: propose, then write them in once he agrees.
+- **Cut scope aggressively.** Don't build roadmap items (ledger, keyframes, native C++, Elixir/BEAM, signed hash chains) or later milestones early.
 
-## 3. Working model
+## 4. Working model
 
 One **principal** agent owns everything that crosses a boundary: CRDT semantics, the wire protocol, identity and access, the feature files and vectors, and the cross-implementation tests. One **expert sub-agent per stack** does the building and answers to the vectors:
 
 | Expert | Owns in the MVP |
 | --- | --- |
 | Engine (Rust) | `xmesh`: tree schema on Yrs, cycle-safe moves, XML Patch subset, canonical XML; C interface (for M2) |
-| Hosting (Rust) | `muppet-host`: WebSocket endpoint, identity handshake, admission and grants, storage, server-side MUPPET (M2) |
+| Hosting (Rust) | `muppet-host`: WebSocket endpoint, identity handshake, admission by session, storage, server-side MUPPET (M2) |
 | Wire | `xtxp-wire`: Yjs sync messages plus XTXP's identity and access messages |
 | Inkscape fork (M2) | The MUPPET adapter in the fork |
 | Web, no JS (M2) | The HTML edit loop: forms, redirects, ETag polling |
 
-**Process:** if the superpowers plugin is installed, start with its brainstorming skill to settle the open points in section 7, then write a plan, then build test-first. Otherwise follow the same order by hand.
+**Process:** if the superpowers plugin is installed, start with its brainstorming skill to settle the open points in section 8, then write a plan, then build test-first. Otherwise follow the same order by hand.
 
-## 4. Step 0: review y-sweet (before any hosting code)
+## 5. Step 0: review y-sweet (before any hosting code)
 
-Review y-sweet for reuse as the basis of hosting. The checklist is on the [Milestones page](https://xtxp.link/build/milestones/#before-m1-review-y-sweet): fit for Xmesh documents and XTXP's messages, tokens versus key-based grants, branching, storage, hosting options, licence and maintenance.
+Review y-sweet for reuse as the basis of hosting. The checklist is on the [Milestones page](https://xtxp.link/build/milestones/#before-m1-review-y-sweet): fit for Xmesh documents and XTXP's messages, tokens versus key-based grants, sessions and forking, storage, hosting options, licence and maintenance.
 
 **Deliverables:**
 - A recommendation: extend y-sweet, borrow from it, or start fresh.
 - A recommendation on hosting for M1: a self-hosted binary or Cloudflare Workers with Durable Objects.
 - Both written up on the spec site, with a decision-log entry once David agrees.
 
-## 5. M1: headless convergence
+## 6. M1: headless convergence (cloud)
 
 **Goal:** prove convergence, reconnect sync and the identity handshake over a real network before anyone draws anything.
 
-### Proposed repository layout
+### Repository layout
 
-A new implementation repository (name to agree with David, for example `xtxp-link/xtxp`), as a Cargo workspace:
+A Cargo workspace in the implementation repository:
 
 ```
 crates/xmesh          pure core: schema on Yrs, moves, XML Patch subset, canonical XML
 crates/xtxp-wire      message types and framing
-crates/muppet-host    headless MUPPET hosting a session over WebSocket
+crates/muppet-host    headless MUPPET hosting sessions over WebSocket
 crates/xtxp-cli       CLI peer: replays a vector stream, can drop and reconnect
 tools/fuzzer          generates JSON vectors from the feature files' behaviours
+tools/chaos-proxy     drops, delays and duplicates frames between peers and host
 features/             Gherkin feature files
 vectors/              generated and hand-written JSON vectors
 ```
 
 ### Scope
 
-- **Document model:** the schema on the Math page: elements and text nodes, expanded names, attributes, moves, deletion (decision 20).
-- **XML Patch:** the `add`, `replace` and `remove` subset needed by the vectors.
-- **Moves:** the numbered algorithm on the Math page. Spike `yrs_tree` against it first; adopt it only if it gives the same trees on every vector.
-- **Canonical XML:** canonical form v0, as on the Math page (decision 21).
-- **Wire:** Yjs sync step 1 and 2 plus updates, as Yrs v1 updates in XTXP frames over WebSocket; `hello`, `challenge`, `prove`, `bind`; `grant` and `revoke` for write access. Expect this to change (decision 21).
-- **Identity:** Ed25519 keys loaded from files, every signature domain-tagged as on the Identity page (decision 22). Static grants signed by the owner. Sign-in to fetch keys is out of scope for M1.
-- **Chaos proxy:** between peers and host, dropping, delaying and duplicating frames.
-- **Sessions:** one shared session, `@main`. Each peer connection edits in its own session with a fresh client ID, and the host admits it into `@main` by merging (decision 19). Named forks, previews and trust come later.
+- **Document model:** the schema on the [Math page](https://xtxp.link/spec/math/#data-model): every XML node kind (element, text, CDATA, comment, processing instruction), expanded names, attributes, position on the edge, tombstone deletion, fixed genesis, node IDs from creating operations (decision 20).
+- **Moves:** the numbered [tree-reading algorithm](https://xtxp.link/spec/math/#reading-the-tree). Spike `yrs_tree` against it first; adopt it only if it gives the same trees on every vector.
+- **Snapshots:** state vector plus delete set; a short hash in URLs and ETags; Yrs garbage collection off (decision 19).
+- **Canonical XML:** [canonical form v0](https://xtxp.link/spec/math/#canonical-form-v0) (decision 21).
+- **XML Patch:** the `add`, `replace` and `remove` subset needed by the vectors, for import and export only.
+- **Wire:** Yjs sync step 1 and 2 plus updates, as Yrs v1 updates in XTXP frames over WebSocket; `hello`, `challenge`, `prove`, `bind`; `grant` and `revoke`. A starting point that David expects to need further work (decision 21).
+- **Identity:** Ed25519 keys loaded from files, every signature domain-tagged as on the [Identity page](https://xtxp.link/spec/identity/#what-gets-signed) (decision 22). Static grants signed by the owner. Sign-in to fetch keys is out of scope.
+- **Sessions:** one shared session, `@main`. Each peer connection edits in its own session with a fresh client ID, and the host admits whole sessions into `@main` by merging; a refused session is simply not merged (decision 19). Named forks, previews and trust come later.
 - **Storage:** files on disk; append updates, compact periodically.
+- **Hosting:** one host binary.
 
 ### Done when
 
 1. Every vector converges under many shuffled delivery orders: same SHA-256 of canonical XML, no cycles, idempotent re-delivery.
-2. Two CLI peers and a late joiner, connected to one host over WebSocket with connections dropped on purpose, end with identical hashes.
+2. Three CLI peers, one of them a late joiner, connected to one host over WebSocket through the chaos proxy, end with identical hashes.
 3. A late joiner loads the full state in one update.
 4. A key without a write grant has its session refused: never merged into `@main`, and the other peers keep converging.
 5. After a revocation reaches the host, that key's session stops being merged.
 6. A signature made for one host, session or purpose is rejected anywhere else.
-7. A fork rebuilt from its snapshot keeps content deleted after the fork, and deleting a shape changes the ETag hash.
+7. A fork rebuilt from its snapshot keeps content deleted after the fork, and deleting a shape changes the snapshot hash.
 8. All of the above runs in CI.
 
-## 6. M2: Inkscape plus a browser with no JavaScript
+## 7. M2: Inkscape plus a browser with no JavaScript (local)
 
 **Goal:** the first demo a person can see, and a direct test of the north star.
 
 ### Scope
 
-- **Xmesh C interface**, linked into an Inkscape fork. The fork's build needs a Rust toolchain.
-- **Inkscape adapter:** start from Inkboard's code (`src/jabber_whiteboard/` in Inkscape 0.46). Capture edits at Inkscape's undo transaction commit, so each action becomes one batch of operations. Apply incoming operations outside the local undo stack. Follow the adapter contract on the Inkscape fork page (decision 23): side-table node mapping, echo suppression, every XML node kind mapped (comments, processing instructions and CDATA included), never rewriting `id`s. Take undo and other whiteboard semantics from Inkboard for the first implementation; they get deliberated later against tldraw and Miro. Test the known Inkboard pitfalls: automatically named gradients and patterns, `defs` and metadata, and new windows.
-- **Server-side MUPPET:** renders the drawing as HTML and SVG, accepts edits as form POSTs, redirects, and serves `ETag`/`304` for meta-refresh polling (see the no-JS edit diagram on the Addressing page). Forms can be rich HTML and CSS, but every edit is a form POST carrying its node ID, the snapshot hash it was rendered from and a CSRF token (Addressing page, decision 23). Don't sanitise or block scripts in M2: rendering safety is a note to revisit.
+- **Xmesh C interface**, linked into an Inkscape fork. The fork vendors the engine as a submodule; its build needs a Rust toolchain.
+- **Inkscape adapter:** start from Inkboard's code (`src/jabber_whiteboard/` in Inkscape 0.46). Capture edits at Inkscape's undo transaction commit, so each action becomes one batch of operations, and apply incoming operations outside the local undo stack. Follow the [adapter contract](https://xtxp.link/build/inkscape-fork/#the-adapter-contract) (decision 23):
+  - a side table maps node IDs to Inkscape's XML nodes; nothing extra is written into the document
+  - echoes are suppressed while remote edits are applied
+  - every XML node kind maps, comments, processing instructions and CDATA included; warn only on XML that isn't well-formed
+  - `id`s are never rewritten: the document is exactly the user's version
+  - undo and other whiteboard semantics come from Inkboard for this first implementation; tldraw and Miro come later
+  - test the known Inkboard pitfalls: automatically named gradients and patterns, `defs` and metadata, and new windows
+- **Duplicate ids:** after a merge, detect and flag them as a [conflict above the CRDT](https://xtxp.link/spec/sessions/#conflicts-above-the-crdt). The resolution algorithm is open; don't invent one.
+- **Server-side MUPPET**, in the host binary: renders the drawing as HTML and SVG, accepts edits as form POSTs, redirects, and serves `ETag`/`304` for meta-refresh polling. The page can be rich HTML and CSS, but every edit is a form POST carrying its node ID, the snapshot hash the page was rendered from, and a CSRF token ([Addressing](https://xtxp.link/spec/addressing/#forms)). Don't sanitise or block scripts: rendering safety is a note to revisit.
 - **No-JS identity:** an ephemeral key tied to the HTTP session (a cookie may keep it), granted access by the drawing's owner.
-- **Duplicate ids:** detect and flag them after a merge. The resolution algorithm is open.
-- **Addressing:** the host serves its own sessions at `https://{host}/{path}@{ref}`, with bare URLs redirecting to `@main`. No muppet disco: xtxp.link doesn't serve documents.
+- **Addressing:** the host serves its own sessions at `https://{host}/{path}@{ref}`, with bare URLs redirecting to `@main`. Native documents only; no muppet disco.
 
 ### Done when
 
@@ -112,31 +130,25 @@ vectors/              generated and hand-written JSON vectors
 4. Comments, processing instructions and CDATA written by one Inkscape arrive intact in the other.
 5. Two sessions creating the same `id` merge, converge, and the duplicate is flagged.
 
-## 7. Open points to settle at the start
+## 8. Open points to settle along the way
 
-From the [open questions](https://xtxp.link/discussion/open-questions/) page:
+- **The `yrs_tree` spike:** adopt only if it matches the decided algorithm on every vector.
+- **Message framing:** how XTXP's own messages sit alongside the Yjs sync messages.
+- **Hosting:** a self-hosted binary or Durable Objects, from the y-sweet review.
+- **Snapshot hashes:** which hash, how short, and how it's written after `@`.
 
-- Spike `yrs_tree` against the decided move algorithm (adopt only if it matches).
-- How XTXP's own messages are framed alongside the Yjs sync messages.
-- Hosting: a self-hosted binary or Durable Objects (from the y-sweet review).
+Propose answers to David; don't settle them silently. Everything else on the [open questions](https://xtxp.link/discussion/open-questions/) page can wait until after M2.
 
-From the spec review (`handover/review-decisions.md`, section A for M1 and B for M2), *pending review*:
+## 9. Out of scope for the MVP
 
-- **Decided** (decisions 19 to 22): snapshots name points in history, with a short hash in URLs and ETags (A1); hosts admit or refuse whole sessions, and every connection edits in its own session (A2); a fresh client ID per session per connection (A3); the move algorithm (A4) and tree schema (A5), both on the Math page; canonical form v0 (A6); Yrs v1 updates in XTXP frames as the starting wire format (A7, which David expects to need further work); domain-tagged Ed25519 signatures (A8); the smallest M1 (A9).
-- **M1 and M2:** nothing left pending from the review. M2's contracts are decision 23.
+Ledger and keyframes, the XMPP bridge, the muppet disco (discovery, the bouncer, federation), live web branching, the sketch-level [use cases](https://xtxp.link/overview/use-cases/), the Wasm MUPPET (M3), sign-in to fetch keys, named forks and previews beyond what M2 needs, sessions on other hosts and trust between them, rendering safety, signed hash chains, native C++ and Elixir/BEAM.
 
-Everything else can wait until after M2.
+## 10. Background
 
-## 8. Out of scope for the MVP
+A spec review was run on 2026-10-18 by an independent Opus agent (Fable was intended but needed usage credits; it can be re-run on Fable later). The report is `handover/spec-review.md`, and David's decisions on it are recorded in `handover/review-decisions.md` and on the site (decisions 19 to 23). The report predates the move from "branch" to "session" and from "gateway" to "muppet disco". Items in section C of the decisions list wait until after M2.
 
-Ledger and keyframes, the XMPP bridge, the muppet disco (xtxp.link as discovery, the bouncer, federation), live web branching (open question 9), the sketch-level [use cases](https://xtxp.link/overview/use-cases/), the Wasm MUPPET (M3), sign-in to fetch keys, sessions on other hosts and trust between them, signed hash chains, native C++ and Elixir/BEAM.
+## 11. Repositories
 
-## 9. Pending decisions
-
-A spec review was run on 2026-10-18 by an independent Opus agent (Fable was intended but needed usage credits; it can be re-run on Fable later). The full report is `handover/spec-review.md` and the decisions it raises are in `handover/review-decisions.md` in this repository. David will decide those before work starts; update this handover and the spec with his answers.
-
-## 10. Repositories and access
-
-- **Spec:** `xtxp-link/website` (Astro Starlight, deployed to xtxp.link by Cloudflare on push to `main`). Diagrams are PlantUML in `diagrams/`, rendered with `npm run diagrams` (needs Java), and the SVGs are committed.
-- **Implementation:** a new repository to be created with David's agreement.
-- **Inkscape fork:** to be created for M2, with the engine vendored as a submodule and CI rebasing onto Inkscape's main branch on a schedule.
+- **Spec:** `xtxp-link/website` (Astro Starlight, deployed to xtxp.link by Cloudflare on push to `main`). Diagrams are PlantUML in `diagrams/`, rendered with `npm run diagrams` (needs Java), and the SVGs are committed. Fetch and rebase before every push: David also edits the site.
+- **Implementation:** `xtxp-link/xtxp` (suggested; David creates it).
+- **Inkscape fork:** created for M2, with the engine vendored as a submodule and CI rebasing onto Inkscape's main branch on a schedule.
