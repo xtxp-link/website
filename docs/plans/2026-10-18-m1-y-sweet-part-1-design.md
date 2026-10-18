@@ -32,7 +32,7 @@ Decided by David during brainstorming on 2026-10-18. They hold for the spike and
 | S6 | **Snapshot hash:** SHA-256 over XTXP's own canonical snapshot encoding (section 3.6), shortened to 16 hex characters. How it is written after `@` stays open. |
 | S7 | Reserved names for comments, processing instructions and CDATA are provisional (section 3.2) and reviewed after the spike. |
 | S8 | Message framing (handover open point) is deferred to the full M1: y-sweet carries plain Yjs sync with no XTXP frames. |
-| S9 | *Proposed with the plan, for David's review.* The fragment holds the root element plus any comments and processing instructions around it, in order, because Inkscape writes a comment before `<svg>`. Paths start at the root element. |
+| S9 | *Agreed by David.* Everything around the root element is kept, in order: comments, processing instructions, the XML declaration and the DOCTYPE (section 3.2). Paths start at the root element. |
 | S10 | *Proposed with the plan, for David's review.* Text offsets count UTF-16 code units, as Yjs does, so the M2 browser agrees. |
 
 ## 3. `xmesh`
@@ -42,7 +42,7 @@ A pure library: no networking, file access, clocks or threads. It depends on `yr
 ### 3.1 Document
 
 - An `Xmesh` wraps one Yrs `Doc`, with a client ID supplied by the caller and garbage collection off (`Options::skip_gc`, present in Yrs 0.28).
-- The document is the Yrs XML fragment named `xmesh`. It holds the root element, such as `<svg>`, plus any comments and processing instructions before or after it, in order (S9).
+- The document is the Yrs XML fragment named `xmesh`. It holds the root element, such as `<svg>`, plus everything before or after it, in order: comments, processing instructions, the XML declaration and the DOCTYPE (S9). Whitespace between those top-level nodes is dropped.
 - **Seed:** `Xmesh::seed(xml) -> Vec<u8>` imports `xml` into an empty `Doc` with client ID `0` and returns the update. Client ID `0` is reserved for seeds; `Xmesh::new` refuses it. Applying the same seed twice changes nothing. The importer keeps attribute order from the source and never iterates a hash map, so the seed bytes are deterministic; a test checks this across runs.
 
 ### 3.2 Data model
@@ -56,7 +56,9 @@ As on the [Math page](https://xtxp.link/spec/math/#data-model):
   - a comment is an element `{https://xtxp.link/ns}comment` holding one text node
   - a processing instruction is `{https://xtxp.link/ns}pi`, with its target in the attribute `target` and its data in one text node
   - CDATA is `{https://xtxp.link/ns}cdata` holding one text node
-- The XML declaration and DOCTYPE are not stored.
+- The XML declaration is an element `{https://xtxp.link/ns}xml-decl` with `version` and, if given, `standalone` as attributes. The encoding isn't kept: Xmesh always holds UTF-8.
+- The DOCTYPE is an element `{https://xtxp.link/ns}doctype` holding its text verbatim, internal subset included.
+- Entities declared in the DOCTYPE's internal subset (`<!ENTITY name "value">`) are expanded when parsing, also inside namespace declarations, as Illustrator files need. References inside comments, CDATA and processing instructions are left as they are. Parameter and external entities aren't supported.
 
 ### 3.3 Edits
 
@@ -91,7 +93,7 @@ Each call is one Yrs transaction and returns the update bytes it produced, so on
 - prefixes for namespaces outside the fixed list (`ns1`, `ns2` and so on) are numbered in document order: each element, then its attributes in sorted order
 - the attributes of the `xml:` namespace use the prefix `xml` and are never declared
 - an element with no namespace under SVG as the default namespace gets `xmlns=""` (S5)
-- reserved elements are written back as `<!--…-->`, `<?target data?>` and `<![CDATA[…]]>`, their text unescaped
+- reserved elements are written back as `<!--…-->`, `<?target data?>`, `<![CDATA[…]]>` and `<!DOCTYPE …>`, their text unescaped; the XML declaration isn't written
 
 `hash() -> String` is the SHA-256 of the canonical XML, as lowercase hex.
 
@@ -165,6 +167,7 @@ Failures name the vector, the seed and the delivery order.
 | `comment-pi-cdata` | Round trip of the reserved elements |
 | `namespaced-attrs` | `inkscape:label`, `sodipodi:` and `xlink:href` prefixes and sorting |
 | `no-namespace-element` | `xmlns=""` (S5) |
+| `doctype-and-entities` | Declaration and DOCTYPE kept, DOCTYPE entities expanded (S9) |
 | `deletes-out-of-order` | Deletes delivered before the inserts they delete (the bug fixed in Yrs 0.27.2) |
 | `move-with-concurrent-edit` | Known gap: the edit lands on the original and is lost |
 | `concurrent-moves-same-node` | Known gap: the node is duplicated |
@@ -212,6 +215,7 @@ CI (GitHub Actions): `cargo fmt --check`, `cargo clippy -D warnings`, `cargo tes
 
 - **Yrs 0.19.2, which y-sweet v0.9.1 runs, loses a delete that arrives before the insert it deletes.** Applied in the order they were made, every vector's Yrs 0.28 updates give identical XML on 0.19.2. In shuffled orders, 6 of 14 vectors diverge on 0.19.2, with deleted content coming back (`tools/yrs-compat`, test `finding_019_loses_a_delete_that_arrives_first`). y-sweet's hub topology mostly delivers causally, since a peer only sees content through the host, but the full design's sessions, forks and merges would hit it.
 - **Yrs 0.28.0 can leave a pending update stuck.** Fuzz seed 0 found an order of 8 valid updates from four clients after which Yrs still reports missing updates, although everything has arrived; delivering again heals it (`tools/fuzzer`, test `finding_yrs_028_leaves_a_pending_update_stuck`). Xmesh works around it: `apply` keeps any update that leaves the document with missing dependencies and re-applies those after later updates, which is idempotent. The real sync protocol would also heal it at the next state-vector exchange. Worth reporting upstream.
+- **The parser rejected files whose DOCTYPE declares entities**, as Illustrator exports do. Fixed with S9: such entities are now expanded.
 - **Yrs 0.28 keeps an element's attributes in a hash map**, so source order is lost; `tree()` returns them in canonical order.
 - **A batch can't be rolled back in Yrs**, so `edit` tries it on a throwaway copy first.
 - **Yrs 0.28 client IDs are 53-bit**, checked only by a debug assertion; Xmesh refuses larger ones.
