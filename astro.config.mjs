@@ -24,7 +24,15 @@ export default defineConfig({
       },
       customCss: ['./src/styles/theme.css', './src/styles/logo.generated.css', './src/styles/custom.css'],
       lastUpdated: false,
-      head: [{ tag: 'script', attrs: { type: 'module', src: '/scripts/sidebar-reveal.js' } }],
+      head: [
+        { tag: 'script', attrs: { type: 'module', src: '/scripts/sidebar-reveal.js' } },
+        // Link previews (Slack, social sites, chat apps): one site-wide image, rendered by scripts/social/render.mjs.
+        { tag: 'meta', attrs: { property: 'og:image', content: 'https://xtxp.link/social-card.png' } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'XTXP, the XML to XML Protocol: many people editing one XML document at once, with branchable history.' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://xtxp.link/social-card.png' } },
+      ],
       sidebar: [
         {
           label: 'Start here',
