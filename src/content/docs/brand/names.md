@@ -9,7 +9,7 @@ XTXP has a small vocabulary, and each word names one part of the design. This pa
 
 | Word | Names | Write it |
 | --- | --- | --- |
-| **XTXP** | The protocol: XML to XML Protocol, node to node | All capitals in prose. `xtxp` in code, package names and the `xtxp://` scheme. |
+| **XTXP** | The protocol: XML to XML Protocol, node to node | All capitals in prose. Spelled out as "XML to XML Protocol", never "the XML to XML Protocol". `xtxp` in code, package names and the `xtxp://` scheme. |
 | **xtxp.link** | The spec site, and later a muppet disco | Always lowercase, as a domain. |
 | **Xmesh** | The engine: the XML tree CRDT, a pure Rust layer on Yrs | Capital X, lowercase mesh. `xmesh` in code. |
 | **muppet** | The executor and application layer: Multi User Progressive Patch Execution Tree. Client-side Xmesh, and, run headless, a session host | Always lowercase, as plain text, like session and bouncer. Capitalised only to start a sentence, like any word. Never `MUPPET`. |

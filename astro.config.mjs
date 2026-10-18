@@ -11,7 +11,7 @@ export default defineConfig({
       plugins: [starlightThemeGalaxy()],
       title: 'XTXP',
       description:
-        'XTXP, the XML to XML Protocol: a draft specification for collaborative, branchable editing of XML documents, from Inkscape to a browser with no JavaScript.',
+        'XTXP, XML to XML Protocol: a draft specification for collaborative, branchable editing of XML documents, from Inkscape to a browser with no JavaScript.',
       favicon: '/favicon.svg',
       head: [
         { tag: 'link', attrs: { rel: 'alternate icon', href: '/favicon.ico', sizes: '32x32' } },
@@ -30,7 +30,7 @@ export default defineConfig({
         { tag: 'meta', attrs: { property: 'og:image', content: 'https://xtxp.link/social-card.png?v=5' } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
-        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'XTXP, the XML to XML Protocol: many people editing one XML document at once, with branchable history.' } },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'XTXP, XML to XML Protocol: many people editing one XML document at once, with branchable history.' } },
         { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://xtxp.link/social-card.png?v=5' } },
       ],
       sidebar: [
