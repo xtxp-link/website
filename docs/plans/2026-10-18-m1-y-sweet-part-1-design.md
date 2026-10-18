@@ -219,4 +219,4 @@ CI (GitHub Actions): `cargo fmt --check`, `cargo clippy -D warnings`, `cargo tes
 - **Yrs 0.28 shifts a text delete that starts inside a surrogate pair** one unit right, keeping its length, so it deletes a character the client never covered, and panics when the shifted range runs past the end. Inserts and delete ends inside a pair are rounded up correctly. Xmesh rounds both ends itself before calling Yrs (S10). Worth reporting upstream alongside the stuck pending update.
 - **Yrs 0.28 keeps an element's attributes in a hash map**, so source order is lost; `tree()` returns them in canonical order.
 - **A batch can't be rolled back in Yrs**, so `edit` tries it on a throwaway copy first.
-- **Yrs 0.28 client IDs are 53-bit**, checked only by a debug assertion; Xmesh refuses larger ones.
+- **Yrs 0.28 client IDs are 53-bit**, checked only by a debug assertion; Xmesh refuses larger ones. (Part 2 lowered the limit to 32 bits, because y-sweet's Yrs 0.19.2 reads client IDs as 32-bit: see part 2's design, section 10.)

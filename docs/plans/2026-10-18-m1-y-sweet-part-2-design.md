@@ -55,7 +55,7 @@ A pure state machine for one peer's connection to a host. No I/O, no clock, no t
 
 **Interface:** `Peer::new(client_id)`, then `peer.handle(input) -> Vec<Output>`.
 
-- **Inputs:** `Connected`, `Disconnected`, `Frame(bytes)`, `Edit(ops)`, `Reconnect(new_client_id)`.
+- **Inputs:** `Connected`, `Disconnected`, `Frame(bytes)`, `Edit(ops)`, `Apply(update)` (a raw update made elsewhere, such as a seed or a replayed batch), `Reconnect(new_client_id)`.
 - **Outputs:**
   - `Send(bytes)`;
   - `Event(…)`, one of `RemoteUpdate { before, after }`, `Synced`, `LocalAcked` or `ProtocolError(reason)`.
@@ -97,7 +97,7 @@ A pure state machine for one peer's connection to a host. No I/O, no clock, no t
 - **Driven:**
   - `Transport`: connect, send a frame, receive frames, closed;
   - `Clock`: the current time, and timers for backoff and quiet periods;
-  - `IdSource`: fresh client IDs, random 53-bit, never 0;
+  - `IdSource`: fresh client IDs, random 32-bit, never 0 (y-sweet's Yrs 0.19.2 reads client IDs as 32-bit; see section 10);
   - `View`: receives the tree, events and notes to show.
 
 **Adapters** (`src/adapters/`), used only by the binary:
@@ -121,7 +121,7 @@ The core depends on no adapter, no tokio, no terminal library and no network lib
 | `open <doc> [--read-only]` | The TUI (6.4). |
 | `edit <doc> <op>… ` | Connects with a fresh client ID, syncs, applies the ops as one batch, waits for `LocalAcked`, prints the new hashes and exits. Ops use the words in 6.5. |
 | `show <doc> [--canonical \| --tree \| --hashes]` | Connects, syncs, prints and exits. `--hashes` prints JSON: the document hash, the snapshot hash, and how many updates arrived before `Synced`. |
-| `replay <vector.json> --peer NAME [--seed N]` | For tests. Applies that peer's batches to the vector's document, with seeded random gaps of 0 to 50 ms. It edits whether or not it's connected, waits for `LocalAcked`, then waits for 500 ms with no new update, and prints `--hashes` JSON. It only accepts single-round vectors, because separate processes can't keep rounds in step. |
+| `replay <vector.json> --peer NAME [--seed N]` | For tests. Pushes that peer's updates, made from its batches on its own replica of the seed with its own client ID, with seeded random gaps of 0 to 50 ms. (Applying the ops by path instead would let concurrent remote updates shift them.) It edits whether or not it's connected, waits for `LocalAcked`, then waits for 500 ms with no new update, and prints `--hashes` JSON. It only accepts single-round vectors, because separate processes can't keep rounds in step. |
 
 **Errors.** Network failures mean reconnect, not exit. A bad op prints an error, and in the TUI the prompt comes back. Only `init` against a document with content, a file that can't be read or parsed, or a vector `replay` can't use exits with a non-zero status.
 
@@ -197,9 +197,9 @@ delete-text <path> <offset> <len>
 
 | Test | Checks |
 | --- | --- |
-| `three_peers_converge_through_chaos` | `init`, then three `replay` peers run one single-round fuzz vector at the same time, through the proxy, for chaos seeds 0 to 4. Every peer's hashes match one another, and match `xmesh::vector::check`'s in-process result for the same vector. |
+| `three_peers_converge_through_chaos` | `init`, then three `replay` peers run one single-round fuzz vector at the same time, through the proxy, for chaos seeds 0 to 4. Once all have finished, a late joiner's hashes match an in-process replica holding the seed and every peer's updates. (A peer that finishes early hasn't seen later peers' edits, so peers' own final hashes aren't compared.) |
 | `late_joiner_loads_in_one_update` | After the three finish, `show --hashes` from a fourth muppet reports the same hashes, with exactly one update before `Synced`. |
-| `offline_edits_survive_reconnects` | With `--drop` high, replay peers keep editing while disconnected, with fresh client IDs on reconnect, and still converge. |
+| `offline_edits_survive_reconnects` | With `--drop` high (0.1 per frame: at 0.2 a replay often can't finish one handshake within the 10 s one-shot timeout), replay peers keep editing while disconnected, with fresh client IDs on reconnect, and still converge. |
 | `ysweet_restart_keeps_the_document` | y-sweet is stopped mid-run and restarted on the same folder; the peers reconnect, and nothing is lost. |
 
 On divergence, a test prints:
@@ -244,3 +244,13 @@ It uses only bash and tools macOS ships with. The README gets a "Try it" section
 - **Done-when items 4 to 6:** key grants, session refusal and the signed handshake. y-sweet can't express them; they're recorded as gaps.
 - **Awareness**, meaning cursors and presence, which the TUI could show later.
 - **Anything in a browser**, which is M2-y-sweet.
+
+## 10. Findings
+
+Found while building part 2, all by testing against a real y-sweet. Live repros are in `tools/yrs-compat`, and the upstream report is tracked in xtxp-link/xtxp-rs#4.
+
+- **Yrs 0.19.2's v1 decoder reads client IDs as 32-bit** (`yrs-0.19.2/src/updates/decoder.rs:144`). An ID of 2^32 or more, which Yrs 0.28 allows, turns into a different client inside y-sweet, and an editor and a late joiner end up with different snapshots. Xmesh now refuses client IDs above `u32::MAX`, as Yjs uses (test `finding_019_reads_client_ids_as_32_bits`). This replaces part 1's 53-bit limit.
+- **Xmesh's diffs left out pending updates (our bug, fixed).** An update applied before its dependencies had arrived waited in Yrs' pending queue, and `encode_diff` doesn't include that queue. So a reconnect's fresh copy, and any step 2, dropped it. A replay batch applied before the first sync was lost, every later batch sat pending in y-sweet, and the replays still reported success. `Xmesh::diff` now merges in the updates it keeps for retrying.
+- **y-sweet's Yrs 0.19.2 can send a step 2 that lists a client's blocks twice** (test `finding_019_step2_repeats_blocks`).
+- **Yrs 0.28 frees a live block when an update repeats blocks over an integrated skip.** `BlockStore::push` ("this replaces an integrated skip") overwrites a block that is already a live item, and the next read crashes. It caused a segfault in about 1 in 25 runs of `offline_edits_survive_reconnects`. Xmesh now merges each incoming update on its own before applying it, which drops the repeats (`crates/xmesh/tests/repeated_blocks.rs`, with the captured bytes). Test `finding_028_frees_a_live_block_on_repeated_blocks` checks that raw Yrs 0.28 still crashes. This is memory unsafety through Yrs' safe API, so it is the most important item in the upstream report.
+- **y-sweet's 102 echo only means "received"**, not "integrated": an update stuck pending is echoed like any other. `LocalAcked` can't detect the two problems above. The e2e tests do, by comparing what a late joiner gets.
