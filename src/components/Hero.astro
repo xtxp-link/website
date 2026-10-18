@@ -4,12 +4,12 @@
 // logo's red + sits on. The paragraph is a centred block with left-aligned text.
 //
 // A small control sits under the logo's right edge: a pause/play button whose icon shows the current state (> while the logo builds, < while it reverses, || while paused) (WCAG 2.2.2: the loop would otherwise run
-// forever) and, on hover or focus, a seek slider spanning the logo's full width. The button is in the page and keyboard-focusable from the start,
+// forever) and, on hover or focus, a seek slider spanning the logo's full width. The slider shows how built the logo is: it reaches the end when the xtxp is complete, rests there, and returns to the start as the logo reverses to the x. The button is in the page and keyboard-focusable from the start,
 // and fades in once the first build has finished, about 2.7 seconds in, inside the five seconds the criterion allows.
 import DraftContentNotice from 'virtual:starlight/components/DraftContentNotice';
 import { LinkButton } from '@astrojs/starlight/components';
 import Logo from './Logo.astro';
-import { TF, TOTAL, HOLD, HERO_DELAY } from '../brand/logo.mjs';
+import { TF, TOTAL, HOLD, R0, HERO_DELAY } from '../brand/logo.mjs';
 
 const { data } = Astro.locals.starlightRoute.entry;
 const { title = data.title, tagline, actions = [] } = data.hero || {};
@@ -22,14 +22,14 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
 <div class="hero">
   <div class="sl-flex stack">
     <div class="sl-flex copy">
-      <div class="logo-block" data-total={TOTAL} data-delay={HERO_DELAY} style={`--ctl-delay:${showControlAt}s;--hero-delay:${HERO_DELAY}s`}>
+      <div class="logo-block" data-total={TOTAL} data-build={TF} data-reverse={R0} data-delay={HERO_DELAY} style={`--ctl-delay:${showControlAt}s;--hero-delay:${HERO_DELAY}s`}>
         <h1 id="_top" data-page-title>
           <Logo mode="loop" centre="plus" class="xtxp-hero-logo" />
           <span class="sr-only" set:html={title} />
         </h1>
         <div class="xtxp-ctl">
           <label class="sr-only" for="xtxp-seek">Seek through the logo animation</label>
-          <input id="xtxp-seek" type="range" min="0" max={TOTAL} step="0.01" value="0" aria-valuetext="0 of {TOTAL} seconds" />
+          <input id="xtxp-seek" type="range" min="0" max={TF} step="0.005" value="0" aria-valuetext="0% built" />
           <button type="button" class="xtxp-play" aria-label="Pause logo animation" aria-pressed="false">
             <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
               <defs>
@@ -94,6 +94,8 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
 
   if (block && logo && button && seek) {
     const total = parseFloat(block.dataset.total ?? '0');
+    const build = parseFloat(block.dataset.build ?? '0'); // the build runs from 0 to here, and the slider with it
+    const reverseAt = parseFloat(block.dataset.reverse ?? '0'); // when the reverse starts
     const delay = parseFloat(block.dataset.delay ?? '0'); // the loop's first iteration waits for the fade-in
     let userPaused = false;
     let onScreen = true;
@@ -116,14 +118,19 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
       apply();
     };
 
-    // Where the loop is now, in seconds from the start of the first build.
+    // How built the logo is, in build-seconds: 0 is the lone x, `build` is the finished xtxp. It rises during the build,
+    // rests at the end through the hold, falls back to 0 as the logo reverses, and rests at 0 before the loop restarts.
     const position = () => {
       const t = anims()[0]?.currentTime;
       if (typeof t !== 'number') return 0;
-      return Math.max(0, (t / 1000 - delay) % total);
+      const s = Math.max(0, (t / 1000 - delay) % total);
+      if (s < build) return s;
+      if (s < reverseAt) return build;
+      if (s < reverseAt + build) return build - (s - reverseAt);
+      return 0;
     };
 
-    const describe = (s: number) => seek.setAttribute('aria-valuetext', `${s.toFixed(1)} of ${total.toFixed(1)} seconds`);
+    const describe = (s: number) => seek.setAttribute('aria-valuetext', `${Math.round((s / build) * 100)}% built`);
 
     // Keep the thumb on the animation while the slider is on show.
     const follow = () => {
@@ -156,7 +163,8 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
 
     button.addEventListener('click', () => setPaused(!userPaused));
 
-    // Dragging the slider scrubs the logo and pauses it; press play to carry on from there.
+    // Dragging the slider scrubs the logo through its build (it shows the build state at that point) and pauses it;
+    // press play to carry on from there.
     seek.addEventListener('input', () => {
       const s = parseFloat(seek.value);
       if (!userPaused) setPaused(true);
