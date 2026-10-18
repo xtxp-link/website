@@ -2,6 +2,7 @@
 <html><head><meta charset="utf-8">
 <!-- Link-preview card, 1200x630. Centred on the logo's red +, per the brand guide
      (the logo uses the plus-centred viewBox, HERO_VIEWBOX in src/brand/logo.mjs).
+     The title's two "to"s and the URL's dot are centred under the +.
      Everything sits in the centre 630x630 square,
      because Slack crops the image to a centred square thumbnail while WhatsApp and
      others show it whole. Render with scripts/social/render.mjs. -->
@@ -13,11 +14,33 @@
   .col{width:610px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:34px}
   .logo svg{width:610px;height:auto;display:block}
   h1{font-size:58px;line-height:1.08;margin:0;font-weight:700;letter-spacing:-.01em}
-  .url{font-size:30px;color:#ff5436;font-weight:600}
+  
+  .line{white-space:nowrap}
+  .t{color:#ff5436}
+  .p{color:#7d7d83}
+  .url{font-size:30px;font-weight:600;color:#3a3f4b}
+  .dot{color:#ff5436}
 </style></head>
 <body><div class="wrap"><div class="col">
-  <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" class="xtxp-logo" viewBox="-64 -20 192 54" role="img" aria-label="XTXP"><style>.xtxp-logo{--xl-x:#eceff7;--xl-t:#ff5436;--xl-p:#7d7d83}.xtxp-logo .xl-l,.xtxp-logo .xl-r{stroke:var(--xl-x)}.xtxp-logo .xl-c{stroke:var(--xl-t)}.xtxp-logo .xl-p{stroke:var(--xl-p)}.xtxp-logo .xl-ol,.xtxp-logo .xl-p{stroke-dasharray:1 2}</style><g fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path class="xl-c" d="M-14 -14L14 14M14 -14L-14 14" stroke-width="9.9" transform="translate(32 0) rotate(45) scale(.606)"/><g class="xl-l"><path d="M14 -14L0 0L14 14"/><path class="xl-ol" pathLength="1" d="M0 0L-14 -14"/><path class="xl-ol" pathLength="1" d="M0 0L-14 14"/></g><g class="xl-r" transform="translate(64 0)"><path d="M-14 -14L0 0L-14 14"/><path class="xl-ol" pathLength="1" d="M0 0L14 -14"/><path class="xl-ol" pathLength="1" d="M0 0L14 14"/></g><path class="xl-p" pathLength="1" d="M0 -14V28M0 0A14 14 0 1 1 28 0A14 14 0 1 1 0 0" transform="translate(92 0)"/></g></svg>
+  <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" class="xtxp-logo" viewBox="-64 -20 192 54" role="img" aria-label="XTXP"><style>.xtxp-logo{--xl-x:#eceff7;--xl-t:#ff5436;--xl-p:#7d7d83}.xtxp-logo .xl-l,.xtxp-logo .xl-r{stroke:var(--xl-x)}.xtxp-logo .xl-c{stroke:var(--xl-t)}.xtxp-logo .xl-p{stroke:var(--xl-p)}.xtxp-logo .xl-ol,.xtxp-logo .xl-p{stroke-dasharray:1 2}  .line{white-space:nowrap}
+  .t{color:#ff5436}
+  .p{color:#7d7d83}
+  .url{font-size:30px;font-weight:600;color:#3a3f4b}
+  .dot{color:#ff5436}
+</style><g fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path class="xl-c" d="M-14 -14L14 14M14 -14L-14 14" stroke-width="9.9" transform="translate(32 0) rotate(45) scale(.606)"/><g class="xl-l"><path d="M14 -14L0 0L14 14"/><path class="xl-ol" pathLength="1" d="M0 0L-14 -14"/><path class="xl-ol" pathLength="1" d="M0 0L-14 14"/></g><g class="xl-r" transform="translate(64 0)"><path d="M-14 -14L0 0L-14 14"/><path class="xl-ol" pathLength="1" d="M0 0L14 -14"/><path class="xl-ol" pathLength="1" d="M0 0L14 14"/></g><path class="xl-p" pathLength="1" d="M0 -14V28M0 0A14 14 0 1 1 28 0A14 14 0 1 1 0 0" transform="translate(92 0)"/></g></svg>
 </div>
-  <h1>XML to XML<br>Protocol</h1>
-  <div class="url">xtxp.link</div>
-</div></div></body></html>
+  <h1>
+    <div class="line">XML <span class="pivot t">to</span> XML</div>
+    <div class="line p">Pro<span class="pivot">to</span>col</div>
+  </h1>
+  <div class="line url">xtxp<span class="pivot dot">.</span>link</div>
+</div></div><script>
+  // Each line is shifted so its .pivot is centred on the page's centre line, where the logo's red + sits:
+  // the "to" of "XML to XML", the "to" in "Protocol", and the dot in xtxp.link all line up under the +.
+  const mid = document.documentElement.clientWidth / 2;
+  for (const line of document.querySelectorAll('.line')) {
+    const r = line.querySelector('.pivot').getBoundingClientRect();
+    line.style.transform = `translateX(${mid - (r.left + r.width / 2)}px)`;
+  }
+</script>
+</body></html>
