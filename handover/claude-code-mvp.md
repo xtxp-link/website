@@ -75,9 +75,10 @@ vectors/              generated and hand-written JSON vectors
 - **Moves:** the numbered algorithm on the Math page. Spike `yrs_tree` against it first; adopt it only if it gives the same trees on every vector.
 - **Canonical XML:** canonical form v0, as on the Math page (decision 21).
 - **Wire:** Yjs sync step 1 and 2 plus updates, as Yrs v1 updates in XTXP frames over WebSocket; `hello`, `challenge`, `prove`, `bind`; `grant` and `revoke` for write access. Expect this to change (decision 21).
-- **Identity:** Ed25519 keys loaded from files. Sign-in to fetch keys is out of scope for M1.
+- **Identity:** Ed25519 keys loaded from files, every signature domain-tagged as on the Identity page (decision 22). Static grants signed by the owner. Sign-in to fetch keys is out of scope for M1.
+- **Chaos proxy:** between peers and host, dropping, delaying and duplicating frames.
 - **Sessions:** one shared session, `@main`. Each peer connection edits in its own session with a fresh client ID, and the host admits it into `@main` by merging (decision 19). Named forks, previews and trust come later.
-- **Storage:** append updates, compact periodically.
+- **Storage:** files on disk; append updates, compact periodically.
 
 ### Done when
 
@@ -86,8 +87,9 @@ vectors/              generated and hand-written JSON vectors
 3. A late joiner loads the full state in one update.
 4. A key without a write grant has its session refused: never merged into `@main`, and the other peers keep converging.
 5. After a revocation reaches the host, that key's session stops being merged.
-6. A fork rebuilt from its snapshot keeps content deleted after the fork, and deleting a shape changes the ETag hash.
-7. All of the above runs in CI.
+6. A signature made for one host, session or purpose is rejected anywhere else.
+7. A fork rebuilt from its snapshot keeps content deleted after the fork, and deleting a shape changes the ETag hash.
+8. All of the above runs in CI.
 
 ## 6. M2: Inkscape plus a browser with no JavaScript
 
@@ -116,8 +118,8 @@ From the [open questions](https://xtxp.link/discussion/open-questions/) page:
 
 From the spec review (`handover/review-decisions.md`, section A for M1 and B for M2), *pending review*:
 
-- **Decided** (decisions 19 to 21): snapshots name points in history, with a short hash in URLs and ETags (A1); hosts admit or refuse whole sessions, and every connection edits in its own session (A2); a fresh client ID per session per connection (A3); the move algorithm (A4) and tree schema (A5), both on the Math page; canonical form v0 (A6); Yrs v1 updates in XTXP frames as the starting wire format (A7, which David expects to need further work).
-- **M1, pending:** handshake domain separation (A8); the smallest M1 (A9).
+- **Decided** (decisions 19 to 22): snapshots name points in history, with a short hash in URLs and ETags (A1); hosts admit or refuse whole sessions, and every connection edits in its own session (A2); a fresh client ID per session per connection (A3); the move algorithm (A4) and tree schema (A5), both on the Math page; canonical form v0 (A6); Yrs v1 updates in XTXP frames as the starting wire format (A7, which David expects to need further work); domain-tagged Ed25519 signatures (A8); the smallest M1 (A9).
+- **M1:** nothing left pending from the review.
 - **M2:** the Inkscape adapter contract (B1); the no-JS editing model (B2); SVG sanitising, CSP, a separate content origin and CSRF (B3); device keys for no-JS users (B4); native documents only (B5).
 
 Everything else can wait until after M2.

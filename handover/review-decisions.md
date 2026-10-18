@@ -44,11 +44,11 @@ The order in which nodes caught in a cycle are reattached isn't pinned, so two i
 The spec currently implies three: binary Yrs updates, an `application/xtxp+xml` "patch stream" over HTTP, and XML Patch.
 *Recommendation:* on the wire, XTXP carries Yrs updates in one encoding (v1 or v2) inside XTXP frames. XML Patch is only an import and export format for edits. Either drop the HTTP "raw patch stream" from content negotiation, or make it an upgrade to the WebSocket binding.
 
-**A8. Handshake security** [2.10, high]
+**A8. Handshake security** [2.10, high] — **decided** (decision 22), as recommended.
 Signing only a random challenge lets a malicious host relay it and log in elsewhere as the victim.
 *Recommendation:* Ed25519; the signed challenge includes a domain tag, the host's name, the session and the nonce. Awareness messages are scoped to the authenticated connection.
 
-**A9. Smallest M1** [3.1]
+**A9. Smallest M1** [3.1] — **decided** (decision 22), as recommended, with the y-sweet review first.
 *Recommendation:* one host binary, `@main` only, three CLI peers (one a late joiner), key files, static grants signed by the owner, file storage, a chaos proxy that drops, delays and duplicates frames, and revocation either left out of M1 or limited to "refuse and disconnect".
 
 ## B. Blocking M2

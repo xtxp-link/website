@@ -89,6 +89,11 @@ Each node is keyed by the ID of the operation that created it, and holds its kin
 - **Hashes use Xmesh canonical form v0**: UTF-8, deleted nodes left out, attributes sorted by expanded name, fixed prefixes for known namespaces, no whitespace outside text, minimal escaping. Versioned. See [The Math](/spec/math/#canonical-form-v0).
 - **On the wire, peers exchange Yrs v1 updates in XTXP frames.** XML Patch is only for import and export. HTTP serves browsers; the stream is a WebSocket upgrade. This is a starting point to build on, and needs further work. See [The Wire](/spec/wire/#one-wire-format-to-start).
 
+## 22. Handshake signatures, and the smallest M1
+
+- **Ed25519 keys, with a domain tag on every signature.** A challenge answer also covers the host's name, the session address and the nonce, so it can't be relayed to sign in elsewhere. Bindings and grants have tags of their own. Cursors and presence are tied to the authenticated connection. See [Identity and access](/spec/identity/#what-gets-signed).
+- **M1 is deliberately small:** one host binary serving `@main`, three CLI peers (one a late joiner) each in their own session, key files, static signed grants, file storage, a chaos proxy, and revocation only as "stop merging". See [Milestones](/build/milestones/#m1--headless-convergence).
+
 ## Naming
 
 - **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.

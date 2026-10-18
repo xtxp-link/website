@@ -14,7 +14,7 @@ d -> sso : SSO (Google, Apple, Mozilla)
 sso --> d : private key for P,\nfrom the user's own storage
 d -> t : hello (public key P)
 t --> d : challenge (random nonce)
-d -> t : prove: signature over the nonce
+d -> t : prove: sign(xtxp-auth-v0,\nhost, session, nonce)
 t -> t : P verified for this connection
 
 == binding: the one signature that gives authorship ==

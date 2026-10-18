@@ -41,6 +41,7 @@ And the tree rules ([decision 20](/discussion/decisions/#20-the-tree-schema-and-
 - **Move versus reorder:** a concurrent move and reorder of one node never mixes one person's parent with the other's position.
 - **Same-spot inserts:** two peers inserting at the same place get distinct, consistently ordered positions.
 - **Deletion:** edits inside a deleted node merge, stay hidden, and come back on undelete; a move into a deleted node is hidden with it.
+- **Signatures:** a challenge answer, binding or grant is rejected on a different host, for a different session, or under the wrong domain tag.
 - **Mixed content and namespaces:** `<text>` with interleaved `<tspan>`s, and `inkscape:` and `sodipodi:` attributes, round-trip.
 
 

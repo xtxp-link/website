@@ -20,11 +20,23 @@ XTXP identifies a user by a **public key** and authenticates them by proof that 
 
 Signing every operation would be heavy, so XTXP signs only the steps that establish **who** is acting:
 
-1. **Connecting.** The host sends a random challenge and the peer signs it, proving it holds the key.
+1. **Connecting.** The host sends a random challenge and the peer signs it, proving it holds the key. The peer signs the challenge together with the host's name and the session address, so a malicious host can't pass the challenge on and use the answer to sign in somewhere else as that user.
 2. **Binding a client ID.** Every Xmesh operation already carries a client ID. A peer signs one statement, *"public key P owns client 7 on session `{host}/{path}@{name}`,"* and from then on every operation from client 7 is attributed to P. **A client ID is fresh for every session and every connection**: a fork shares item IDs with its parent, so one client ID used on two sessions would make two different items with the same ID, and a merge would silently drop one. A host rejects a binding for a client ID already anywhere in the session's history, including history it inherited from its parent. Yrs picks client IDs at random, so a fresh one costs nothing. The redline gets authorship with no per-operation cost.
 3. **Granting and revoking.** Changes to who may read or write are signed by the person making them, so anyone can check them.
 
-Operations themselves travel unsigned, over an authenticated connection.
+Operations themselves travel unsigned, over an authenticated connection. Cursors and presence are tied to that connection too, so nobody can show a cursor as someone else.
+
+### What gets signed
+
+<span class="status status--decided">decided</span> ([decision 22](/discussion/decisions/#22-handshake-signatures-and-the-smallest-m1))
+
+Keys are **Ed25519**. Every signature covers a **domain tag** naming what kind of statement it is, so a signature made for one purpose can never be reused for another:
+
+| Statement | Domain tag | Also covers |
+| --- | --- | --- |
+| Answering a challenge | `xtxp-auth-v0` | the host's name, the session address, the nonce |
+| Binding a client ID | `xtxp-bind-v0` | the client ID, the session address |
+| Granting or revoking | `xtxp-grant-v0` | the key, the access level, the session address |
 
 <Diagram name="15-seq-identity" alt="Sequence: the owner signs in through a provider and fetches their private key from their own storage, answers the host's challenge, binds client 7 to their key, sends unsigned operations, grants a collaborator write access, then revokes it; the collaborator's later operations are not admitted: the collaborator's session stops being merged and stays theirs." />
 

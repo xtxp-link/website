@@ -34,13 +34,13 @@ The sync messages follow the [Yjs sync protocol](/discussion/prior-art/#the-yjs-
 
 | Message | Purpose | Stored? |
 | --- | --- | --- |
-| `hello` / `challenge` / `prove` | Authenticate a connection by public key. See [Identity and access](/spec/identity/). | No |
+| `hello` / `challenge` / `prove` | Authenticate a connection by public key. The proof signs the host, session and nonce under a domain tag. See [Identity and access](/spec/identity/#what-gets-signed). | No |
 | `bind` | Signed: "public key P owns client ID 7 on this session." | Yes |
 | `sync-1` | "Here is my state vector." | No |
 | `sync-2` | "Here are the operations you're missing." | Yes, as operations |
 | `update` | New operations, as they happen. | Yes |
 | `grant` / `revoke` | Signed changes to who may read or write a session. | Yes |
-| `awareness` | Cursors, selections, presence. Fire-and-forget, overwritten, never archived. | No |
+| `awareness` | Cursors, selections, presence, tied to the authenticated connection. Fire-and-forget, overwritten, never archived. | No |
 
 Cursors and presence travel separately from operations. A 60 Hz cursor stream should never be archived, wrapped in anything heavy, or replayed to a late joiner.
 
