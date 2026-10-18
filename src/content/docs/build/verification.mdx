@@ -42,6 +42,7 @@ And the tree rules ([decision 20](/discussion/decisions/#20-the-tree-schema-and-
 - **Same-spot inserts:** two peers inserting at the same place get distinct, consistently ordered positions.
 - **Deletion:** edits inside a deleted node merge, stay hidden, and come back on undelete; a move into a deleted node is hidden with it.
 - **Signatures:** a challenge answer, binding or grant is rejected on a different host, for a different session, or under the wrong domain tag.
+- **Duplicate ids:** two sessions creating the same `id` merge, converge, and flag the duplicate.
 - **Mixed content and namespaces:** `<text>` with interleaved `<tspan>`s, and `inkscape:` and `sodipodi:` attributes, round-trip.
 
 

@@ -57,6 +57,7 @@ See [Identity and access](/spec/identity/#still-open).
 
 - **Discovery:** how a host finds out which sessions on other hosts trust, or are trusted by, its own.
 - **Website sessions:** an ordinary website isn't a MUPPET, so its sessions live on other hosts. How they appear under the website's address, through a disco, is part of the [muppet disco](/spec/disco/#still-open) design.
+- **Duplicate ids after a merge:** the resolution algorithm, how a person is brought in, and whether partitioned ids such as `path-123` are worth an experiment. See [conflicts above the CRDT](/spec/sessions/#conflicts-above-the-crdt).
 - **Trust management:** who may set up trust into a session (its owner only, or anyone with write access), and how trust is shown to collaborators.
 
 ## The muppet disco

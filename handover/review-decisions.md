@@ -53,23 +53,23 @@ Signing only a random challenge lets a malicious host relay it and log in elsewh
 
 ## B. Blocking M2
 
-**B1. Inkscape adapter contract** [3.2.1, high]
+**B1. Inkscape adapter contract** [3.2.1, high] — **decided, with a change** (decision 23): no automatic id suffixes. The document is exactly the user's version; duplicate ids after a merge are a conflict to resolve, possibly with a person deciding. Partitioned ids are a future experiment.
 - mapping between node IDs and Inkscape's XML nodes
 - suppressing echoes, so remote changes aren't recaptured as local edits
 - how Ctrl+Z works: the reviewer recommends a Yrs undo manager scoped to the local user, bypassing Inkscape's own undo stack for shared documents
 - collisions in Inkscape's auto-generated `id`s, which break `url(#…)` references
 - unsupported node kinds
 
-**B2. The no-JS editing model** [3.2.3, high]
+**B2. The no-JS editing model** [3.2.3, high] — **decided** (decision 23).
 Which forms exist (select, edit attribute, recolour, move, delete, add a basic shape), and how a POST names its target.
 
-**B3. Rendering safety** [2.15, high]
+**B3. Rendering safety** [2.15, high] — **decided** (decision 23).
 User SVG can carry scripts. Sanitise it, apply a strict CSP, and serve user content from a separate origin. Edit forms need CSRF protection.
 
-**B4. Keys for no-JS users** [2.13, 3.2.4, medium]
+**B4. Keys for no-JS users** [2.13, 3.2.4, medium] — **decided** (decision 23).
 *Recommendation:* a server-generated device key per sign-in, granted by the owner, rather than the server holding a user's root key.
 
-**B5. Website scope for M2** [3.2.7, medium]
+**B5. Website scope for M2** [3.2.7, medium] — **decided** (decision 23): native documents only.
 *Recommendation:* native documents only; no website overlays yet.
 
 ## C. Can wait until after M2

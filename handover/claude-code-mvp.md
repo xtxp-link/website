@@ -98,8 +98,10 @@ vectors/              generated and hand-written JSON vectors
 ### Scope
 
 - **Xmesh C interface**, linked into an Inkscape fork. The fork's build needs a Rust toolchain.
-- **Inkscape adapter:** start from Inkboard's code (`src/jabber_whiteboard/` in Inkscape 0.46). Capture edits at Inkscape's undo transaction commit, so each action becomes one batch of operations. Apply incoming operations outside the local undo stack. Test the known Inkboard pitfalls: automatically named gradients and patterns, `defs` and metadata, and new windows.
-- **Server-side MUPPET:** renders the drawing as HTML and SVG, accepts edits as form POSTs, redirects, and serves `ETag`/`304` for meta-refresh polling (see the no-JS edit diagram on the Addressing page).
+- **Inkscape adapter:** start from Inkboard's code (`src/jabber_whiteboard/` in Inkscape 0.46). Capture edits at Inkscape's undo transaction commit, so each action becomes one batch of operations. Apply incoming operations outside the local undo stack. Follow the adapter contract on the Inkscape fork page (decision 23): side-table node mapping, echo suppression, Ctrl+Z as a Yrs undo of the user's own session, never rewriting `id`s. Test the known Inkboard pitfalls: automatically named gradients and patterns, `defs` and metadata, and new windows.
+- **Server-side MUPPET:** renders the drawing as HTML and SVG, accepts edits as form POSTs, redirects, and serves `ETag`/`304` for meta-refresh polling (see the no-JS edit diagram on the Addressing page). The forms, sanitising, `script-src 'none'`, a separate content origin and CSRF tokens are on the Addressing page (decision 23).
+- **No-JS identity:** a server-generated device key per sign-in, granted by the drawing's owner.
+- **Duplicate ids:** detect and flag them after a merge. The resolution algorithm is open.
 - **Addressing:** the host serves its own sessions at `https://{host}/{path}@{ref}`, with bare URLs redirecting to `@main`. No muppet disco: xtxp.link doesn't serve documents.
 
 ### Done when
@@ -107,6 +109,8 @@ vectors/              generated and hand-written JSON vectors
 1. Inkscape and a browser with JavaScript disabled edit the same drawing, and both see each other's changes.
 2. One Inkscape action becomes one batch of operations, and Ctrl+Z in Inkscape undoes only that user's own actions.
 3. Unchanged polls return `304 Not Modified`.
+4. A drawing containing a script renders with the script stripped, under `script-src 'none'`.
+5. Two sessions creating the same `id` merge, converge, and the duplicate is flagged.
 
 ## 7. Open points to settle at the start
 
@@ -119,8 +123,7 @@ From the [open questions](https://xtxp.link/discussion/open-questions/) page:
 From the spec review (`handover/review-decisions.md`, section A for M1 and B for M2), *pending review*:
 
 - **Decided** (decisions 19 to 22): snapshots name points in history, with a short hash in URLs and ETags (A1); hosts admit or refuse whole sessions, and every connection edits in its own session (A2); a fresh client ID per session per connection (A3); the move algorithm (A4) and tree schema (A5), both on the Math page; canonical form v0 (A6); Yrs v1 updates in XTXP frames as the starting wire format (A7, which David expects to need further work); domain-tagged Ed25519 signatures (A8); the smallest M1 (A9).
-- **M1:** nothing left pending from the review.
-- **M2:** the Inkscape adapter contract (B1); the no-JS editing model (B2); SVG sanitising, CSP, a separate content origin and CSRF (B3); device keys for no-JS users (B4); native documents only (B5).
+- **M1 and M2:** nothing left pending from the review. M2's contracts are decision 23.
 
 Everything else can wait until after M2.
 

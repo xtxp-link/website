@@ -11,6 +11,16 @@ Inkscape's mainstream extension system runs scripts per action, with no live acc
 
 Inkscape already groups every user action into a transaction of XML change events and commits it as one undo step ([prior art](/discussion/prior-art/#inkscapes-undo-stack)). The fork's MUPPET adapter hooks that commit, so each Inkscape action becomes one batch of XTXP operations, with the same grouping as Inkscape's own undo. Incoming operations are applied to the XML tree outside the local undo stack, so Ctrl+Z only ever undoes the user's own actions.
 
+## The adapter contract
+
+<span class="status status--decided">decided</span> ([decision 23](/discussion/decisions/#23-the-m2-contracts-inkscape-no-js-editing-rendering-safety))
+
+- **Node mapping.** A side table inside the adapter maps Xmesh node IDs to Inkscape's XML nodes. Nothing extra is written into the document.
+- **No echoes.** A flag stays set while remote edits are applied, so they aren't captured again as local edits.
+- **Ctrl+Z.** Inkscape's undo transactions decide what one step is. Yrs's undo manager carries it out, undoing only this user's own edits in their own session. In shared documents it replaces Inkscape's own undo stack.
+- **The document is exactly your version.** The adapter never rewrites `id`s. If two sessions each create the same `id`, say `path123`, merging them still converges, but leaves a [duplicate id](/spec/sessions/#conflicts-above-the-crdt) to resolve.
+- **Unsupported node kinds.** Comments and processing instructions are dropped in M2, with a warning. CDATA becomes text.
+
 ## The Inkboard warning
 
 Inkboard, the earlier attempt to sync Inkscape over XMPP, also lived in a branch. It was disabled in Inkscape 0.47 because it was broken. See [prior art](/discussion/prior-art/#inkboard-and-pedro).

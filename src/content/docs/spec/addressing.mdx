@@ -90,6 +90,22 @@ The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp:
 
 <Diagram name="04-seq-nojs-edit" alt="Sequence: the browser POSTs a form to the hosting instance, which hands it to its server MUPPET, which makes CRDT ops and sends them to the host; the host fans them out to Inkscape; the browser is redirected and GETs the new HTML; later meta-refresh polls get 304 Not Modified unless someone edited." />
 
+### Forms
+
+<span class="status status--decided">decided</span> for M2 ([decision 23](/discussion/decisions/#23-the-m2-contracts-inkscape-no-js-editing-rendering-safety))
+
+- **The forms:** select an element (a link per element), edit an attribute, recolour, move (x and y fields, or nudge buttons), delete, and add a basic shape.
+- **Every POST carries** the node ID it acts on and the snapshot hash the page was rendered from, so the host can tell when someone edited a stale page.
+- **Every form carries a CSRF token.**
+
+### Rendering safely
+
+User SVG can carry scripts, so the server-side MUPPET:
+
+- **sanitises** it, stripping scripts, `on…` attributes, `foreignObject` and external references
+- serves it with a **CSP of `script-src 'none'`**, which costs nothing, because the no-JS view has no scripts anyway
+- serves rendered user content from a **separate origin**
+
 ## Deep links and short links
 
 - **Snapshots**: `@{snapshot}` names a document at an exact point in history, so a historical state can be shared exactly. How the snapshot hash is written in a URL is <span class="status status--open">open</span>.

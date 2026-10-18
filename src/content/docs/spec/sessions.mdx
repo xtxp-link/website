@@ -95,6 +95,16 @@ XTXP starts with those, and [y-sweet](/discussion/prior-art/#y-sweet) already im
 
 On Yrs: a **fork** is a new document seeded with the parent's state at the fork's snapshot (which needs Yrs's garbage collection off). A **merge** encodes the session's updates since the fork and applies them to the parent.
 
+### Conflicts above the CRDT
+
+<span class="status status--draft">draft</span> ([decision 23](/discussion/decisions/#23-the-m2-contracts-inkscape-no-js-editing-rendering-safety))
+
+A merge always converges: there's never a conflict in the CRDT sense. But the merged document can still break a rule of the document type. The first case is **duplicate `id`s**: two sessions can each create `path123`, as git lets two branches hold different files at the same path, and once merged, `url(#path123)` references become ambiguous.
+
+- **Documents are never silently rewritten.** What's in a session is exactly what its people made.
+- **A merge that produces a duplicate `id` is flagged** as a conflict to resolve. The resolution algorithm is [open](/discussion/open-questions/#hosting-and-sessions), possibly with a person deciding.
+- **Partitioned ids**, such as `path-123` with a per-session part, would be an explicit, permanent part of the document. They're left to a future experiment.
+
 ## Lifecycle
 
 <Diagram name="08-state-session" alt="State machine: Forked, Active, Paused, Proposed, Merged and Abandoned, with merged and abandoned sessions kept as history." />
