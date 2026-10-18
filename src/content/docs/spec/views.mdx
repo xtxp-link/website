@@ -1,6 +1,6 @@
 ---
 title: 'Views: onion skin and redline'
-description: Seeing edits before they merge. Onion skin, redline, paused queues and session previews, all owned by MUPPET.
+description: Seeing edits before they merge. Onion skin, redline, paused queues and session previews, all owned by muppet.
 ---
 
 <span class="status status--decided">decided</span> as a requirement, <span class="status status--draft">draft</span> in detail.
@@ -25,15 +25,15 @@ Collaborators need to see edits **before they merge**. Neither the original desi
 
 ## Who renders them
 
-All views belong to **MUPPET**. They are ephemeral changes to the displayed tree and never change the state of the session being viewed.
+All views belong to **`muppet`**. They are ephemeral changes to the displayed tree and never change the state of the session being viewed.
 
-That holds wherever a MUPPET runs:
+That holds wherever a `muppet` runs:
 
 - **in Inkscape**, the views draw on the canvas
 - **in the browser via Wasm**, they draw in the page
 - **on the server for a no-JS browser**, they are rendered as plain SVG layers and HTML
 
-Because server-side rendering is just a server-side MUPPET, the no-JS view and the native view come from the same code.
+Because server-side rendering is just a server-side `muppet`, the no-JS view and the native view come from the same code.
 
 ## What the engine must provide
 

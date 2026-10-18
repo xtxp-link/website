@@ -3,12 +3,12 @@
 title Discovery and content negotiation
 
 participant "Client" as c
-participant "Muppet disco\n(xtxp.link)" as gw
-participant "Hosting MUPPET" as node
+participant "muppet disco\n(xtxp.link)" as gw
+participant "Hosting muppet" as node
 
 c -> gw : GET https://xtxp.link/{host}/{path}@{ref}\n(+ query signed by the client's key)
-gw -> gw : which MUPPETs host sessions\nof {host}/{path} that this key may see?
-gw --> c : 303 → the hosting MUPPET\n(or a list of visible sessions)
+gw -> gw : which muppets host sessions\nof {host}/{path} that this key may see?
+gw --> c : 303 → the hosting muppet\n(or a list of visible sessions)
 
 alt WebSocket upgrade
   c -> node : upgrade to WebSocket
@@ -21,7 +21,7 @@ end
 note over gw
   The disco hosts nothing, and anyone can run one.
   It is a future milestone; until then a client
-  goes straight to the hosting MUPPET.
+  goes straight to the hosting muppet.
 end note
 
 note over c, node

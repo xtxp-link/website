@@ -4,7 +4,7 @@ title Deployment: where each piece runs
 
 node "Desktop" {
   component "Inkscape fork" as ink
-  component "MUPPET\n(Xmesh via C interface)" as m1
+  component "muppet\n(Xmesh via C interface)" as m1
   ink - m1
 }
 
@@ -13,23 +13,23 @@ node "Browser A — no JS" {
 }
 
 node "Browser B" {
-  component "MUPPET\n(Xmesh in Wasm)" as m2
+  component "muppet\n(Xmesh in Wasm)" as m2
 }
 
 node "Phone" {
   component "XMPP client\n(Conversations-style)" as phone
 }
 
-cloud "Muppet disco (future milestone)" {
+cloud "muppet disco (future milestone)" {
   component "xtxp.link\nfinds hosts; serves no sessions" as gw
 }
 
-node "Hosting server: headless MUPPETs\none binary, or one Durable Object per session" {
+node "Hosting server: headless muppets\none binary, or one Durable Object per session" {
   component "WebSocket endpoint" as ws
-  component "Server MUPPET\n(renders for no-JS)" as m3
-  component "Host: @main\n(headless MUPPET)" as t0
-  component "Host: @sketch\n(headless MUPPET)" as t1
-  component "Host: @review\n(headless MUPPET)" as t2
+  component "Server muppet\n(renders for no-JS)" as m3
+  component "Host: @main\n(headless muppet)" as t0
+  component "Host: @sketch\n(headless muppet)" as t1
+  component "Host: @review\n(headless muppet)" as t2
   database "Session storage\n(append + compact)" as store
 }
 

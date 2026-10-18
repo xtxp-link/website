@@ -9,7 +9,7 @@ The web began as a medium you could write as well as read. XTXP aims to finish t
 
 ## The goal: XTXP in the browser
 
-**XTXP as a first-class web standard, built into the browser.** A browser that speaks XTXP runs its own MUPPET, opens `xtxp://` links, and treats any page as a live document that many people can edit, fork into sessions and merge, with no JavaScript on the page and no app to install. Collaboration becomes part of the web itself, the way links and forms are.
+**XTXP as a first-class web standard, built into the browser.** A browser that speaks XTXP runs its own `muppet`, opens `xtxp://` links, and treats any page as a live document that many people can edit, fork into sessions and merge, with no JavaScript on the page and no app to install. Collaboration becomes part of the web itself, the way links and forms are.
 
 ### Compatible everywhere
 
@@ -17,9 +17,9 @@ Backwards compatibility is part of the standard, so XTXP works in every browser,
 
 | Browser | How it takes part |
 | --- | --- |
-| **Speaks XTXP** | Runs its own MUPPET natively. The goal. |
-| **Runs JavaScript** | A **Wasm MUPPET** polyfills the same engine into the page. |
-| **No JavaScript** | **Plain forms, links and HTTP caching**, with a server-side MUPPET doing the CRDT work on the browser's behalf. A full participant, not a fallback. |
+| **Speaks XTXP** | Runs its own `muppet` natively. The goal. |
+| **Runs JavaScript** | A **Wasm `muppet`** polyfills the same engine into the page. |
+| **No JavaScript** | **Plain forms, links and HTTP caching**, with a server-side `muppet` doing the CRDT work on the browser's behalf. A full participant, not a fallback. |
 
 Native apps (Inkscape) and mobile clients (through an XMPP bridge) are peers on the same mesh. Every client may get more or less on screen, but none gets a *different* document.
 

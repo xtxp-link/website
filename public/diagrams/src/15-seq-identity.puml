@@ -3,7 +3,7 @@
 title Identity and access: sign in, bind, grant, revoke
 
 actor "Owner\n(key P)" as o
-participant "Device\n(MUPPET)" as d
+participant "Device\n(muppet)" as d
 participant "Sign-in provider\n+ user's storage" as sso
 participant "Host\n(session @review)" as t
 actor "Collaborator\n(key Q)" as q

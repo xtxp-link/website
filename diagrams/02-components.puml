@@ -13,14 +13,14 @@ package "Xmesh — the engine (Rust)" as engine {
   component "Native C++ Xmesh\n<<later spike>>" as xcpp #line.dashed
 }
 
-package "MUPPET — the executor (Xmesh plus views)" as muppet {
+package "muppet — the executor (Xmesh plus views)" as muppet {
   component "Inkscape adapter\n<<C++, in the fork>>" as mink
   component "Browser adapter\n<<Wasm>>" as mwasm
-  component "Server MUPPET\n<<renders HTML/SVG for no-JS>>" as msrv
+  component "Server muppet\n<<renders HTML/SVG for no-JS>>" as msrv
   component "Canvas, spatial chat\nand comments\n(views, shared by all adapters)" as mviews
 }
 
-package "MUPPET hosting a session (headless)" as hosting {
+package "muppet hosting a session (headless)" as hosting {
   component "Host\n(admit, route, store;\nmerges from trusted sessions)" as session
   database "Session storage\n(append + compact;\nledger on the roadmap)" as store
 }

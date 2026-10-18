@@ -1,6 +1,6 @@
 ---
 title: Sessions and history
-description: Sessions as lightweight forks of a document's history, from a user's private scratch state to a shared main line, each hosted by one MUPPET and merged by applying their updates.
+description: Sessions as lightweight forks of a document's history, from a user's private scratch state to a shared main line, each hosted by one muppet and merged by applying their updates.
 ---
 
 import Diagram from '../../../components/Diagram.astro';
@@ -11,7 +11,7 @@ import Diagram from '../../../components/Diagram.astro';
 
 A **session** is a fork of a document's history at a point given by a [snapshot](/spec/math/#snapshots-name-points-in-history): a branch, in git's terms. Sessions are meant to be cheap enough to make one per person, per proposal or per visit. That one idea covers several features:
 
-- **A personal session** is one user's own state, which may never leave that user's own MUPPET: a private scratch copy, a draft, or the state an ordinary web session would keep today. See [use cases](/overview/use-cases/#user-sessions).
+- **A personal session** is one user's own state, which may never leave that user's own `muppet`: a private scratch copy, a draft, or the state an ordinary web session would keep today. See [use cases](/overview/use-cases/#user-sessions).
 - **Undo** forks a session from an earlier point, so history is never thrown away.
 - **A proposed edit** is a session that hasn't been merged yet.
 - **A preview** draws a session over its parent.
@@ -44,7 +44,7 @@ Where they differ from Inkscape: in Inkscape, undoing and then making a new edit
 
 ## Hosting a session
 
-Any MUPPET can **host** a session. A host holds the session's Xmesh document like any other MUPPET, and also:
+Any `muppet` can **host** a session. A host holds the session's Xmesh document like any other `muppet`, and also:
 
 - **admits** whole sessions into it against its [grants](/spec/identity/#access-is-granted-by-key), in arrival order (see below)
 - **routes** admitted updates to everyone subscribed to the session
@@ -89,7 +89,7 @@ XTXP starts with those, and [y-sweet](/discussion/prior-art/#y-sweet) already im
 
 ## Fork, preview, merge
 
-<Diagram name="07-seq-session" alt="Sequence: an author forks main at a state vector, a host for the session is spawned, the author sends ops to it, a reviewer views onion skin and redline rendered by the server MUPPET, accepts, and main replays the session ops and fans them out." />
+<Diagram name="07-seq-session" alt="Sequence: an author forks main at a state vector, a host for the session is spawned, the author sends ops to it, a reviewer views onion skin and redline rendered by the server muppet, accepts, and main replays the session ops and fans them out." />
 
 **Merging is mechanical.** CRDT operations commute, so merging a session means applying its updates to the parent. Nobody has to resolve conflicts by hand, and the **redline** is exactly the set of operations being applied, grouped by author.
 

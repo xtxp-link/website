@@ -102,3 +102,17 @@
 .pagination-links a[rel='next'] {
   grid-column: 2;
 }
+
+/* Brand: the looping logo at the top of The logo page */
+.brand-logo-demo {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.5rem;
+  background: var(--sl-color-bg-nav, var(--sl-color-black));
+}
+.brand-logo-demo .xtxp-logo {
+  width: min(22rem, 100%);
+  height: auto;
+}

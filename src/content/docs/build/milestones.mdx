@@ -24,7 +24,7 @@ The outcome decides whether hosting extends y-sweet, borrows from it, or starts 
 
 ## M1 — Headless convergence
 
-Three CLI peers (Rust, embedding Xmesh), one of them a late joiner that loads the full state, connect over WebSocket to a headless MUPPET hosting the session and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network and the identity handshake before anyone draws anything.
+Three CLI peers (Rust, embedding Xmesh), one of them a late joiner that loads the full state, connect over WebSocket to a headless `muppet` hosting the session and replay the fuzzer's vectors, with connections dropped on purpose to exercise reconnect sync. Each peer authenticates by key and binds its client ID. There is no UI. This proves convergence over a patchy network and the identity handshake before anyone draws anything.
 
 Deliberately small ([decision 22](/discussion/decisions/#22-handshake-signatures-and-the-smallest-m1)):
 
@@ -37,19 +37,19 @@ Deliberately small ([decision 22](/discussion/decisions/#22-handshake-signatures
 
 ## M2 — Inkscape plus no-JS
 
-The Inkscape fork, linking Xmesh through its C interface, and a plain HTML browser served by a server-side MUPPET edit the same drawing. This is the first demo a person can see, and it tests the north star directly.
+The Inkscape fork, linking Xmesh through its C interface, and a plain HTML browser served by a server-side `muppet` edit the same drawing. This is the first demo a person can see, and it tests the north star directly.
 
 ## M3 — Inkscape plus Wasm
 
-A Wasm MUPPET in the browser joins as a full peer.
+A Wasm `muppet` in the browser joins as a full peer.
 
 ## M4 — Inkscape plus Conversations
 
 Mobile and chat users take part through the XMPP bridge. What a stock Conversations user gets is [open question 7](/discussion/open-questions/#q7-what-does-a-conversations-user-get-in-m4).
 
-## Later: the muppet disco and live web branching
+## Later: the `muppet` disco and live web branching
 
-The [muppet disco](/spec/disco/) is a future milestone, deliberately deferred. Until then, a host serves its own sessions directly, which is all M2's no-JS path needs. Where live web branching fits is [open question 9](/discussion/open-questions/#q9-where-does-live-web-branching-sit-in-the-milestones).
+The [`muppet` disco](/spec/disco/) is a future milestone, deliberately deferred. Until then, a host serves its own sessions directly, which is all M2's no-JS path needs. Where live web branching fits is [open question 9](/discussion/open-questions/#q9-where-does-live-web-branching-sit-in-the-milestones).
 
 ## Roadmap
 
@@ -62,5 +62,5 @@ Deferred until the first milestones show they're needed. Each one starts by chec
 | **History limits and garbage collection** | Snapshots need Yrs's garbage collection off, so deleted content is kept | Keep everything; measure growth |
 | **Native C++ Xmesh** | Yrs is already native code; a rewrite would be about owning the engine, not speed | Xmesh on Yrs, through its C interface |
 | **Elixir / BEAM hosting** | Worth considering at large scale, for the BEAM's supervision and clustering | Rust hosting, one actor per session |
-| **XTXP in the browser**: a first-class web standard, the [north star](/overview/north-star/) | Needs working implementations and a spec mature enough to propose | The compatibility layers, which stay afterwards: no-JS browsers through a server-side MUPPET, and the Wasm polyfill (M3) |
+| **XTXP in the browser**: a first-class web standard, the [north star](/overview/north-star/) | Needs working implementations and a spec mature enough to propose | The compatibility layers, which stay afterwards: no-JS browsers through a server-side `muppet`, and the Wasm polyfill (M3) |
 | **Signed hash chains** of each client's operations | Signing only at identity steps is enough to start | Authorship from client bindings |

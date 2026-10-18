@@ -48,11 +48,11 @@ Cursors and presence travel separately from operations. A 60 Hz cursor stream sh
 
 | Binding | Used by | Notes |
 | --- | --- | --- |
-| **WebSocket**, binary frames | Wasm MUPPETs in the browser, the Inkscape fork, CLI peers | The primary binding, chosen for raw speed. Hosts serve it directly. |
-| **HTTP** forms and redirects | Browsers with no JavaScript, through a server-side MUPPET | See [Addressing](/spec/addressing/#the-no-js-edit-loop). |
+| **WebSocket**, binary frames | Wasm `muppet`s in the browser, the Inkscape fork, CLI peers | The primary binding, chosen for raw speed. Hosts serve it directly. |
+| **HTTP** forms and redirects | Browsers with no JavaScript, through a server-side `muppet` | See [Addressing](/spec/addressing/#the-no-js-edit-loop). |
 | **XMPP**, through a bridge | Mobile and chat clients such as Conversations, and federation | A bridge in front of a host, not the core transport. |
 
-<Diagram name="05-seq-convergence" alt="Sequence: two MUPPETs connected to a host over WebSocket make concurrent edits; the host checks each client's grant, records the operations and fans them out; both peers integrate and reach the same state vector and hash." />
+<Diagram name="05-seq-convergence" alt="Sequence: two muppets connected to a host over WebSocket make concurrent edits; the host checks each client's grant, records the operations and fans them out; both peers integrate and reach the same state vector and hash." />
 
 ## The XMPP bridge
 
@@ -67,12 +67,12 @@ Behind the bridge, everything is ordinary XTXP to a host. Inkboard's old problem
 
 ## Encryption
 
-Every binding runs over TLS. A session can also be end-to-end encrypted, so that its host only sees ciphertext. The host can still **admit** operations, because client bindings and grants are metadata it can check. It can't compact the session into a full state or render previews, though, so those move to the clients. A server-side MUPPET can still take part as one of the user's own devices.
+Every binding runs over TLS. A session can also be end-to-end encrypted, so that its host only sees ciphertext. The host can still **admit** operations, because client bindings and grants are metadata it can check. It can't compact the session into a full state or render previews, though, so those move to the clients. A server-side `muppet` can still take part as one of the user's own devices.
 
 ## Still open
 
 - How XTXP's own messages (identity, grants) are framed alongside the Yjs sync messages.
 - The wire format as a whole: decision 21 is a starting point to build on, not the final word.
-- Whether `xtxp://` names the WebSocket binding directly, or resolves to it through a muppet disco.
+- Whether `xtxp://` names the WebSocket binding directly, or resolves to it through a `muppet` disco.
 - How the XMPP bridge is built: for example as a component plugged into an existing XMPP server, speaking XTXP to a host.
 

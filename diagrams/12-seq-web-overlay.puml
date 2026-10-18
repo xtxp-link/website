@@ -3,9 +3,9 @@
 title Live web branching: genesis, overlay, upstream as a peer
 
 actor "Browser" as b
-participant "Muppet disco\n(xtxp.link)" as d
+participant "muppet disco\n(xtxp.link)" as d
 participant "Hosting instance\n(HTTPS)" as gw
-participant "Server MUPPET" as sm
+participant "Server muppet" as sm
 participant "Hosts\n@origin + sessions" as t
 participant "Origin site" as o
 

@@ -4,9 +4,9 @@ title No-JS edit: form POST, redirect, cached polling
 
 actor "Browser\n(no JS)" as b
 participant "Hosting instance\n(HTTPS)" as gw
-participant "Server MUPPET\n(acts for this user)" as sm
+participant "Server muppet\n(acts for this user)" as sm
 participant "Host\n(session main)" as t
-participant "Inkscape\nMUPPET" as ink
+participant "Inkscape\nmuppet" as ink
 
 b -> gw : POST /host/doc@main (form fields)
 gw -> sm : edit intent for this user's key
@@ -32,6 +32,6 @@ end
 note over sm
   The dumb client is a puppet:
   all CRDT work happens in the
-  server-side MUPPET.
+  server-side muppet.
 end note
 @enduml

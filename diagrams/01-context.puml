@@ -11,19 +11,19 @@ actor "Browser user\n(no JavaScript)" as nojs
 actor "Mobile / chat user\n(XMPP client)" as mobile
 
 rectangle "XTXP mesh" as mesh {
-  component "Peers running\nMUPPET + Xmesh" as peers
-  component "Hosts\n(headless MUPPETs;\nsessions merge by trust)" as hosts
-  component "Server MUPPET on a host\n(acts for the user)" as server
+  component "Peers running\nmuppet + Xmesh" as peers
+  component "Hosts\n(headless muppets;\nsessions merge by trust)" as hosts
+  component "Server muppet on a host\n(acts for the user)" as server
 }
 
-rectangle "Muppet disco\n(xtxp.link, or anyone's)\nfinds sessions, hosts none\n(future milestone)" as disco
+rectangle "muppet disco\n(xtxp.link, or anyone's)\nfinds sessions, hosts none\n(future milestone)" as disco
 component "XMPP bridge" as bridge
 rectangle "Origin websites\n(e.g. en.wikipedia.org)" as origin
 rectangle "Sign-in provider\n(Google, Apple, Mozilla)\n+ user's own storage" as sso
 
 designer --> peers : edits SVG natively
 wasm --> peers : edits in browser
-native --> peers : built-in MUPPET,\nopens xtxp:// links
+native --> peers : built-in muppet,\nopens xtxp:// links
 nojs --> server : HTML forms,\nlinks, HTTP caching
 mobile --> bridge : chat, comments,\npush when asleep
 server --> hosts : in process

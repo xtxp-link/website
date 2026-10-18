@@ -64,6 +64,13 @@ export default defineConfig({
           items: [{ label: 'Repositories', slug: 'contribute/repositories' }],
         },
         {
+          label: 'Brand',
+          items: [
+            { label: 'Names and marks', slug: 'brand/names' },
+            { label: 'The logo', slug: 'brand/logo' },
+          ],
+        },
+        {
           label: 'Discussion',
           items: [
             { label: 'Decision log', slug: 'discussion/decisions' },

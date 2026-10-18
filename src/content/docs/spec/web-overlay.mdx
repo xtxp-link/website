@@ -1,6 +1,6 @@
 ---
 title: Live web branching
-description: Forking any public web page into sessions hosted by MUPPETs and found through a muppet disco, the origin site as a peer, and the safety requirements of a rewriting proxy.
+description: Forking any public web page into sessions hosted by muppets and found through a muppet disco, the origin site as a peer, and the safety requirements of a rewriting proxy.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -8,7 +8,7 @@ import Diagram from '../../../components/Diagram.astro';
 
 <span class="status status--draft">draft</span> · placement in the milestones is <span class="status status--open">open</span>
 
-Any hosting MUPPET can act as a collaborative overlay for **any existing website**, a kind of "git for the web". Asking a [muppet disco](/spec/disco/) for
+Any hosting `muppet` can act as a collaborative overlay for **any existing website**, a kind of "git for the web". Asking a [`muppet` disco](/spec/disco/) for
 
 ```
 https://xtxp.link/en.wikipedia.org/wiki/Browser@origin
@@ -20,7 +20,7 @@ There is no special proxy address. A website is addressed like any other documen
 
 The first visit fetches the canonical page and makes it the genesis state (vector 0). Links and form actions are rewritten to stay inside XTXP, each carrying a ref. Edits POSTed by users become XTXP operations on a session, and the origin site is never touched.
 
-<Diagram name="12-seq-web-overlay" alt="Sequence: first visit fetches the origin page without cookies, the server MUPPET parses it into a tree with stable IDs as vector 0, the page is returned with rewritten links, disabled origin forms and an overlay frame; edits become ops on an overlay session; later re-fetches are diffed and applied as ops from an upstream peer." />
+<Diagram name="12-seq-web-overlay" alt="Sequence: first visit fetches the origin page without cookies, the server muppet parses it into a tree with stable IDs as vector 0, the page is returned with rewritten links, disabled origin forms and an overlay frame; edits become ops on an overlay session; later re-fetches are diffed and applied as ops from an upstream peer." />
 
 ## The origin site is a peer
 
@@ -36,7 +36,7 @@ Genesis needs an **HTML5 parser** that produces a tree the CRDT can hold. It als
 Without safeguards, anyone could edit a bank's login page and serve it from an XTXP host. Browsers' safe-browsing lists would flag that host's domain quickly, and any disco that lists it. xtxp.link doesn't serve pages itself, which limits the damage to it but doesn't remove the risk.
 </Aside>
 
-These apply to every MUPPET that hosts sessions of websites, and to every disco that lists them, from the first deploy, not as later polish:
+These apply to every `muppet` that hosts sessions of websites, and to every disco that lists them, from the first deploy, not as later polish:
 
 1. **No credentials pass through.** Never forward cookies, auth headers or form submissions to origin sites.
 2. **Origin forms are disabled** in overlays. Only XTXP edit forms submit.

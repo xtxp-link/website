@@ -8,8 +8,8 @@ node "Server: xtxp.example.org" {
 
 node "Studio LAN: studio.lan\n(Inkscape A hosting)" {
   component "drawing@studio" as studio
-  component "Inkscape A\n(MUPPET)" as ia
-  component "Inkscape B\n(MUPPET)" as ib
+  component "Inkscape A\n(muppet)" as ia
+  component "Inkscape B\n(muppet)" as ib
 }
 
 node "Laptop: my-laptop.lan" {

@@ -1,0 +1,57 @@
+---
+title: The logo
+description: The XTXP mark, how it builds from a lone x, its palette, and where the source files live.
+---
+
+import Logo from '../../../components/Logo.astro';
+
+<div class="brand-logo-demo">
+  <Logo />
+</div>
+
+The mark is **x + x p**: two x's either side of a red **+**, which is a **t** with no tail, followed by a grey **p**. Read aloud, it's xtxp.
+
+## How it builds
+
+The logo starts as a lone x and builds the whole mark in five moves, each a small edit to the same drawing:
+
+1. **x → +.** The x turns 45° and becomes the red +.
+2. **+ → +++.** Two copies branch out to either side.
+3. **+++ → x+x.** The outer two turn 45° (left clockwise, right counter-clockwise) and grow into x's.
+4. **x+x → &lt;+&gt;.** The x's lose their outer legs, leaving chevrons around the +.
+5. **&lt;+&gt; → xtxp.** The legs regrow and the p draws on, together.
+
+It rests briefly on each pose and moves quickly between them. The loop holds the full logo, plays the build backwards to the lone x, and starts again. The site title plays it once on hover.
+
+The explainer animation on [What is XTXP?](/overview/what-is-xtxp/) uses the same build: four different clients each make one of the moves, through one shared document. The favicon is the &lt;+&gt; pose.
+
+## Palette
+
+Black, white and one red. Greys are neutral, with no blue tint. Red is the only colour that isn't black, white or grey, apart from status colours that carry meaning.
+
+| Part | Light | Dark | On blue |
+| --- | --- | --- | --- |
+| x's | `#11151f` | `#eceff7` | `#ffffff` |
+| + (the t) | `#ff5436` | `#ff5436` | `#ff5436` |
+| p | `#8a8a90` | `#7d7d83` | `#a3aac4` |
+| Background | page | page | `#3347ff` |
+
+The site uses the same red as its accent colour, for links, buttons and focus rings.
+
+## Don't
+
+- Don't recolour the +. It's always the red.
+- Don't add a second accent colour.
+- Don't pair the logo, or the word `muppet`, with puppet, felt or frog imagery. See [Names and marks](/brand/names/#the-muppet-advisory).
+
+## Files
+
+| File | What it is |
+| --- | --- |
+| `src/brand/logo.mjs` | The source of truth: geometry, timeline and palettes |
+| `scripts/render-logo.mjs` | Generates the CSS and SVGs below. Run `npm run logo` after changing `logo.mjs`. |
+| `src/styles/logo.generated.css` | The animation as CSS, for the inline logo on the site |
+| `public/brand/logo{,-light,-dark,-on-blue}.svg` | The still logo. The plain file follows the viewer's colour scheme. |
+| `public/brand/logo-animated{,-light,-dark,-on-blue}.svg` | The animated logo, standalone |
+| `public/brand/favicon{,-light,-dark}.svg` | The &lt;+&gt; favicon |
+| `src/components/Logo.astro` | The inline logo used by the hero and the site title |

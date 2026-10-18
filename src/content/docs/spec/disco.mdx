@@ -1,6 +1,6 @@
 ---
 title: The muppet disco
-description: Discovery, not hosting. How a client finds the MUPPETs hosting the sessions it may see, how domain owners keep control of their @origin, and why the design is deliberately deferred.
+description: Discovery, not hosting. How a client finds the muppets hosting the sessions it may see, how domain owners keep control of their @origin, and why the design is deliberately deferred.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -13,19 +13,19 @@ The disco's design, plan and implementation come after the MVP. It raises questi
 
 ## Discovery, not hosting
 
-Hosting a session costs server resources, and XTXP doesn't aim to host everyone's. The ideal is federated and self-organising: people and organisations run their own MUPPETs, and nobody has to ask a central service for permission.
+Hosting a session costs server resources, and XTXP doesn't aim to host everyone's. The ideal is federated and self-organising: people and organisations run their own `muppet`s, and nobody has to ask a central service for permission.
 
-So `xtxp.link/{host}/{path}@{ref}` isn't served by xtxp.link. xtxp.link is a **muppet disco**: it helps a client find the actual MUPPETs hosting the sessions behind an address, and hands it on to them.
+So `xtxp.link/{host}/{path}@{ref}` isn't served by xtxp.link. xtxp.link is a **`muppet` disco**: it helps a client find the actual `muppet`s hosting the sessions behind an address, and hands it on to them.
 
 - **Anyone can run a disco.** xtxp.link is one among many. Others can run their own, and XTXP couldn't stop them and wouldn't want to.
-- **A disco never hosts sessions.** It lists them and points to the MUPPETs that host them.
-- **A disco is a starting point for creating sessions.** It can open a new session on an instance of your choosing, including a MUPPET on your own machine (`localhost`) tied to your key. The new session lives there, not at the disco.
+- **A disco never hosts sessions.** It lists them and points to the `muppet`s that host them.
+- **A disco is a starting point for creating sessions.** It can open a new session on an instance of your choosing, including a `muppet` on your own machine (`localhost`) tied to your key. The new session lives there, not at the disco.
 
 ## Queries are signed
 
 A client asks a disco for sessions with a query signed by its key. The signature tells the disco what that key may see, so it can answer with only the sessions visible to that key, under their [grants](/spec/identity/#access-is-granted-by-key).
 
-That keeps lightweight sessions private by default. A [personal session](/spec/sessions/#one-mechanism-for-undo-proposals-and-previews), such as one user's scratch state, need never be advertised at all and may never leave that user's own MUPPET.
+That keeps lightweight sessions private by default. A [personal session](/spec/sessions/#one-mechanism-for-undo-proposals-and-previews), such as one user's scratch state, need never be advertised at all and may never leave that user's own `muppet`.
 
 ## Domain owners and the bouncer
 
@@ -53,6 +53,6 @@ ActivityPub itself might even carry disco federation. That's a side quest, delib
 - A registrar for session names, or a federation mechanism that makes names resolve consistently.
 - The TXT record format for claiming a domain's `@origin` by key.
 - The signed query format, and what a disco learns about a user from it.
-- How MUPPETs advertise sessions to a disco, and how listings expire.
+- How `muppet`s advertise sessions to a disco, and how listings expire.
 
 **Prior art:** [Mastodon and ActivityPub](/discussion/prior-art/#mastodon-and-activitypub) for federation, and [domain verification by DNS record](/discussion/prior-art/#claiming-a-domain-by-dns-record) for claiming `@origin`.

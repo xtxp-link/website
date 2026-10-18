@@ -5,9 +5,9 @@ title Milestones
 left to right direction
 
 rectangle "**Before M1**\nReview y-sweet\n\nreuse for\nhosting?" as m0
-rectangle "**M1**\nHeadless convergence\n\n3 CLI peers + a headless\nMUPPET host, all on Xmesh,\nover WebSocket, replaying\nvectors with forced disconnects" as m1
-rectangle "**M2**\nInkscape + no-JS\n\nInkscape fork MUPPET +\nserver MUPPET serving\nplain HTML" as m2
-rectangle "**M3**\nInkscape + Wasm\n\nbrowser MUPPET\n(full Wasm peer)" as m3
+rectangle "**M1**\nHeadless convergence\n\n3 CLI peers + a headless\nmuppet host, all on Xmesh,\nover WebSocket, replaying\nvectors with forced disconnects" as m1
+rectangle "**M2**\nInkscape + no-JS\n\nInkscape fork muppet +\nserver muppet serving\nplain HTML" as m2
+rectangle "**M3**\nInkscape + Wasm\n\nbrowser muppet\n(full Wasm peer)" as m3
 rectangle "**M4**\nInkscape + Conversations\n\nmobile and chat users\nvia the XMPP bridge\n(scope: open question 7)" as m4
 
 rectangle "**Later**\nThe muppet disco\n\ndiscovery, the bouncer,\nfederation" as disco

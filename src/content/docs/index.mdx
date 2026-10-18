@@ -31,12 +31,12 @@ Pages mark each point as <span class="status status--decided">decided</span>, <s
   <Card title="Xmesh: the engine" icon="setting">
     The CRDT engine that resolves concurrent edits on an XML tree. A thin, pure layer on the XML types of Yrs, the Rust port of Yjs: a stable, open foundation to build on. No I/O, no clocks, no threads: everything else is an adapter around it.
   </Card>
-  <Card title="MUPPET: the executor" icon="pencil">
-    Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns every view: the canvas, spatial chat and comments, onion skin and redline. Any MUPPET can host sessions: admitting edits against their grants, routing them and storing them. On a server it runs headless.
+  <Card title="muppet: the executor" icon="pencil">
+    Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns every view: the canvas, spatial chat and comments, onion skin and redline. Any `muppet` can host sessions: admitting edits against their grants, routing them and storing them. On a server it runs headless.
   </Card>
 </CardGrid>
 
-<Diagram name="01-context" alt="System context: designers, browser users (an XTXP-compliant browser, a Wasm polyfill, or no JavaScript), and mobile users connect to a mesh of peers and hosts over WebSocket, an XMPP bridge and, from a host's server MUPPET, plain HTML; a muppet disco such as xtxp.link helps them find sessions." />
+<Diagram name="01-context" alt="System context: designers, browser users (an XTXP-compliant browser, a Wasm polyfill, or no JavaScript), and mobile users connect to a mesh of peers and hosts over WebSocket, an XMPP bridge and, from a host's server muppet, plain HTML; a muppet disco such as xtxp.link helps them find sessions." />
 
 ## Where to start
 

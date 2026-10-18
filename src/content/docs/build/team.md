@@ -21,10 +21,10 @@ Owns everything that crosses a boundary:
 | Stack | Owns |
 | --- | --- |
 | **Engine (Rust)** | Xmesh on Yrs's XML types: node-kind mapping, XML Patch translation, canonical output, and its C and Wasm bindings |
-| **Inkscape fork** | The MUPPET adapter inside Inkscape, and keeping the fork current |
-| **MUPPET roles (Rust)** | Hosting (admission, grants, routing, storage, trust between sessions), its WebSocket endpoint, and the server-side MUPPET |
+| **Inkscape fork** | The `muppet` adapter inside Inkscape, and keeping the fork current |
+| **`muppet` roles (Rust)** | Hosting (admission, grants, routing, storage, trust between sessions), its WebSocket endpoint, and the server-side `muppet` |
 | **Wire and bridges** | The sync protocol's message encoding, and the XMPP bridge for mobile and chat clients (from M4) |
-| **Web clients** | The Wasm MUPPET and the no-JS HTML client |
+| **Web clients** | The Wasm `muppet` and the no-JS HTML client |
 
 ## Why this shape
 

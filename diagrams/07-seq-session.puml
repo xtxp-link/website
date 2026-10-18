@@ -3,10 +3,10 @@
 title Sessions: fork, preview, merge
 
 actor "Author" as au
-participant "Author's\nMUPPET" as am
+participant "Author's\nmuppet" as am
 participant "Host\nmain" as main
 participant "Host\n@sketch" as b1
-participant "Server MUPPET\n(views)" as sm
+participant "Server muppet\n(views)" as sm
 actor "Reviewer" as rv
 
 au -> am : propose an edit\n(or undo to an earlier point)

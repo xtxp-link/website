@@ -2,7 +2,7 @@
 !include _style.iuml
 title Reconnecting after a drop: state-vector sync
 
-participant "Peer\n(MUPPET)" as p
+participant "Peer\n(muppet)" as p
 participant "Host\n(session main)" as t
 
 p -> t : update ops (1,1)…(1,40)

@@ -8,17 +8,17 @@ description: What still needs deciding, with the options on the table.
 Stock Conversations can't render a canvas. The answer affects the protocol now: fallback bodies, and how comments map to chat messages.
 
 1. **Chat only.** Canvas comments appear as room messages, and replies flow back as comments. Drawing operations are invisible.
-2. **Chat plus a picture.** As 1, plus a server-side MUPPET posts a rendered snapshot to the room and keeps it current, optionally with the onion skin or redline of an open session. A reviewer could accept a proposal with a chat reply.
-3. **A Conversations fork** with a MUPPET built in: a full mobile peer, and a second fork to maintain.
+2. **Chat plus a picture.** As 1, plus a server-side `muppet` posts a rendered snapshot to the room and keeps it current, optionally with the onion skin or redline of an open session. A reviewer could accept a proposal with a chat reply.
+3. **A Conversations fork** with a `muppet` built in: a full mobile peer, and a second fork to maintain.
 4. **Our own mobile client** following Conversations' XMPP practices.
 
 *Current lean:* 2. It needs no client changes, and server-side rendering already exists for the no-JS path.
 
 ## Q9. Where does live web branching sit in the milestones?
 
-M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live web branching does raise the questions the [muppet disco](/spec/disco/) defers: who claims `@origin`, and which forks get listed.
+M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live web branching does raise the questions the [`muppet` disco](/spec/disco/) defers: who claims `@origin`, and which forks get listed.
 
-1. After the muppet disco milestone, once domain owners can claim `@origin` and run a bouncer.
+1. After the `muppet` disco milestone, once domain owners can claim `@origin` and run a bouncer.
 2. Earlier, on a single host, with forks of websites unlisted until discos exist.
 3. Make web overlays the main product, with the Inkscape canvas as its first specialised client.
 
@@ -28,8 +28,8 @@ M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live
 
 - **Ref names:** whether `@main` or `@latest` names the shared session.
 - **Snapshot hashes in URLs:** which hash, how short, and how it's written after `@`.
-- **Native or website?** How a disco or client tells that `{host}` is a MUPPET rather than an ordinary site, for example a `/.well-known/` file or a DNS record.
-- **`xtxp://` binding:** does it name the WebSocket binding directly, or resolve to it through a muppet disco?
+- **Native or website?** How a disco or client tells that `{host}` is a `muppet` rather than an ordinary site, for example a `/.well-known/` file or a DNS record.
+- **`xtxp://` binding:** does it name the WebSocket binding directly, or resolve to it through a `muppet` disco?
 - **Message framing:** how XTXP's own messages (identity, grants) sit alongside the Yjs sync messages and Yrs updates.
 - **XMPP bridge envelope:** namespace, transit-safe encoding and fallback body for chat clients (from M4).
 - **Media types:** reuse `application/xml-patch+xml` for patches; whether the stream needs a type of its own.
@@ -56,11 +56,11 @@ See [Identity and access](/spec/identity/#still-open).
 ## Hosting and sessions
 
 - **Discovery:** how a host finds out which sessions on other hosts trust, or are trusted by, its own.
-- **Website sessions:** an ordinary website isn't a MUPPET, so its sessions live on other hosts. How they appear under the website's address, through a disco, is part of the [muppet disco](/spec/disco/#still-open) design.
+- **Website sessions:** an ordinary website isn't a `muppet`, so its sessions live on other hosts. How they appear under the website's address, through a disco, is part of the [`muppet` disco](/spec/disco/#still-open) design.
 - **Duplicate ids after a merge:** the resolution algorithm, how a person is brought in, and whether partitioned ids such as `path-123` are worth an experiment. See [conflicts above the CRDT](/spec/sessions/#conflicts-above-the-crdt).
 - **Trust management:** who may set up trust into a session (its owner only, or anyone with write access), and how trust is shown to collaborators.
 
-## The muppet disco
+## The `muppet` disco
 
 A future milestone; see [its own list](/spec/disco/#still-open): federation rules and ActivityPub, a registrar for contestable session names, the TXT record for claiming `@origin`, and the signed query format.
 
@@ -87,5 +87,5 @@ The [use cases](/overview/use-cases/) are sketches. Each needs its rules for acc
 
 ## Naming
 
-- A public-facing name for the engine, given the Xmesh collision.
-- Whether MUPPET stays internal.
+- A public-facing name for the engine, given the Xmesh collision ([name checks](/brand/names/#name-checks)).
+- Whether `muppet` survives a commercial launch, or the `muppet` disco going live. It's a lowercase keyword for now; see [the `muppet` advisory](/brand/names/#the-muppet-advisory).

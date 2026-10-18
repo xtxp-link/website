@@ -11,9 +11,9 @@ import Diagram from '../../../components/Diagram.astro';
 | --- | --- | --- |
 | **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, moves. *The Wire*: sync messages, handshakes, session routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
 | **Xmesh** | The engine. Resolves concurrent edits. A thin, pure Rust layer on Yrs's own XML types that adds full XML node-kind mapping, XML Patch translation and canonical output. A native C++ rewrite is a possible later spike. | <span class="status status--decided">decided</span> |
-| **MUPPET** | Multi User Progressive Patch Execution Tree: client-side Xmesh, and the application layer. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns every view: the vector canvas, spatial chat and comments, paused queues, onion skin and session previews. Views never change the state of the session being viewed. A MUPPET can also run headless and **host** sessions: admitting edits against their grants, routing them and storing them. | <span class="status status--decided">decided</span> |
+| **`muppet`** | Multi User Progressive Patch Execution Tree: client-side Xmesh, and the application layer. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns every view: the vector canvas, spatial chat and comments, paused queues, onion skin and session previews. Views never change the state of the session being viewed. A `muppet` can also run headless and **host** sessions: admitting edits against their grants, routing them and storing them. | <span class="status status--decided">decided</span> |
 
-<Diagram name="02-components" alt="Component diagram: Xmesh, a pure Rust layer on Yrs, implements the Math; MUPPET adapters embed it through a C interface (Inkscape), Wasm (browser) and natively (server); session hosts embed it directly in Rust; a native C++ rewrite is shown as a later spike." />
+<Diagram name="02-components" alt="Component diagram: Xmesh, a pure Rust layer on Yrs, implements the Math; muppet adapters embed it through a C interface (Inkscape), Wasm (browser) and natively (server); session hosts embed it directly in Rust; a native C++ rewrite is shown as a later spike." />
 
 ## A pure, hexagonal core
 
@@ -21,8 +21,8 @@ Xmesh is the hexagon's centre: pure state transformations, with no networking, n
 
 - **Inkscape:** linked into the fork through a C interface, the way `yffi` exposes Yrs to C
 - **Browser:** compiled to Wasm
-- **Server MUPPET:** used natively from Rust
-- **Hosting MUPPETs:** used directly, in Rust
+- **Server `muppet`:** used natively from Rust
+- **Hosting `muppet`s:** used directly, in Rust
 - **Tests:** driven directly by the vector harness
 
 Keeping the core pure is what lets one Rust codebase serve every one of these. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-a-thin-layer-on-yrs).
@@ -31,16 +31,16 @@ Keeping the core pure is what lets one Rust codebase serve every one of these. S
 
 There is **no central authority**. "Canonical state" means the state every peer converges to, not a state a server announces.
 
-- **MUPPETs execute and render.** Every client runs Xmesh, so desktop clients work offline and merge on reconnect. A MUPPET can run in the Inkscape fork, in the browser (Wasm), on a server for a browser with no JavaScript, or headless as a host.
-- **Any MUPPET can host a session.** A host holds the session like any MUPPET and adds admission, routing and storage; on a server it runs headless, with no views and no user of its own. Each session lives on one host, and sessions on different hosts keep each other up to date through trust. New clients load its full state as one compact update instead of replaying history. A dedicated ledger and keyframes are on the [roadmap](/build/milestones/#roadmap).
-- **XTXP is node to node.** It connects any MUPPET to any other, hosts included. It is not a client–server API.
+- **`muppet`s execute and render.** Every client runs Xmesh, so desktop clients work offline and merge on reconnect. A `muppet` can run in the Inkscape fork, in the browser (Wasm), on a server for a browser with no JavaScript, or headless as a host.
+- **Any `muppet` can host a session.** A host holds the session like any `muppet` and adds admission, routing and storage; on a server it runs headless, with no views and no user of its own. Each session lives on one host, and sessions on different hosts keep each other up to date through trust. New clients load its full state as one compact update instead of replaying history. A dedicated ledger and keyframes are on the [roadmap](/build/milestones/#roadmap).
+- **XTXP is node to node.** It connects any `muppet` to any other, hosts included. It is not a client–server API.
 
-Because rendering is just a MUPPET running somewhere, the no-JS view and the Inkscape view come from the same code and can't drift apart.
+Because rendering is just a `muppet` running somewhere, the no-JS view and the Inkscape view come from the same code and can't drift apart.
 
-<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a MUPPET linking Xmesh, a Wasm MUPPET in a browser, and an app-server MUPPET connect over WebSocket to a Rust server of headless MUPPETs, each hosting one session, which embeds Xmesh and persists sessions to storage; a phone reaches the hosts through XMPP federation and a bridge; a no-JS browser reaches the server MUPPET on the host directly; the xtxp.link muppet disco only points clients to hosts." />
+<Diagram name="03-deployment" alt="Deployment: desktop Inkscape with a muppet linking Xmesh, a Wasm muppet in a browser, and an app-server muppet connect over WebSocket to a Rust server of headless muppets, each hosting one session, which embeds Xmesh and persists sessions to storage; a phone reaches the hosts through XMPP federation and a bridge; a no-JS browser reaches the server muppet on the host directly; the xtxp.link muppet disco only points clients to hosts." />
 
 ## Transport
 
-XTXP is a small sync protocol that doesn't care about transport. Its main binding is **WebSocket**, for raw speed, which hosts serve directly. Browsers without JavaScript use **HTTP** through a server-side MUPPET. Mobile and chat clients reach a host through an **XMPP bridge**, which keeps push and store-and-forward for phones. Reconnecting is a state-vector exchange built into XTXP. See [The Wire](/spec/wire/).
+XTXP is a small sync protocol that doesn't care about transport. Its main binding is **WebSocket**, for raw speed, which hosts serve directly. Browsers without JavaScript use **HTTP** through a server-side `muppet`. Mobile and chat clients reach a host through an **XMPP bridge**, which keeps push and store-and-forward for phones. Reconnecting is a state-vector exchange built into XTXP. See [The Wire](/spec/wire/).
 
 Identity is a **public key**, and access is granted by key. See [Identity and access](/spec/identity/).
