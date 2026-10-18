@@ -3,7 +3,7 @@
 // and search engines) and there is no image column. Everything is centred on the page's centre line, which the
 // logo's red + sits on. The paragraph is a centred block with left-aligned text.
 //
-// A small control sits under the logo's right edge: a pause/play button (WCAG 2.2.2: the loop would otherwise run
+// A small control sits under the logo's right edge: a pause/play button whose icon shows the current state (> while playing, || while paused) (WCAG 2.2.2: the loop would otherwise run
 // forever) and, on hover or focus, a speed slider. The button is in the page and keyboard-focusable from the start,
 // and fades in once the first build has finished, about 2.7 seconds in, inside the five seconds the criterion allows.
 import DraftContentNotice from 'virtual:starlight/components/DraftContentNotice';
@@ -40,10 +40,11 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
                   <stop offset="1" stop-color="#ff5436"></stop>
                 </linearGradient>
               </defs>
-              <!-- Playing: pause bars, the right one accented. Paused: the logo's > chevron, its right edge accented. -->
+              <!-- The icon shows the current state. Playing: the logo's > chevron, its right edge accented.
+                   Paused: two bars in one colour. The label and aria-pressed describe the action and state in words. -->
               <g class="icon-pause" fill="none" stroke-width="2.6" stroke-linecap="round">
                 <path d="M7 4.5V15.5" stroke="var(--sl-color-white)"></path>
-                <path d="M13 4.5V15.5" stroke="#ff5436"></path>
+                <path d="M13 4.5V15.5" stroke="var(--sl-color-white)"></path>
               </g>
               <path class="icon-play" d="M7 3.8L14.2 10L7 16.2" fill="none" stroke="url(#xtxp-edge)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
@@ -235,13 +236,13 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
     width: 1.1rem;
     height: 1.1rem;
   }
-  .xtxp-play .icon-play {
+  .xtxp-play .icon-pause {
     display: none;
   }
-  .xtxp-play[data-paused='true'] .icon-play {
+  .xtxp-play[data-paused='true'] .icon-pause {
     display: inline;
   }
-  .xtxp-play[data-paused='true'] .icon-pause {
+  .xtxp-play[data-paused='true'] .icon-play {
     display: none;
   }
   /* No hover on touch: show the slider while the control has focus (after a tap). */
