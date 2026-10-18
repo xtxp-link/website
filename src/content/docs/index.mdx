@@ -26,13 +26,19 @@ Pages mark each point as <span class="status status--decided">decided</span>, <s
 
 <CardGrid>
   <Card title="XTXP: the protocol" icon="document">
-    The specification every node obeys. **The Math** defines how concurrent edits merge. **The Wire** defines how they travel.
+    The specification every node obeys. **[The Math](/spec/math/)** defines how concurrent edits merge. **[The Wire](/spec/wire/)** defines how they travel.
+
+    <a class="card-link" href="/spec/math/">Read the spec →</a>
   </Card>
   <Card title="Xmesh: the engine" icon="setting">
     The CRDT engine that resolves concurrent edits on an XML tree. A thin, pure layer on the XML types of Yrs, the Rust port of Yjs: a stable, open foundation to build on. No I/O, no clocks, no threads: everything else is an adapter around it.
+
+    <a class="card-link" href="/spec/math/#built-on-yrs">Read about Xmesh →</a>
   </Card>
   <Card title="muppet: the executor" icon="pencil">
     Multi User Progressive Patch Execution Tree. Client-side Xmesh, embedded in Inkscape, in the browser via Wasm, or on a server for no-JS users. It owns every view: the canvas, spatial chat and comments, onion skin and redline. Any muppet can host sessions: admitting edits against their grants, routing them and storing them. On a server it runs headless.
+
+    <a class="card-link" href="/overview/architecture/#the-split-that-matters">Read about the muppet →</a>
   </Card>
 </CardGrid>
 
