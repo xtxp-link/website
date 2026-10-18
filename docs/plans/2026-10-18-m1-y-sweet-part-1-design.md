@@ -33,7 +33,7 @@ Decided by David during brainstorming on 2026-10-18. They hold for the spike and
 | S7 | Reserved names for comments, processing instructions and CDATA are provisional (section 3.2) and reviewed after the spike. |
 | S8 | Message framing (handover open point) is deferred to the full M1: y-sweet carries plain Yjs sync with no XTXP frames. |
 | S9 | *Agreed by David.* Everything around the root element is kept, in order: comments, processing instructions, the XML declaration and the DOCTYPE (section 3.2). Paths start at the root element. |
-| S10 | *Agreed by David.* Text offsets count UTF-16 code units, as JavaScript and Yjs do, so the M2 browser and M3 Wasm muppet can use cursor positions as they are. |
+| S10 | *Agreed by David.* Text offsets count UTF-16 code units, as JavaScript and Yjs do, so the M2 browser and M3 Wasm muppet can use cursor positions as they are. An offset inside a character (between the halves of a surrogate pair) rounds up to the next character boundary; for a delete, both ends round up. |
 
 ## 3. `xmesh`
 
@@ -75,7 +75,7 @@ Each call is one Yrs transaction and returns the update bytes it produced, so on
 | `move(path, new_parent, index)` | Inserts a copy at the destination and deletes the original, in one transaction (decision 20). `index` is counted before the original is removed. |
 
 - A **path** is a list of child indexes among live children, starting at the root element: `[]` is the root element, `[2]` its third child (S9). Nodes outside the root element can't be edited in part 1.
-- Text offsets count UTF-16 code units (S10).
+- Text offsets count UTF-16 code units (S10). An offset inside a character rounds up to the next character boundary: an insert lands after the character, a delete ending inside one takes all of it, and a delete starting inside one starts after it.
 - Errors, never panics: a path that doesn't resolve, an index out of range, XML that isn't well-formed, a text operation on an element, and a move into the node's own subtree.
 - A moved node gets a new node ID. This is one of decision 20's known gaps.
 
@@ -216,6 +216,7 @@ CI (GitHub Actions): `cargo fmt --check`, `cargo clippy -D warnings`, `cargo tes
 - **Yrs 0.19.2, which y-sweet v0.9.1 runs, loses a delete that arrives before the insert it deletes.** Applied in the order they were made, every vector's Yrs 0.28 updates give identical XML on 0.19.2. In shuffled orders, 6 of 14 vectors diverge on 0.19.2, with deleted content coming back (`tools/yrs-compat`, test `finding_019_loses_a_delete_that_arrives_first`). y-sweet's hub topology mostly delivers causally, since a peer only sees content through the host, but the full design's sessions, forks and merges would hit it.
 - **Yrs 0.28.0 can leave a pending update stuck.** Fuzz seed 0 found an order of 8 valid updates from four clients after which Yrs still reports missing updates, although everything has arrived; delivering again heals it (`tools/fuzzer`, test `finding_yrs_028_leaves_a_pending_update_stuck`). Xmesh works around it: `apply` keeps any update that leaves the document with missing dependencies and re-applies those after later updates, which is idempotent. The real sync protocol would also heal it at the next state-vector exchange. Worth reporting upstream.
 - **The parser rejected files whose DOCTYPE declares entities**, as Illustrator exports do. Fixed with S9: such entities are now expanded.
+- **Yrs 0.28 shifts a text delete that starts inside a surrogate pair** one unit right, keeping its length, so it deletes a character the client never covered, and panics when the shifted range runs past the end. Inserts and delete ends inside a pair are rounded up correctly. Xmesh rounds both ends itself before calling Yrs (S10). Worth reporting upstream alongside the stuck pending update.
 - **Yrs 0.28 keeps an element's attributes in a hash map**, so source order is lost; `tree()` returns them in canonical order.
 - **A batch can't be rolled back in Yrs**, so `edit` tries it on a throwaway copy first.
 - **Yrs 0.28 client IDs are 53-bit**, checked only by a debug assertion; Xmesh refuses larger ones.
