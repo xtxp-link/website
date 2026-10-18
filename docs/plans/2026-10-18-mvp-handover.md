@@ -18,7 +18,7 @@ In `website`: diagrams are PlantUML in `diagrams/`, rendered with `npm run diagr
 
 ## 2. What this is
 
-XTXP (XML to XML Protocol) lets many people edit one XML document at once, with branchable history, from a forked Inkscape down to a browser with JavaScript switched off. SVG is the first document type.
+XTXP lets many people edit one XML document at once, with branchable history, from a forked Inkscape down to a browser with JavaScript switched off. SVG is the first document type.
 
 **The spec is the source of truth:** https://xtxp.link, built from the `xtxp-link/website` repository. Read these pages before writing code, in this order:
 

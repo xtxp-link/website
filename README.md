@@ -1,6 +1,6 @@
 # xtxp.link
 
-The draft specification site for **XTXP, XML to XML Protocol**, built with [Astro Starlight](https://starlight.astro.build/) and a suite of PlantUML diagrams.
+The draft specification site for **XML to XML Protocol**, built with [Astro Starlight](https://starlight.astro.build/) and a suite of PlantUML diagrams.
 
 ## Layout
 
