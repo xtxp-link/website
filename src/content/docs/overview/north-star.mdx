@@ -1,13 +1,17 @@
 ---
-title: 'North star: the web without JS'
-description: Why a browser with JavaScript switched off is the design target, and where the idea comes from.
+title: 'North star: XTXP in the browser'
+description: XTXP as a first-class web standard built into browsers, the web without JavaScript as the path there, and where the idea comes from.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
 <span class="status status--decided">decided</span>
 
-**Real web without JavaScript.** The no-JS HTML client is the point of the design, not a fallback. Plain forms, links and HTTP caching make a browser a full participant in a collaborative session. A server-side MUPPET does the CRDT work on that browser's behalf.
+**XTXP as a first-class web standard, built into the browser.** A browser that speaks XTXP runs its own MUPPET, opens `xtxp://` links, and treats any page as a live document that many people can edit, fork into sessions and merge, with no JavaScript on the page and no app to install. Collaboration becomes part of the web itself, the way links and forms are.
+
+## The path there: the web without JavaScript
+
+Until browsers speak XTXP, **the no-JS HTML client is the point of the design, not a fallback**. Plain forms, links and HTTP caching make today's browsers full participants in a collaborative session, with a server-side MUPPET doing the CRDT work on the browser's behalf. Everything that works this way is something a browser could later do natively.
 
 Richer clients (Inkscape, a Wasm MUPPET in the browser, mobile clients through an XMPP bridge) are peers on the same mesh. They get more, but they don't get *different* documents.
 
@@ -30,6 +34,6 @@ Some consequences:
 Around 2005, David Campey wrote an experimental JEP (Jabber Enhancement Proposal, the name for XMPP extensions before the 2006 rename to XEP) for message and document updates over XMPP, with the aim of replacing HTTP.
 </Aside>
 
-XTXP is that idea's second run. This time HTTP stays: it's the no-JS edge every browser already speaks. Underneath it runs a lean streaming protocol for documents, over WebSocket, with XMPP kept as a bridge for the mobile and chat clients it serves well.
+XTXP is that idea's second run. This time HTTP stays: it's the no-JS edge every browser already speaks, and the way in until browsers speak XTXP themselves. Underneath it runs a lean streaming protocol for documents, over WebSocket, with XMPP kept as a bridge for the mobile and chat clients it serves well.
 
 The original JEP text hasn't been located yet. It isn't in the XSF's `xeps` repository, whose history starts with the October 2006 import, so the 2005 standards mailing list archives are the next place to look.

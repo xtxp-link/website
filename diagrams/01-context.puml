@@ -39,8 +39,13 @@ wasm -[hidden]right- native
 native -[hidden]right- nojs
 nojs -[hidden]right- mobile
 
+note top of native
+  North star: XTXP built into the
+  browser, a first-class web standard.
+end note
+
 note top of nojs
-  North star: the no-JS browser
-  is a full participant, not a fallback.
+  Until then: the no-JS browser is
+  a full participant, not a fallback.
 end note
 @enduml

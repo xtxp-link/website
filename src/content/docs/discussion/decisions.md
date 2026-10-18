@@ -103,6 +103,10 @@ Each node is keyed by the ID of the operation that created it, and holds its kin
 - **No-JS users get an ephemeral key tied to their HTTP session**, perhaps kept by a cookie, and granted access by the owner; the server never holds a user's own key.
 - **M2 serves native documents only.**
 
+## 24. North star: XTXP in the browser
+
+The long-term goal is XTXP as a first-class web standard, built into browsers: a browser that runs its own MUPPET and opens `xtxp://` links. Until then, the web without JavaScript is the path there and the design test. See [North star](/overview/north-star/).
+
 ## Naming
 
 - **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.

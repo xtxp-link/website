@@ -31,7 +31,7 @@ export default defineConfig({
           items: [
             { label: 'What is XTXP?', slug: 'overview/what-is-xtxp' },
             { label: 'Use cases', slug: 'overview/use-cases' },
-            { label: 'North star: the web without JS', slug: 'overview/north-star' },
+            { label: 'North star: XTXP in the browser', slug: 'overview/north-star' },
             { label: 'Architecture', slug: 'overview/architecture' },
             { label: 'Glossary', slug: 'overview/glossary' },
           ],
