@@ -1,17 +1,17 @@
 // The XTXP logo: geometry, animation timeline and standalone SVG builders.
 // Everything here is generated into CSS/SVG by scripts/render-logo.mjs. Change the timeline here, then run `npm run logo`.
 //
-// The mark is x + x p, where the + is a t with no tail. The animation builds it up, holds the full logo, then plays
-// the same build in reverse back to a lone + and starts again.
+// The mark is x + x p, where the + is a t with no tail. The animation starts and ends on a lone white x.
 //
-//   build:   + in the middle; two copies slide out (+++); the outer two turn 45 degrees (left clockwise, right
-//            counter-clockwise) and grow into x's; the x's lose their outer legs (<+>) and regrow them; the p draws on.
+//   build:   the x turns 45 degrees and becomes a red + (a t with no tail); two copies branch out to either side
+//            (+++); the outer two turn 45 degrees (left clockwise, right counter-clockwise) and grow into x's;
+//            the x's lose their outer legs (<+>); the legs regrow, and the p draws on at the same moment.
 //   hold:    full logo
-//   reverse: the build, backwards
+//   reverse: the build, backwards, back to the lone x
 
-export const TF = 9.8; // end of the build, in seconds
+export const TF = 9.5; // end of the build, in seconds
 export const HOLD = 6; // full logo held for this long
-export const REST = 1.2; // pause on the lone + before the loop restarts
+export const REST = 0.8; // extra pause on the lone x before the loop restarts
 export const R0 = TF + HOLD; // when the reverse starts
 export const TOTAL = R0 + TF + REST;
 export const EASE = 'cubic-bezier(.65,0,.35,1)';
@@ -26,37 +26,47 @@ export const RUN_COUNT = +((TOTAL + TF) / TOTAL).toFixed(5);
 // Forward timeline per part: [seconds, properties changed at that time]. Anything not named carries over.
 const SMALL = 'scale(.606)'; // a + is an x scaled to 0.606 and turned 45 degrees
 const TIMELINE = {
+  // The middle glyph: a white x that turns into the red +.
+  c: [
+    [0, { stroke: 'var(--xl-x)', 'stroke-width': 6, transform: 'translate(32px,0) rotate(0deg) scale(1)' }],
+    [0.5, {}],
+    [1.7, { stroke: 'var(--xl-t)', 'stroke-width': 9.9, transform: `translate(32px,0) rotate(45deg) ${SMALL}` }],
+    [TF, {}],
+  ],
+  // The copies that branch off the + and become the outer x's.
   l: [
     [0, { opacity: 0, stroke: 'var(--xl-t)', 'stroke-width': 9.9, transform: `translate(32px,0) rotate(-45deg) ${SMALL}` }],
-    [0.84, {}],
-    [0.85, { opacity: 1 }],
-    [2.4, { transform: `translate(0,0) rotate(-45deg) ${SMALL}` }],
-    [3.24, {}],
-    [4.8, { stroke: 'var(--xl-x)', 'stroke-width': 6, transform: 'translate(0,0) rotate(0deg) scale(1)' }],
+    [2.0, {}],
+    [2.01, { opacity: 1 }],
+    [3.56, { transform: `translate(0,0) rotate(-45deg) ${SMALL}` }],
+    [4.4, {}],
+    [5.96, { stroke: 'var(--xl-x)', 'stroke-width': 6, transform: 'translate(0,0) rotate(0deg) scale(1)' }],
     [TF, {}],
   ],
   r: [
     [0, { opacity: 0, stroke: 'var(--xl-t)', 'stroke-width': 9.9, transform: `translate(32px,0) rotate(45deg) ${SMALL}` }],
-    [0.84, {}],
-    [0.85, { opacity: 1 }],
-    [2.4, { transform: `translate(64px,0) rotate(45deg) ${SMALL}` }],
-    [3.24, {}],
-    [4.8, { stroke: 'var(--xl-x)', 'stroke-width': 6, transform: 'translate(64px,0) rotate(0deg) scale(1)' }],
+    [2.0, {}],
+    [2.01, { opacity: 1 }],
+    [3.56, { transform: `translate(64px,0) rotate(45deg) ${SMALL}` }],
+    [4.4, {}],
+    [5.96, { stroke: 'var(--xl-x)', 'stroke-width': 6, transform: 'translate(64px,0) rotate(0deg) scale(1)' }],
     [TF, {}],
   ],
+  // Outer legs of the x's: retract to make <+>, then regrow.
   ol: [
     [0, { 'stroke-dashoffset': 0 }],
-    [5.4, {}],
-    [6.24, { 'stroke-dashoffset': 1 }],
-    [7.44, {}],
-    [8.28, { 'stroke-dashoffset': 0 }],
+    [6.5, {}],
+    [7.34, { 'stroke-dashoffset': 1 }],
+    [8.5, {}],
+    [9.34, { 'stroke-dashoffset': 0 }],
     [TF, {}],
   ],
+  // The p draws on over exactly the same moment as the legs regrow, so the eye is on the legs.
   p: [
     [0, { 'stroke-dashoffset': 1, opacity: 0 }],
     [8.5, {}],
-    [8.58, { opacity: 1 }],
-    [9.72, { 'stroke-dashoffset': 0 }],
+    [8.51, { opacity: 1 }],
+    [9.34, { 'stroke-dashoffset': 0 }],
     [TF, {}],
   ],
 };
@@ -79,7 +89,7 @@ function keyframes(name, points) {
 }
 
 // Selector for each part, and the keyframes it follows.
-const PARTS = [['xl-l', 'l'], ['xl-r', 'r'], ['xl-ol', 'ol'], ['xl-p', 'p']];
+const PARTS = [['xl-c', 'c'], ['xl-l', 'l'], ['xl-r', 'r'], ['xl-ol', 'ol'], ['xl-p', 'p']];
 
 /** CSS shared by the page and the standalone files. `root` is the svg class. */
 export function logoCss(root = '.xtxp-logo', { animate = true } = {}) {
@@ -101,7 +111,7 @@ export function logoCss(root = '.xtxp-logo', { animate = true } = {}) {
 export function glyphs({ withP = true } = {}) {
   return (
     '<g fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">' +
-    '<path class="xl-c" d="M-12 0H12M0 -12V12" transform="translate(32 0)"/>' +
+    '<path class="xl-c" d="M-14 -14L14 14M14 -14L-14 14" stroke-width="9.9" transform="translate(32 0) rotate(45) scale(.606)"/>' +
     '<g class="xl-l"><path d="M14 -14L0 0L14 14"/><path class="xl-ol" pathLength="1" d="M0 0L-14 -14"/><path class="xl-ol" pathLength="1" d="M0 0L-14 14"/></g>' +
     '<g class="xl-r" transform="translate(64 0)"><path d="M-14 -14L0 0L-14 14"/><path class="xl-ol" pathLength="1" d="M0 0L14 -14"/><path class="xl-ol" pathLength="1" d="M0 0L14 14"/></g>' +
     (withP ? '<path class="xl-p" pathLength="1" d="M0 34V-14M0 0A14 14 0 1 1 28 0A14 14 0 1 1 0 0" transform="translate(94 0)"/>' : '') +

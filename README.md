@@ -32,7 +32,7 @@ The logo is generated from `src/brand/logo.mjs`. To change the shape, colours or
 npm run logo         # rewrites public/favicon.svg, public/brand/*.svg and src/styles/logo.generated.css
 ```
 
-Commit the output. The mark is x + x p, where the + is a t with no tail. The animation builds it up from a lone +, holds the full logo, then plays the build in reverse and repeats.
+Commit the output. The mark is x + x p, where the + is a t with no tail. The animation starts and ends on a lone white x. The x turns into a red +, which branches into `+++`; the outer two turn into x's, lose their outer legs (`<+>`), and regrow them while the p draws on at the same moment. It holds the full logo, then plays the build in reverse back to the x.
 
 - `public/brand/logo.svg`, `logo-animated.svg`: follow the viewer's light/dark setting.
 - `logo-light.svg`, `logo-dark.svg` (and `-animated-` variants): fixed colours for a known background.
