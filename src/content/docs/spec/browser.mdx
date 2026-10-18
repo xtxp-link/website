@@ -50,7 +50,7 @@ The template repeats the marker, so the same node can be patched again. A Yrs up
 
 ### The patch stream
 
-**The page's own response stays open.** After the first render, the muppet keeps the HTTP response open and flushes a `<template for>` each time the session changes. With no `fetch`, no polling and no script, the page stays live. This replaces the `<meta http-equiv="refresh">` and `304 Not Modified` loop of the [no-JS edit loop](/spec/addressing/#the-no-js-edit-loop) wherever the browser supports it.
+**The page's own response stays open.** After the first render, the muppet keeps the HTTP response open and flushes a `<template for>` each time the session changes. With no `fetch`, no polling and no script, the page stays live. The stream is an enhancement for modern browsers, not a replacement: the `<meta http-equiv="refresh">` and `304 Not Modified` loop of the [no-JS edit loop](/spec/addressing/#the-no-js-edit-loop) stays the baseline that works in every browser, older ones included, and the patch stream is what makes it sing where the browser can do it.
 
 Templates are streamed as children of `<body>`, which lets them reach markers anywhere in the document.
 
@@ -81,7 +81,7 @@ This matters most for edits you didn't make. An **agent** is just another peer w
 
 ### Navigations animate too
 
-Where a browser falls back to the form, redirect and GET loop, cross-document view transitions (`@view-transition { navigation: auto; }` in CSS) animate from the old page to the new one, with the same names and the same author styling. The fallback looks like the live version, only less often.
+On the baseline form, redirect and GET loop, cross-document view transitions (`@view-transition { navigation: auto; }` in CSS) animate from the old page to the new one, with the same names and the same author styling. The baseline looks like the live version, only less often.
 
 ## Popovers carry the control handles
 
@@ -128,14 +128,14 @@ The same split holds wherever the muppet runs:
 Declarative partial updates are new. `<template for>` ships in Chrome and Edge 150; the streaming HTML setters are behind a flag, planned for Chrome 155. Firefox and Safari support neither yet. View transitions and popovers are more widely available; anchor positioning is newer.
 </Aside>
 
-"Does this still work with no JS?" stays the test, so every browser keeps a full path:
+"Does this still work with no JS?" stays the test. The meta refresh loop is the baseline every browser gets, and each feature above is a progressive enhancement layered on it:
 
 | Browser | Changes arrive by | Feels like |
 | --- | --- | --- |
-| **Supports declarative partial updates** | the patch stream | live, animated |
-| **Doesn't** | form POST, `303` redirect, GET, and meta refresh with ETags | page by page, animated where cross-document view transitions are supported |
+| **Every browser** (the baseline) | form POST, `303` redirect, GET, and meta refresh with ETags | page by page, animated where cross-document view transitions are supported |
+| **Modern browsers with declarative partial updates** (the enhancement) | the patch stream | live, animated |
 
-Without popovers or anchor positioning, the handles fall back to the plain forms the page already carries. Nobody gets a different document, only more or less on screen.
+Handles work the same way: the plain forms are the baseline, and popovers with anchor positioning put them on the element where the browser supports it. Nobody gets a different document, only more or less on screen.
 
 ## Still open
 

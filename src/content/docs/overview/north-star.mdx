@@ -32,8 +32,8 @@ Every design decision gets checked against one question:
 Some consequences:
 
 - Edits from a plain browser arrive as **form POSTs**, followed by a redirect and a GET, so refresh and the back button behave.
-- Where the browser supports **declarative partial updates**, the page stays live: the muppet streams HTML patches into it, view transitions animate each change, and popovers carry the control handles. See [The browser as client](/spec/browser/).
-- Elsewhere, passive viewing uses **`<meta http-equiv="refresh">`** with **ETag / `If-None-Match`**, so an unchanged document costs a `304 Not Modified`.
+- Passive viewing uses **`<meta http-equiv="refresh">`** with **ETag / `If-None-Match`**, so an unchanged document costs a `304 Not Modified`. This is the baseline, and it works in every browser, older ones included.
+- Modern browsers with **declarative partial updates** get more on top: the page stays live as the muppet streams HTML patches into it, view transitions animate each change, and popovers carry the control handles. See [The browser as client](/spec/browser/).
 - **Onion skin, redline and session previews** are rendered on the server as SVG layers. To a browser they are just images and markup.
 - The hand-off to a native client is a **plain link** to `xtxp://`, not a script that probes for a protocol handler.
 
