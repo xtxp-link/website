@@ -12,12 +12,12 @@ sm --> b : 200 HTML: page, markers, handle popovers\n(response stays open: the p
 
 == the user edits ==
 b -> b : click the shape: its handle popover\nopens in the top layer (no request)
-b -> sm : POST nudge form (node ID, snapshot, CSRF)
-sm -> sm : Xmesh: intent → CRDT op(s), apply
+b -> sm : POST nudge form (node ID, snapshot,\nCSRF, request ID)
+sm -> sm : resolve the edit (e.g. snap to grid),\nXmesh: CRDT op(s), apply
 sm -> t : XTXP op (WebSocket)
 sm --> b : 204 No Content (the page stays put)
-sm --> b : stream: <template for="n7-12">…</template>
-b -> b : browser applies the patch;\nview transition moves the shape
+sm --> b : stream: confirmation patch\n<template for="n7-12"> where it landed </template>\n<template for="status"> snapped to grid </template>
+b -> b : browser applies the patch;\nview transition settles the shape
 
 == someone else edits ==
 p -> t : XTXP op

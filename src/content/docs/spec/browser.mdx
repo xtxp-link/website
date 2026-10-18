@@ -20,7 +20,7 @@ Put together, **the browser itself is the muppet's client**. Patches go in, tran
 
 This idea comes from Schalk Venter's talk [*Surprise, it's server rendering*](https://za.pycon.org/talks/4-suprise-its-server-rendering/) (see [North star](/overview/north-star/#surprise-its-server-rendering)). The talk named these features as ways to make server-rendered sites feel live. For XTXP they are more than that: they are the client.
 
-<Diagram name="17-seq-browser-patch" alt="Sequence: a no-JS browser GETs the page and the response stays open as a patch stream; clicking a shape opens its handle popover locally; a nudge form POST becomes CRDT ops in the server muppet, which answers 204 and streams a template-for patch that the browser applies with a view transition; an agent's edit arrives through the host and streams to the browser the same way, styled by author." />
+<Diagram name="17-seq-browser-patch" alt="Sequence: a no-JS browser GETs the page and the response stays open as a patch stream; clicking a shape opens its handle popover locally; a nudge form POST becomes CRDT ops in the server muppet, which may resolve it (snap to grid), answers 204 and streams a confirmation patch with the resolved position and a status line, which the browser applies with a view transition; an agent's edit arrives through the host and streams to the browser the same way, styled by author." />
 
 ## Declarative partial updates change the document
 
@@ -56,7 +56,18 @@ Templates are streamed as children of `<body>`, which lets them reach markers an
 
 ### Edits still go in as forms
 
-**Edits stay [form POSTs](/spec/addressing/#forms)**, each naming its node, the snapshot it was rendered from and a CSRF token. What changes is the answer: with a patch stream open, the muppet answers **`204 No Content`**, so the browser stays on the page, and the edit comes back through the stream like everyone else's. One path renders every change, the user's own included.
+**Edits stay [form POSTs](/spec/addressing/#forms)**, each naming its node, the snapshot it was rendered from and a CSRF token, plus a request ID of the page's own.
+
+### The answer confirms where the edit landed
+
+A POST is a request, not a fact. The muppet may place an edit somewhere other than where it was aimed: an editor snaps a shape to the grid or to another shape, a game world applies its rules (collisions, turns, positions that are taken), a stale edit is rebased onto a newer state, or the grant doesn't allow it at all. So the answer to every POST is a **confirmation**: what the edit became, rendered.
+
+- **The confirmation is a patch.** It carries the node as the muppet resolved it (the snapped position, the move the game allowed) and a short status region saying what happened, such as "Moved to 48, 40, snapped to the grid" or "Not allowed: that square is taken". The request ID ties it to the POST that caused it.
+- **With a patch stream, a no-JS browser gets it on the stream.** A form POST can't patch the page it came from without navigating, so the muppet answers **`204 No Content`**, the browser stays on the page, and the confirmation is the next patch on that page's stream, sent to it ahead of the same change reaching anyone else. A [view transition](#view-transitions-make-each-change-visible) shows the shape settling where it landed.
+- **A page with script can take it as the response.** The Wasm muppet, or a few lines of script, can send the form with `fetch` and apply the response body, the same confirmation patch, with `streamHTML`.
+- **On the baseline loop it's the redirect.** The `303` lands on the page as it now stands, with the status region filled in.
+
+One renderer produces every change, the user's own included; the confirmation is that renderer's answer to one request.
 
 ### Coarse or fine patches
 

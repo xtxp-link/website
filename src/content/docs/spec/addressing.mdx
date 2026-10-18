@@ -88,7 +88,7 @@ The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp:
 
 ## The no-JS edit loop
 
-This loop is the baseline, and it works in every browser, older ones included. Modern browsers that support declarative partial updates get the [patch stream](/spec/browser/#the-patch-stream) on top of it: a POST is answered with `204 No Content` and the change arrives as a patch, with no polling.
+This loop is the baseline, and it works in every browser, older ones included. Modern browsers that support declarative partial updates get the [patch stream](/spec/browser/#the-patch-stream) on top of it: a POST is answered with `204 No Content` and a [confirmation](/spec/browser/#the-answer-confirms-where-the-edit-landed) of where the edit landed arrives as a patch, with no polling.
 
 <Diagram name="04-seq-nojs-edit" alt="Sequence: the browser POSTs a form to the hosting instance, which hands it to its server muppet, which makes CRDT ops and sends them to the host; the host fans them out to Inkscape; the browser is redirected and GETs the new HTML; later meta-refresh polls get 304 Not Modified unless someone edited." />
 
