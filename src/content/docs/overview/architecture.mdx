@@ -9,8 +9,8 @@ import Diagram from '../../../components/Diagram.astro';
 
 | Part | Role | Status |
 | --- | --- | --- |
-| **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, cycle-free moves. *The Wire*: sync messages, handshakes, session routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
-| **Xmesh** | The engine. Resolves concurrent edits. A thin, pure Rust layer on Yrs that adds an XML tree schema, cycle-safe moves and XML Patch translation. A native C++ rewrite is a possible later spike. | <span class="status status--decided">decided</span> |
+| **XTXP** | The specification. *The Math*: CRDT rules, clocks, patch structures, moves. *The Wire*: sync messages, handshakes, session routing. The language-agnostic contract every node obeys. | <span class="status status--draft">draft</span> |
+| **Xmesh** | The engine. Resolves concurrent edits. A thin, pure Rust layer on Yrs's own XML types that adds full XML node-kind mapping, XML Patch translation and canonical output. A native C++ rewrite is a possible later spike. | <span class="status status--decided">decided</span> |
 | **MUPPET** | Multi User Progressive Patch Execution Tree: client-side Xmesh, and the application layer. Turns local edits into outbound XTXP payloads, applies incoming patches to the local XML tree, and owns every view: the vector canvas, spatial chat and comments, paused queues, onion skin and session previews. Views never change the state of the session being viewed. A MUPPET can also run headless and **host** sessions: admitting edits against their grants, routing them and storing them. | <span class="status status--decided">decided</span> |
 
 <Diagram name="02-components" alt="Component diagram: Xmesh, a pure Rust layer on Yrs, implements the Math; MUPPET adapters embed it through a C interface (Inkscape), Wasm (browser) and natively (server); session hosts embed it directly in Rust; a native C++ rewrite is shown as a later spike." />
@@ -25,7 +25,7 @@ Xmesh is the hexagon's centre: pure state transformations, with no networking, n
 - **Hosting MUPPETs:** used directly, in Rust
 - **Tests:** driven directly by the vector harness
 
-Keeping the core pure is what lets one Rust codebase serve every one of these. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer).
+Keeping the core pure is what lets one Rust codebase serve every one of these. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-a-thin-layer-on-yrs).
 
 ## The split that matters
 

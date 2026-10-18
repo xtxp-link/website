@@ -27,7 +27,7 @@ XTXP (XML to XML Protocol) lets many people edit one XML document at once, with 
 3. [The Math](https://xtxp.link/spec/math/), [The Wire](https://xtxp.link/spec/wire/), [Identity and access](https://xtxp.link/spec/identity/), [Sessions and history](https://xtxp.link/spec/sessions/)
 4. [Verification](https://xtxp.link/build/verification/), [Milestones](https://xtxp.link/build/milestones/), [The Inkscape fork](https://xtxp.link/build/inkscape-fork/)
 5. [Decision log](https://xtxp.link/discussion/decisions/) and [Open questions](https://xtxp.link/discussion/open-questions/)
-6. [Prior art](https://xtxp.link/discussion/prior-art/): read the Yrs, Wallace, y-sweet, Yjs sync protocol, Inkscape undo and Inkboard entries before designing the matching parts
+6. [Prior art](https://xtxp.link/discussion/prior-art/): read the Yrs, y-sweet, Yjs sync protocol, Inkscape undo and Inkboard entries before designing the matching parts
 
 ## 3. Where each milestone runs
 
@@ -46,7 +46,8 @@ XTXP (XML to XML Protocol) lets many people edit one XML document at once, with 
 - **Behaviour first.** Write Gherkin `.feature` files and JSON test vectors before implementation code. The vectors are the contract.
 - **Pure core.** Xmesh has no networking, no file access, no clocks and no threads. Everything that touches the world is an adapter.
 - **One language for the MVP: Rust.** Xmesh is a thin layer on Yrs. Hosting is a small Rust server.
-- **Reuse before writing.** Check Yrs, `yrs_tree`, y-sweet and the Yjs sync protocol first. Look at Inkboard's code before writing the Inkscape adapter.
+- **Make something, get feedback, understand, make the next thing.** Build on stable open foundations first; they have already found and fixed problems a fresh design would rediscover.
+- **Reuse before writing.** Check Yrs (including its XML types), y-sweet and the Yjs sync protocol first. Look at Inkboard's code before writing the Inkscape adapter.
 - **No-JS test.** Every user-facing decision must still work in a browser with JavaScript off.
 - **Keep the spec current.** When a decision is made or changed, update the relevant spec page and the decision log in `xtxp-link/website` in the same piece of work. The log lists only decisions in force; don't narrate reversals. Decisions are David's: propose, then write them in once he agrees.
 - **Cut scope aggressively.** Don't build roadmap items (ledger, keyframes, native C++, Elixir/BEAM, signed hash chains) or later milestones early.
@@ -57,7 +58,7 @@ One **principal** agent owns everything that crosses a boundary: CRDT semantics,
 
 | Expert | Owns in the MVP |
 | --- | --- |
-| Engine (Rust) | `xmesh`: tree schema on Yrs, cycle-safe moves, XML Patch subset, canonical XML; C interface (for M2) |
+| Engine (Rust) | `xmesh`: XML on Yrs's XML types, XML Patch subset, canonical XML; C interface (for M2) |
 | Hosting (Rust) | `muppet-host`: WebSocket endpoint, identity handshake, admission by session, storage, server-side MUPPET (M2) |
 | Wire | `xtxp-wire`: Yjs sync messages plus XTXP's identity and access messages |
 | Inkscape fork (M2) | The MUPPET adapter in the fork |
@@ -95,8 +96,8 @@ vectors/              generated and hand-written JSON vectors
 
 ### Scope
 
-- **Document model:** the schema on the [Math page](https://xtxp.link/spec/math/#data-model): every XML node kind (element, text, CDATA, comment, processing instruction), expanded names, attributes, position on the edge, tombstone deletion, fixed genesis, node IDs from creating operations (decision 20).
-- **Moves:** the numbered [tree-reading algorithm](https://xtxp.link/spec/math/#reading-the-tree). Spike `yrs_tree` against it first; adopt it only if it gives the same trees on every vector.
+- **Document model:** Yrs's own XML types, as on the [Math page](https://xtxp.link/spec/math/#data-model) (decision 20): elements, attributes and text; comments, processing instructions and CDATA as elements with reserved names (settle the encoding); expanded names; node IDs from creating items; fixed genesis.
+- **Moves:** a delete plus an inserted copy, in one transaction. Write the [known gaps](https://xtxp.link/spec/math/#moves-in-v1-a-copy) as expected-failure vectors; don't build a tree layer of our own yet.
 - **Snapshots:** state vector plus delete set; a short hash in URLs and ETags; Yrs garbage collection off (decision 19).
 - **Canonical XML:** [canonical form v0](https://xtxp.link/spec/math/#canonical-form-v0) (decision 21).
 - **XML Patch:** the `add`, `replace` and `remove` subset needed by the vectors, for import and export only.
@@ -146,7 +147,7 @@ vectors/              generated and hand-written JSON vectors
 
 ## 9. Open points to settle along the way
 
-- **The `yrs_tree` spike:** adopt only if it matches the decided algorithm on every vector.
+- **Reserved names** for comments, processing instructions and CDATA inside Yrs's XML types.
 - **Message framing:** how XTXP's own messages sit alongside the Yjs sync messages.
 - **Hosting:** a self-hosted binary or Durable Objects, from the y-sweet review.
 - **Snapshot hashes:** which hash, how short, and how it's written after `@`.

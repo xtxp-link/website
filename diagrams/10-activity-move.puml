@@ -1,6 +1,6 @@
 @startuml 10-activity-move
 !include _style.iuml
-title Cycle-safe tree moves (after Evan Wallace)
+title Later: cycle-safe tree moves (after Evan Wallace)
 
 partition "Writing a move" {
   start

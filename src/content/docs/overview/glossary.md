@@ -34,7 +34,7 @@ description: Terms used across the XTXP specification.
 : A MUPPET hosting sessions: it admits operations to its own sessions against their grants, routes them and stores them, usually headless on a server.
 
 **Immortal parent**
-: An element node that is never replaced, only updated. Its attributes live in a map, and its children point to it through their own parent maps, so concurrent edits to one element never orphan each other.
+: An element that edits never replace: attributes change one at a time and children are inserted alongside what's there, so concurrent edits to one element both survive. In v1, a move does replace it with a copy (see The Math).
 
 **Keyframe**
 : *Roadmap.* A compacted snapshot of a session, tuned for instant loading. Until then, a session's full state encoded as one Yrs update does the job.
@@ -79,7 +79,7 @@ description: Terms used across the XTXP specification.
 : For live web branching, the origin website treated as a peer. Its "edits" are the differences between successive fetches.
 
 **Xmesh**
-: The CRDT engine: a pure Rust layer on Yrs that adds an XML tree schema, cycle-safe moves and XML Patch translation. A native C++ rewrite is a possible later spike.
+: The CRDT engine: a pure Rust layer on Yrs's own XML types that adds full XML node-kind mapping, XML Patch translation and canonical output. A tree layer of its own and a native C++ rewrite are possible later steps.
 
 **XTXP**
 : XML to XML Protocol. The specification: The Math and The Wire.

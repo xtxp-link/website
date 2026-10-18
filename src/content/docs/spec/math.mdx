@@ -1,6 +1,6 @@
 ---
 title: The Math
-description: How Xmesh merges concurrent edits to an XML tree. Built on Yrs, with immortal parents, cycle-safe tree moves, state vectors, snapshots and the patch language.
+description: How Xmesh merges concurrent edits to an XML tree. v1 builds on Yrs's own XML types, with moves as copies and their known gaps, plus state vectors, snapshots, canonical form and the patch language.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -13,96 +13,90 @@ The Math half of XTXP defines what every implementation of Xmesh must compute. I
 ## Requirements
 
 1. **Convergence.** Peers that have seen the same set of operations hold the same document, whatever order those operations arrived in.
-2. **Intent preservation.** An attribute change and a concurrent child insertion on the same element both survive.
+2. **Intent preservation.** An attribute change and a concurrent child insertion on the same element both survive. In v1, not yet across a move: see [moves](#moves-in-v1-a-copy).
 3. **No cycles.** Concurrent moves can never make an element its own ancestor.
 4. **No central authority.** Merging needs no server to decide order.
 
 ## Built on Yrs
 
-The first implementation of Xmesh is a thin layer on **[Yrs](/discussion/prior-art/#yata-yjs-and-yrs)**, the Rust port of Yjs. Yrs already provides the hard, well-tested parts: YATA ordering for sequences and text, maps, state vectors, a compact binary update format, and snapshots. Xmesh adds what an XML tree needs on top:
+The first implementation of Xmesh is a thin layer on **[Yrs](/discussion/prior-art/#yata-yjs-and-yrs)**, the Rust port of Yjs, using **Yrs's own XML types**. Yrs already provides the hard, well-tested parts: XML elements, attributes and text, YATA ordering, state vectors, a compact binary update format, and snapshots. Xmesh adds what XTXP needs on top:
 
-- a **schema** that maps XML elements onto Yrs maps and text
-- **cycle-safe tree moves**, which Yrs doesn't have
+- **mapping every XML node kind** onto Yrs's XML types
 - **XML Patch translation**, from UI actions to Yrs operations
 - **canonical XML output**, for hashing and rendering
 
-Xmesh stays a pure core: no networking, no files, no clocks. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer).
+Building v1 on a stable, open implementation is deliberate: make something, get feedback, understand it, then make the next thing. A foundation that has already stabilised saves time and effort that a fresh design would spend rediscovering its problems. Where it falls short, the gaps are written down ([moves](#moves-in-v1-a-copy)) and the next design is ready to [reflect on](#later-a-tree-layer-of-our-own).
+
+Xmesh stays a pure core: no networking, no files, no clocks. See [decision 13](/discussion/decisions/#13-xmesh-v1-is-a-thin-layer-on-yrs).
 
 ## Data model
 
-<Diagram name="09-class-model" alt="Class diagram: an Xmesh document is a Yrs document holding a map of nodes keyed by the ID of the operation that created them; each node has a kind, a namespaced name, an edge map from parent to counter and position, an attribute map, a deleted flag, and text content for text nodes; client IDs are bound to authors' public keys; a session has a parent and a fork snapshot." />
+<Diagram name="09-class-model" alt="Class diagram: an Xmesh document is a Yrs XML fragment holding the root element; elements are Yrs XML elements with an expanded name and attributes, holding child elements and Yrs XML text; comments, processing instructions and CDATA are elements with reserved names; node IDs are the Yrs IDs of the items that created them; client IDs are bound to authors' public keys; a session has a parent and a fork snapshot." />
 
-<span class="status status--decided">decided</span> ([decision 20](/discussion/decisions/#20-the-tree-schema-and-a-deterministic-move-algorithm))
+<span class="status status--decided">decided</span> for v1 ([decision 20](/discussion/decisions/#20-v1-uses-yrss-own-xml-types))
 
-The document is a **map of nodes, keyed by node ID**, not a nested Yrs XML fragment. Each node holds:
+The document is a Yrs **XML fragment** holding the root element.
 
-| Field | Yrs type | Purpose |
+| XML | Yrs type | Notes |
 | --- | --- | --- |
-| `kind` | string | `element`, `text`, `cdata`, `comment` or `processing-instruction`: every kind of node an XML document can hold, so Inkscape's XML maps across in full. Text nodes give SVG's `<text>` and `<tspan>` their mixed content. |
-| `name` | string | Elements: the expanded name; processing instructions: the target. For elements, namespace URI plus local name, such as `{http://www.w3.org/2000/svg}circle` |
-| `edges` | map: parent ID → (counter, position) | Every parent the node has had, each with the position it was given there. The highest counter is its current parent and position (see moves, below). |
-| `attrs` | map | Elements only: attributes by expanded name, such as `fill` or `{http://www.inkscape.org/namespaces/inkscape}label` |
-| `deleted` | boolean | A tombstone. See deletion, below. |
-| `content` | text | Text, CDATA, comment and processing-instruction nodes: the characters |
+| Element | XML element | Its tag is the expanded name, namespace URI plus local name, such as `{http://www.w3.org/2000/svg}circle`. |
+| Attribute | attribute on the XML element | Keyed by expanded name, such as `{http://www.inkscape.org/namespaces/inkscape}label`. Last writer wins per attribute. |
+| Text | XML text | Mixed content, as in SVG's `<text>` and `<tspan>`, comes for free. |
+| Comment, processing instruction, CDATA | XML element with a reserved name | Yrs has no types for these, so each is an element in an XTXP namespace holding its text. Inkscape's XML still maps across in full; the exact encoding is settled in M1. |
 
-- **Node IDs need no coordination.** A node's ID is the Yrs ID of the operation that created it: client ID plus counter. Client IDs are [fresh per session and connection](/spec/identity/#signing-only-at-identity-steps), so IDs never collide.
+- **Node IDs need no coordination.** A node's ID is the Yrs ID of the item that created it: client ID plus counter. Client IDs are [fresh per session and connection](/spec/identity/#signing-only-at-identity-steps), so IDs never collide.
 - **Namespaces are stored expanded.** Prefixes such as `inkscape:`, `sodipodi:` and `xlink:` are chosen only when writing XML out, by the canonical form.
 - **Genesis is one fixed update.** Every document starts from the same initial update that creates the root, identical byte for byte everywhere, so two peers can never create two different roots.
-
-### Deletion
-
-Deleting a node sets its `deleted` flag. The node and everything under it disappear from the materialised tree, but stay in the document:
-
-- **Edits inside a deleted node still merge.** They are hidden with it.
-- **Undeleting clears the flag**, and the node comes back with everything that was done inside it meanwhile. Undo relies on this.
-- **A move into a deleted node** is hidden too, until the node is undeleted.
+- **Deletion is a Yrs delete.** The element and everything under it leave the current document. History keeps them, because garbage collection is off, so undo and earlier snapshots can bring them back. Edits that arrive inside a deleted element aren't shown.
 
 ## Ordering
 
-Within text, Yrs orders concurrent insertions with **YATA** (Yet Another Transformation Approach). Each insertion remembers the neighbours it went between, and ties are broken by client ID. Deleted characters become tombstones, so later insertions can still find their place.
-
-Among siblings, order comes from each node's **fractional index**: a sortable key that can always fit a new key between two others. The position lives on the node's current edge, so its parent and its place among that parent's children always come from the same move. Reordering within the same parent is a move to the same parent with a new position.
-
-Two people inserting at the same spot at the same time could generate the same key, so **every key ends with the client ID of the peer that made it**. Keys are then always distinct, and ties break the same way everywhere.
+Yrs orders concurrent insertions with **YATA** (Yet Another Transformation Approach), for an element's children and for text alike. Each insertion remembers the neighbours it went between, and ties are broken by client ID, so two people inserting at the same spot at the same time get the same order on every peer.
 
 ## Immortal parents
 
-An XML element is never replaced, only updated:
+Within an element, edits never replace it:
 
-- its **attributes** live in a map, last-writer-wins per key
-- its **children** point to it, rather than living inside it
+- its **attributes** are updated one at a time, last writer wins per attribute
+- **new children** are inserted into it alongside what's there
 
-Setting `@fill="blue"` updates one map entry. The `<circle>` keeps its ID, so a concurrent edit to the same circle still has something to land on. Replacing whole nodes would orphan concurrent edits; immortal parents prevent that.
+Setting `@fill="blue"` updates one attribute. The `<circle>` keeps its identity, so a concurrent edit to the same circle still has something to land on, and an attribute change and a concurrent child insertion on the same element both survive.
 
-<Aside type="caution" title="Why not Yrs's own XML types?">
-Yrs has XML element and fragment types, but in them a move is a delete plus an insert: the element gets a new identity, and concurrent edits to it are lost. A flat node map with parent pointers keeps identity through moves.
-</Aside>
+## Moves in v1: a copy
 
-## Moves without cycles
+<span class="status status--decided">decided</span> for v1, with known gaps
 
-Moving an element changes its parent. If Alice moves group A into group B while Bob moves B into A, a naive merge creates a cycle. Xmesh uses **Evan Wallace's mutable tree algorithm** ([prior art](/discussion/prior-art/#cycle-safe-tree-moves)):
+Yrs's XML types have no move. In v1, **moving an element deletes it and inserts a copy** at the new place, in one transaction. Reordering among siblings, such as raising or lowering a shape, is a move too.
+
+Concurrent moves can't form a cycle, because a move makes a copy rather than rewiring a parent. The cost is three known gaps, kept as **expected failures** in the [test vectors](/build/verification/) so they stay visible:
+
+1. **An edit made during a move goes to the original.** If Alice moves a group while Bob changes its fill, Bob's change lands on the deleted original and doesn't appear on Alice's copy.
+2. **Two concurrent moves make two copies.** If Alice moves G into A while Bob moves it into B, G appears twice.
+3. **Moving a large group costs its full size**, because the subtree is copied.
+
+So in v1, requirement 2 (intent preservation) doesn't yet hold across a move.
+
+## Later: a tree layer of our own
+
+<span class="status status--draft">draft</span> · to reflect on after M2
+
+Two designs are on the table for closing the gaps.
+
+**A "moved to" link**, like an HTTP `301`. The deleted original records where its copy went, and readers follow the link: edits that landed on the original after the move are folded into the copy, and when an element was moved twice at once, one copy is shown, chosen the same way on every peer. This has to happen when the tree is read, not by copying edits across, or every peer that noticed would copy them and children would arrive several times. Reading edits inside a deleted element means working with Yrs's history rather than its normal API.
+
+**A node map with cycle-safe moves**, after **Evan Wallace's mutable tree algorithm** ([prior art](/discussion/prior-art/#cycle-safe-tree-moves)). Each node keeps a map of every parent it has had, each with a counter and a position; a move is a map write, and reading the tree resolves cycles deterministically:
 
 <Diagram name="10-activity-move" alt="Activity: to move a node, write the new parent into its edge map with a counter one above its current maximum and the new position. To read the tree, each node's best edge is the highest counter, then the lowest parent ID; nodes that reach the root are rooted; nodes caught in cycles are rooted in ascending node ID order at their best edge to an already-rooted parent; children are ordered by position and deleted nodes are hidden." />
 
-- **A move is a map write.** The node's edge map gets the new parent, with a counter one higher than any it already has, and the position it's given there. Old entries stay.
-- **Reading the tree resolves cycles deterministically**, by the algorithm below.
-- **Every peer agrees**, because they all apply the same rule to the same converged maps. Stored data is never rewritten, so peers never fight over it.
-
-### Reading the tree
-
-<span class="status status--decided">decided</span>
-
-Node IDs compare by client ID, then counter. Edges compare by counter, highest first, then by parent node ID, lowest first.
-
 1. The root (from genesis) is **rooted**.
-2. Give every other node its **preferred edge**: its best edge by the order above.
+2. Give every other node its **preferred edge**: highest counter, then lowest parent node ID.
 3. Follow preferred edges. Every node whose chain reaches the root is **rooted**, at its preferred edge.
-4. Take the nodes that aren't rooted. They are caught in cycles. Go through them in **ascending node ID order**. For each one, take its best edge whose parent is now rooted. If it has one, it is rooted there; then root any nodes whose preferred edge leads to it.
-5. Repeat step 4 until every node is rooted. This always ends, because every node's first edge, from when it was created, points to a parent that existed before it, so those edges lead back to the root.
-6. Within each parent, order children by the position on their chosen edge.
+4. Take the nodes that aren't rooted. They are caught in cycles. Go through them in **ascending node ID order** (client ID, then counter). For each one, take its best edge whose parent is now rooted. If it has one, it is rooted there; then root any nodes whose preferred edge leads to it.
+5. Repeat step 4 until every node is rooted. This always ends, because every node's first edge, from when it was created, points to a parent that existed before it.
+6. Within each parent, order children by the position on their chosen edge, a fractional key ending in the client ID.
 7. Hide deleted nodes and everything under them.
 
-The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements Wallace's algorithm on Yrs. It will be spiked against this algorithm and the test vectors, and adopted only if it gives exactly the same trees.
+The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements Wallace's algorithm on Yrs, and would be spiked against this algorithm and the test vectors.
 
 ## Clocks and state vectors
 

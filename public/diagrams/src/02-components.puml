@@ -8,7 +8,7 @@ package "XTXP — the specification" as spec {
 }
 
 package "Xmesh — the engine (Rust)" as engine {
-  component "Xmesh tree layer\n(pure: schema, moves,\nXML Patch, canonical XML)" as xm
+  component "Xmesh\n(pure: XML on Yrs XML types,\nXML Patch, canonical XML)" as xm
   component "Yrs\n(YATA, maps, text,\nstate vectors, updates)" as yrs
   component "Native C++ Xmesh\n<<later spike>>" as xcpp #line.dashed
 }

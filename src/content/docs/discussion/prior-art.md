@@ -55,7 +55,7 @@ An XMPP extension for synchronising XML documents between clients. Worth reviewi
 
 ### YATA, Yjs and Yrs
 
-YATA orders concurrent insertions in a sequence. Yjs implements it, including XML element and fragment types, and Yrs is its Rust port. **Xmesh v1 is built on Yrs** ([decision 13](/discussion/decisions/#13-xmesh-v1-is-yrs-plus-a-tree-layer)). Neither has a native tree move, which is what Xmesh adds.
+YATA orders concurrent insertions in a sequence. Yjs implements it, including XML element and fragment types, and Yrs is its Rust port. **Xmesh v1 is built on Yrs** ([decision 13](/discussion/decisions/#13-xmesh-v1-is-a-thin-layer-on-yrs)). Xmesh v1 uses Yrs's XML types directly. Neither Yjs nor Yrs has a native tree move, which is the main thing a later tree layer of our own would add.
 
 Yrs already reaches every place XTXP runs: `yffi` exposes it to C, and it compiles to Wasm. Xmesh follows the same patterns for its own bindings.
 
@@ -64,7 +64,7 @@ Yrs already reaches every place XTXP runs: `yffi` exposes it to C, and it compil
 
 ### Cycle-safe tree moves
 
-**Evan Wallace's mutable tree hierarchy** gives each node a map of every parent it has had, with counters; the highest counter wins, and nodes caught in a cycle are reattached deterministically when the tree is read. It needs only ordinary map writes, so it fits Yrs. The basis for [moves in Xmesh](/spec/math/#moves-without-cycles). The **`yrs_tree`** crate implements it on Yrs.
+**Evan Wallace's mutable tree hierarchy** gives each node a map of every parent it has had, with counters; the highest counter wins, and nodes caught in a cycle are reattached deterministically when the tree is read. It needs only ordinary map writes, so it fits Yrs. The basis for [moves in Xmesh](/spec/math/#later-a-tree-layer-of-our-own). The **`yrs_tree`** crate implements it on Yrs.
 
 **Kleppmann, Mulligan, Gomes and Beresford**, *A highly-available move operation for replicated trees* (IEEE TPDS, 2021), solves the same problem by undoing and replaying operations in timestamp order.
 

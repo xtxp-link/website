@@ -38,7 +38,7 @@ M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live
 
 ## Engine
 
-- **Tree layer:** the algorithm is [decided](/spec/math/#reading-the-tree); whether the `yrs_tree` crate (young, 0.4.x) matches it is for a spike to show.
+- **A tree layer of our own:** after M2, reflect on closing v1's move gaps with a "moved to" link resolved when reading, or a node map with Wallace's cycle-safe moves (the `yrs_tree` crate, young at 0.4.x, implements the latter). See [later: a tree layer of our own](/spec/math/#later-a-tree-layer-of-our-own).
 - **History and memory:** snapshots need Yrs's garbage collection off. How fast do documents grow, and when is the [roadmap](/build/milestones/#roadmap) ledger worth building?
 - **Reusing y-sweet:** how much of hosting it can provide. Decided by the [y-sweet review](/build/milestones/#before-m1-review-y-sweet) before implementation.
 - **Hosting:** a single self-hosted Rust binary, or Cloudflare Workers with one Durable Object per session? Keeping each hosted session a pure actor with storage behind an interface allows both.

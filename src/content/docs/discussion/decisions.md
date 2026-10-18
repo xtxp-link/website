@@ -45,9 +45,9 @@ XTXP's wire is a small sync protocol that doesn't care about transport: operatio
 A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a session owns it and grants `read` or `write` to keys or to `*`. A host enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits land on a fork the revoked user owns. See [Identity and access](/spec/identity/).
 
 
-## 13. Xmesh v1 is Yrs plus a tree layer
+## 13. Xmesh v1 is a thin layer on Yrs
 
-The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. Yrs supplies YATA ordering, maps, text, state vectors, a binary update format, snapshots and a sync protocol. Xmesh adds an XML tree schema (a map of nodes with parent pointers and fractional indexes), **cycle-safe moves after Evan Wallace's algorithm**, XML Patch translation and canonical XML output. It stays a pure core, reached through a C interface (Inkscape), Wasm (browser) and Rust directly (server MUPPET and hosts). A native C++ engine becomes a later spike, held to the same vectors.
+The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. Yrs supplies YATA ordering, maps, text, state vectors, a binary update format, snapshots and a sync protocol. Xmesh adds the mapping of XML onto Yrs (see decision 20), XML Patch translation and canonical XML output. It stays a pure core, reached through a C interface (Inkscape), Wasm (browser) and Rust directly (server MUPPET and hosts). A native C++ engine becomes a later spike, held to the same vectors.
 
 
 ## 14. Toolchain first: ledger and keyframes go on the roadmap
@@ -80,9 +80,9 @@ XTXP doesn't aim to host everyone's sessions, which cost server resources. xtxp.
 
 See [The Math](/spec/math/#snapshots-name-points-in-history), [Sessions and history](/spec/sessions/#admission-is-by-session) and [Identity and access](/spec/identity/).
 
-## 20. The tree schema and a deterministic move algorithm
+## 20. v1 uses Yrs's own XML types
 
-Each node is keyed by the ID of the operation that created it, and holds its kind (any XML node kind: element, text, CDATA, comment or processing instruction), its expanded name, its edges (parent → counter and position), its attributes, a `deleted` tombstone, and text content for text nodes. Position travels with the edge. Fractional keys end with the client ID. Namespaces are stored expanded, and genesis is one fixed update. Deletion hides a subtree without losing what happens inside it. Reading the tree follows a numbered algorithm that roots cycle-caught nodes in ascending node ID order. `yrs_tree` is spiked against it and adopted only if it gives the same trees. See [The Math](/spec/math/#data-model).
+Xmesh v1 builds on Yrs's XML fragment, element and text types: a stable, open implementation, so the project can make something, get feedback and understand it before designing the next thing. Every XML node kind maps across (comments, processing instructions and CDATA as elements with reserved names), names are stored expanded, node IDs are the Yrs IDs of the items that created them, and genesis is one fixed update. Child order comes from YATA. **A move is a delete plus an inserted copy**, so cycles can't happen, at the cost of three known gaps, kept as expected failures in the test vectors: an edit made during a move lands on the original, two concurrent moves make two copies, and a large move costs its size. A tree layer of our own (a "moved to" link resolved when reading, or a node map with Wallace's cycle-safe moves) is the next design, to reflect on after M2. See [The Math](/spec/math/#data-model).
 
 ## 21. Canonical form v0, and one wire format to start
 

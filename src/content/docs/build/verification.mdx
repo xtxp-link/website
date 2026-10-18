@@ -35,12 +35,12 @@ Vectors also pin down the session rules ([decision 19](/discussion/decisions/#19
 - **Held dependencies:** a session built on an unadmitted one is held back with it, with a defined error.
 - **Client ID reuse:** a binding for a client ID already in the session's history is rejected.
 
-And the tree rules ([decision 20](/discussion/decisions/#20-the-tree-schema-and-a-deterministic-move-algorithm)):
+And the tree rules ([decision 20](/discussion/decisions/#20-v1-uses-yrss-own-xml-types)):
 
-- **Cycles:** concurrent moves forming cycles of two, three and more nodes, including nested cycles, give the same tree in every delivery order.
-- **Move versus reorder:** a concurrent move and reorder of one node never mixes one person's parent with the other's position.
-- **Same-spot inserts:** two peers inserting at the same place get distinct, consistently ordered positions.
-- **Deletion:** edits inside a deleted node merge, stay hidden, and come back on undelete; a move into a deleted node is hidden with it.
+- **Moves never form cycles:** concurrent moves that would make a cycle of two, three or more elements converge to the same tree in every delivery order.
+- **Same-spot inserts:** two peers inserting at the same place get the same order on every peer.
+- **Deletion:** a deleted element and its subtree leave the document; undo brings them back.
+- **Known gaps, as expected failures** ([moves in v1](/spec/math/#moves-in-v1-a-copy)): an edit made during a move appears on the copy; two concurrent moves of one element leave one copy. These vectors are kept so the gaps stay visible, and pass once a tree layer of our own lands.
 - **Signatures:** a challenge answer, binding or grant is rejected on a different host, for a different session, or under the wrong domain tag.
 - **Duplicate ids:** two sessions creating the same `id` merge, converge, and flag the duplicate.
 - **Mixed content, namespaces and every node kind:** `<text>` with interleaved `<tspan>`s, `inkscape:` and `sodipodi:` attributes, comments, processing instructions and CDATA all round-trip.

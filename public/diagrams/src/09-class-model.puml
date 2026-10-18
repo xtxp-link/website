@@ -1,22 +1,27 @@
 @startuml 09-class-model
 !include _style.iuml
-title Core data model: an XML tree on Yrs (draft)
+title Core data model v1: XML on Yrs's own XML types
 
 hide empty methods
 
 class "Xmesh document" as Doc <<Yrs Doc>> {
-  nodes : Map<NodeId, Node>
-  root : NodeId (from genesis)
+  root : XmlFragment
+  genesis : one fixed update
 }
 
-class Node <<Yrs Map>> {
-  id = ID of the creating op
-  kind : element | text
-  name : {namespace}local (elements)
-  edges : Map<NodeId, (counter, position)>
-  attrs : Map<{ns}name, string> (elements)
-  deleted : bool (tombstone)
-  content : Text (text nodes)
+class Element <<Yrs XmlElement>> {
+  id = Yrs ID of the creating item
+  tag : {namespace}local
+  attributes : {ns}name -> string (LWW)
+  children : elements and text (YATA order)
+}
+
+class Text <<Yrs XmlText>> {
+  characters
+}
+
+class Special <<XmlElement, reserved name>> {
+  comment | processing instruction | CDATA
 }
 
 class "ID (Yrs)" as ID <<value>> {
@@ -56,18 +61,20 @@ class Author {
   public_key : PublicKey
 }
 
-Doc *-- "many" Node
-Node ..> Node : edges point to\nparents by NodeId
+Doc *-- Element : root
+Element *-- "many" Element : children
+Element *-- "many" Text
+Element *-- "many" Special
 Session --> Snapshot
 Snapshot --> StateVector
 Trust --> Session : changes merge\nautomatically
 ID ..> ClientBinding : client
 ClientBinding --> Author : signed by
 
-note right of Node
-  "Immortal parents": an element is never
-  replaced. Changing @fill updates attrs;
-  moving it writes a new edge. Its NodeId
-  survives both, so concurrent edits land.
+note right of Element
+  v1 move = delete + inserted copy
+  (no cycles; known gaps: edits during
+  a move, concurrent moves duplicate).
+  A tree layer of our own comes later.
 end note
 @enduml
