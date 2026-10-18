@@ -31,7 +31,12 @@ hosts ..> origin : genesis fetch\n(no cookies forwarded)
 peers ..> sso : fetch own private key\nafter sign-in
 peers ..> disco : signed query:\nwhich sessions may I see?
 
-note bottom of server
+' Keep the actors in reading order, top to bottom: designer, Wasm, no-JS, mobile.
+designer -[hidden]right- wasm
+wasm -[hidden]right- nojs
+nojs -[hidden]right- mobile
+
+note top of nojs
   North star: the no-JS browser
   is a full participant, not a fallback.
 end note
