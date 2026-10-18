@@ -1,6 +1,6 @@
 # Decisions from the spec review (for David, morning of 2026-10-18)
 
-An independent review of the whole spec ran overnight. The full report is in [`spec-review.md`](spec-review.md), with section numbers in brackets below. It was meant to run on Fable, but Fable needed usage credits on the account, so a fresh Opus agent that hadn't seen our conversation did it instead. It can be re-run on Fable once credits are available.
+An independent review of the whole spec ran overnight. The full report is in [`2026-10-18-spec-review.md`](2026-10-18-spec-review.md), with section numbers in brackets below. It was meant to run on Fable, but Fable needed usage credits on the account, so a fresh Opus agent that hadn't seen our conversation did it instead. It can be re-run on Fable once credits are available.
 
 **Already fixed overnight** (stale text only, no new decisions): the glossary's old data model, session identity wording, decision 1 and 7 wording to match decision 16, `user@domain` in the no-JS diagram, undo-versus-session wording, "headless Inkscape", two versus three CLI peers, the stale `live` ref, links without a ref, the server MUPPET's place in the deployment diagram, "borrows", "polyfill", and the "decided" labels on Verification and Milestones.
 

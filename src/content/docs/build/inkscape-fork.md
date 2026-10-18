@@ -42,6 +42,6 @@ Inkboard is GPL, like Inkscape, so its code can be reused inside the fork. Keep 
 
 ## Rules for the fork
 
-1. **The engine and the transport adapter live in their own repository.** The fork vendors them as a submodule and links Xmesh through its C interface, so Inkscape-specific code stays a thin adapter. The fork's build needs a Rust toolchain for this.
+1. **The engine and the transport adapter live in their own repository** (`xtxp-link/xtxp-rs`, with the fork in `xtxp-link/inkscape`). The fork vendors them as a submodule and links Xmesh through its C interface, so Inkscape-specific code stays a thin adapter. The fork's build needs a Rust toolchain for this.
 2. **CI rebases the fork onto Inkscape's main branch on a schedule.** Breakage shows up within days, not at the next release.
 3. **The size of the fork's diff is a tracked metric.** If it stays small, an upstream proposal becomes realistic later.
