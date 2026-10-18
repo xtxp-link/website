@@ -207,3 +207,11 @@ CI (GitHub Actions): `cargo fmt --check`, `cargo clippy -D warnings`, `cargo tes
 - Yrs fixes after 0.19.2 that y-sweet lacks: delete set lost after applying an update (0.27.2), missing right neighbour on insert at index 0 (0.27.3), swallowed pending update (0.27.1), apply delete skipping blocks (0.26.0), decoder hardening (0.28.0).
 - Yrs 0.27 removed its array move feature; XTXP never used it.
 - "A fresh client ID per connection" (decision 19) conflicts with keeping unsent edits across a reconnect, because a Yrs `Doc` keeps one client ID for its life. Part 2 takes it as "per CLI process".
+
+### Found while building part 1
+
+- **Yrs 0.19.2, which y-sweet v0.9.1 runs, loses a delete that arrives before the insert it deletes.** Applied in the order they were made, every vector's Yrs 0.28 updates give identical XML on 0.19.2. In shuffled orders, 6 of 14 vectors diverge on 0.19.2, with deleted content coming back (`tools/yrs-compat`, test `finding_019_loses_a_delete_that_arrives_first`). y-sweet's hub topology mostly delivers causally, since a peer only sees content through the host, but the full design's sessions, forks and merges would hit it.
+- **Yrs 0.28.0 can leave a pending update stuck.** Fuzz seed 0 found an order of 8 valid updates from four clients after which Yrs still reports missing updates, although everything has arrived; delivering again heals it (`tools/fuzzer`, test `finding_yrs_028_leaves_a_pending_update_stuck`). Xmesh works around it: `apply` keeps any update that leaves the document with missing dependencies and re-applies those after later updates, which is idempotent. The real sync protocol would also heal it at the next state-vector exchange. Worth reporting upstream.
+- **Yrs 0.28 keeps an element's attributes in a hash map**, so source order is lost; `tree()` returns them in canonical order.
+- **A batch can't be rolled back in Yrs**, so `edit` tries it on a throwaway copy first.
+- **Yrs 0.28 client IDs are 53-bit**, checked only by a debug assertion; Xmesh refuses larger ones.
