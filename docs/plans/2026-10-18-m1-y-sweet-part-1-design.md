@@ -33,7 +33,7 @@ Decided by David during brainstorming on 2026-10-18. They hold for the spike and
 | S7 | Reserved names for comments, processing instructions and CDATA are provisional (section 3.2) and reviewed after the spike. |
 | S8 | Message framing (handover open point) is deferred to the full M1: y-sweet carries plain Yjs sync with no XTXP frames. |
 | S9 | *Agreed by David.* Everything around the root element is kept, in order: comments, processing instructions, the XML declaration and the DOCTYPE (section 3.2). Paths start at the root element. |
-| S10 | *Proposed with the plan, for David's review.* Text offsets count UTF-16 code units, as Yjs does, so the M2 browser agrees. |
+| S10 | *Agreed by David.* Text offsets count UTF-16 code units, as JavaScript and Yjs do, so the M2 browser and M3 Wasm muppet can use cursor positions as they are. |
 
 ## 3. `xmesh`
 
