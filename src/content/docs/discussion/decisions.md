@@ -24,7 +24,7 @@ A y-sweet review → M1 headless convergence → M2 Inkscape plus no-JS → M3 I
 
 ## 7. Peer model with hosted sessions
 
-- **A muppet is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are muppet views, wherever a muppet runs.
+- **Muppet is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are muppet views, wherever a muppet runs.
 - **XTXP is node to node.**
 - **A session is hosted by exactly one muppet**; any number of muppets may hold copies. A session is a fork of the document's history.
 - **Server-side rendering is a server-side muppet.** Hosts hold sessions; every muppet executes, and those with a user render.
@@ -110,7 +110,7 @@ The long-term goal is XTXP as a first-class web standard, built into browsers: a
 ## Naming
 
 - **XTXP** for the protocol, **Xmesh** for the engine, **muppet** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.
-- **The word muppet is always lowercase, as plain text.** It's an ordinary word of the protocol, not a brand: never `MUPPET` or `Muppet`, never the product's name, never paired with puppet imagery. XTXP is the public name. See [Names and marks](/brand/names/#the-muppet-advisory), which also records the name checks (*Xmesh* collides with Thinkbox XMesh; no clash found for *XTXP*).
+- **Muppet is lowercase, as plain text.** It's an ordinary word of the protocol, not a brand: capitalised only to start a sentence, never `MUPPET`, never the product's name, never paired with puppet imagery. XTXP is the public name. See [Names and marks](/brand/names/#the-muppet-advisory), which also records the name checks (*Xmesh* collides with Thinkbox XMesh; no clash found for *XTXP*).
 
 ## Conventions
 

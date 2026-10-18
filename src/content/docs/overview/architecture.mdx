@@ -31,7 +31,7 @@ Keeping the core pure is what lets one Rust codebase serve every one of these. S
 
 There is **no central authority**. "Canonical state" means the state every peer converges to, not a state a server announces.
 
-- **Every muppet executes, and those with a user render.** Every client runs Xmesh, so desktop clients work offline and merge on reconnect. A muppet can run in the Inkscape fork, in the browser (Wasm), on a server for a browser with no JavaScript, or headless as a host.
+- **Muppets execute and render.** Every client runs Xmesh, so desktop clients work offline and merge on reconnect. A muppet can run in the Inkscape fork, in the browser (Wasm), on a server for a browser with no JavaScript, or headless as a host.
 - **Any muppet can host a session.** A host holds the session like any muppet and adds admission, routing and storage; on a server it runs headless, with no views and no user of its own. Each session lives on one host, and sessions on different hosts keep each other up to date through trust. New clients load its full state as one compact update instead of replaying history. A dedicated ledger and keyframes are on the [roadmap](/build/milestones/#roadmap).
 - **XTXP is node to node.** It connects any muppet to any other, hosts included. It is not a client–server API.
 

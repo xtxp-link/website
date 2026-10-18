@@ -12,12 +12,12 @@ XTXP has a small vocabulary, and each word names one part of the design. This pa
 | **XTXP** | The protocol: XML to XML Protocol, node to node | All capitals in prose. `xtxp` in code, package names and the `xtxp://` scheme. |
 | **xtxp.link** | The spec site, and later a muppet disco | Always lowercase, as a domain. |
 | **Xmesh** | The engine: the XML tree CRDT, a pure Rust layer on Yrs | Capital X, lowercase mesh. `xmesh` in code. |
-| **muppet** | The executor and application layer: Multi User Progressive Patch Execution Tree. Client-side Xmesh, and, run headless, a session host | Always lowercase, as plain text, like session and bouncer. Never capitalised, not even at the start of a sentence; rephrase instead. |
+| **muppet** | The executor and application layer: Multi User Progressive Patch Execution Tree. Client-side Xmesh, and, run headless, a session host | Always lowercase, as plain text, like session and bouncer. Capitalised only to start a sentence, like any word. Never `MUPPET`. |
 | **session** | A line of a document's history, from one user's scratch state to `@main` | Lowercase, an ordinary word. |
 | **muppet disco** | Discovery: finding the muppets that host a session. A future milestone | Lowercase. |
 | **bouncer** | A domain owner's control of its `@origin` at a disco | Lowercase, an ordinary word. |
 
-The word muppet is written as an ordinary lowercase word, not a name. That's deliberate: see [the muppet advisory](#the-muppet-advisory) below.
+Muppet is written as an ordinary lowercase word, not a name. That's deliberate: see [the muppet advisory](#the-muppet-advisory) below.
 
 Code style is kept for things you'd type, such as `xtxp://`, `@main` and file names, so a word in code style always means a literal.
 
@@ -53,13 +53,13 @@ Would Disney act against muppet on xtxp.link? An AI search summary was asked, th
 - **Confusion isn't the only test.** A famous mark can also be protected against dilution, without anyone being confused. South Africa's Trade Marks Act (section 34(1)(c)) has such a provision, as do US and EU law. "A different industry" isn't a complete answer.
 - **The backronym helps, but isn't a shield.** It shows good faith. What counts is how the word is actually presented to people.
 - **The claim about crawlers filing takedowns on sight of frog imagery is unsupported.** Keep the guidance (no puppet imagery), drop the certainty.
-- **Here, muppet is more public than an internal codename.** In this design people run, host and talk about muppets, which makes it closer to a product word in software.
+- **Muppet is more public than an internal codename.** In this design people run, host and talk about muppets, which makes it closer to a product word in software.
 - **"muppet disco" is the riskiest phrase.** It's playful and character-flavoured, which reads more like a nod to the brand than a technical acronym.
 - **Renaming gets more expensive with time.** Today a rename is a find-and-replace. Once federated nodes run other people's muppets, it's a migration of a protocol nobody fully controls.
 
 ### The decision
 
-- **Keep muppet, always lowercase, as plain text.** It's spelled out as Multi User Progressive Patch Execution Tree where it's introduced, and never written `MUPPET` or `Muppet`. That meets the advisory's main condition and keeps it alongside session and bouncer as an ordinary word of the protocol, not a brand. (It was briefly set as code; that was dropped, because code style here means a literal you'd type.)
+- **Muppet stays, lowercase, as plain text.** It's spelled out as Multi User Progressive Patch Execution Tree where it's introduced, capitalised only to start a sentence, and never written `MUPPET`. That meets the advisory's main condition and keeps it alongside session and bouncer as an ordinary word of the protocol, not a brand. (It was briefly set as code; that was dropped, because code style here means a literal you'd type.)
 - **XTXP is the public name.** muppet never becomes the name of the product, an app-store listing or a domain.
 - **No puppet imagery.** The brand is the [XTXP logo](/brand/logo/): black, white and one red. Nothing felt, furry, frog-like or puppet-like goes near muppet, in the UI, the logo, the docs or talks.
 - **Revisit before anything commercial**, before a downloadable client ships under its own name, and before the muppet disco goes live. Each of those raises the stakes, the disco most of all. A clearance search (CIPC in South Africa, USPTO in the US) for the word in software classes is the first step then.
