@@ -58,6 +58,10 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Contribute',
+          items: [{ label: 'Repositories', slug: 'contribute/repositories' }],
+        },
+        {
           label: 'Discussion',
           items: [
             { label: 'Decision log', slug: 'discussion/decisions' },

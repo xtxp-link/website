@@ -4,7 +4,7 @@
 
 ## 1. Repositories
 
-Three repositories under the `xtxp-link` GitHub organisation, each with one job. All are public by default, and the layout is set for the first milestones; expect it to be tidied later. The home page of xtxp.link maps them under "Contribute".
+Three repositories under the `xtxp-link` GitHub organisation, each with one job. All are public by default, and the layout is set for the first milestones; expect it to be tidied later. The site maps them under Contribute → Repositories.
 
 | Repository | What it holds | Status |
 | --- | --- | --- |
