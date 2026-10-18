@@ -13,7 +13,7 @@ description: Terms used across the XTXP specification.
 : A way of carrying XTXP: WebSocket, HTTP, or the XMPP bridge.
 
 **Bouncer**
-: *Sketch.* A domain owner's control over its `@origin` session at a `muppet` disco: which forked sessions are listed, which edits are permitted where, and what is officially relayed. The domain is claimed by public key through a DNS TXT record.
+: *Sketch.* A domain owner's control over its `@origin` session at a muppet disco: which forked sessions are listed, which edits are permitted where, and what is officially relayed. The domain is claimed by public key through a DNS TXT record.
 
 **Client ID**
 : The number Yrs stamps on every operation, with a per-client counter. Fresh for every session and every connection, and bound to a public key.
@@ -31,7 +31,7 @@ description: Terms used across the XTXP specification.
 : The first state of a document: one fixed update that creates the root, identical everywhere. For live web branching, it is the fetched origin page.
 
 **Host**
-: A `muppet` hosting sessions: it admits operations to its own sessions against their grants, routes them and stores them, usually headless on a server.
+: A muppet hosting sessions: it admits operations to its own sessions against their grants, routes them and stores them, usually headless on a server.
 
 **Immortal parent**
 : An element that edits never replace: attributes change one at a time and children are inserted alongside what's there, so concurrent edits to one element both survive. In v1, a move does replace it with a copy (see The Math).
@@ -42,11 +42,11 @@ description: Terms used across the XTXP specification.
 **Ledger**
 : *Roadmap.* A chronological log of a session's patches in cold storage. Until then, sessions persist the usual Yjs way: append updates, then compact.
 
-**`muppet`**
-: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh and the application layer: it owns all views, including the vector canvas and spatial chat and comments. Run headless, a `muppet` hosts sessions.
+**muppet**
+: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh and the application layer: it owns all views, including the vector canvas and spatial chat and comments. Run headless, a muppet hosts sessions.
 
-**`muppet` disco**
-: *Future milestone.* A discovery service that helps a client find the `muppet`s hosting the sessions it may see, from a query signed with its key. A disco doesn't host sessions itself, and anyone can run one. xtxp.link is one.
+**muppet disco**
+: *Future milestone.* A discovery service that helps a client find the muppets hosting the sessions it may see, from a query signed with its key. A disco doesn't host sessions itself, and anyone can run one. xtxp.link is one.
 
 **Node ID**
 : The ID of the Yrs operation that created a node: client ID plus counter. Needs no coordination, and survives moves and edits.

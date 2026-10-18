@@ -176,7 +176,7 @@ HTTP calls the server that holds the authoritative version of a resource the *or
 
 ### Mastodon and ActivityPub
 
-ActivityPub is the W3C protocol behind the fediverse. Mastodon runs it as independent instances, each with its own rules and moderation, that choose whom to federate with. That is the model for how [`muppet` discos](/spec/disco/) might federate, and ActivityPub might even carry it.
+ActivityPub is the W3C protocol behind the fediverse. Mastodon runs it as independent instances, each with its own rules and moderation, that choose whom to federate with. That is the model for how [muppet discos](/spec/disco/) might federate, and ActivityPub might even carry it.
 
 - [W3C: ActivityPub](https://www.w3.org/TR/activitypub/)
 

@@ -11,7 +11,7 @@ import Diagram from '../../../components/Diagram.astro';
 
 A **session** is a fork of a document's history at a point given by a [snapshot](/spec/math/#snapshots-name-points-in-history): a branch, in git's terms. Sessions are meant to be cheap enough to make one per person, per proposal or per visit. That one idea covers several features:
 
-- **A personal session** is one user's own state, which may never leave that user's own `muppet`: a private scratch copy, a draft, or the state an ordinary web session would keep today. See [use cases](/overview/use-cases/#user-sessions).
+- **A personal session** is one user's own state, which may never leave that user's own muppet: a private scratch copy, a draft, or the state an ordinary web session would keep today. See [use cases](/overview/use-cases/#user-sessions).
 - **Undo** forks a session from an earlier point, so history is never thrown away.
 - **A proposed edit** is a session that hasn't been merged yet.
 - **A preview** draws a session over its parent.
@@ -44,7 +44,7 @@ Where they differ from Inkscape: in Inkscape, undoing and then making a new edit
 
 ## Hosting a session
 
-Any `muppet` can **host** a session. A host holds the session's Xmesh document like any other `muppet`, and also:
+Any muppet can **host** a session. A host holds the session's Xmesh document like any other muppet, and also:
 
 - **admits** whole sessions into it against its [grants](/spec/identity/#access-is-granted-by-key), in arrival order (see below)
 - **routes** admitted updates to everyone subscribed to the session

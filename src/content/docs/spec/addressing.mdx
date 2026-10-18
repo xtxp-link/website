@@ -14,17 +14,17 @@ import Diagram from '../../../components/Diagram.astro';
 xtxp://{host}/{path}@{ref}
 ```
 
-Used by native desktop clients, terminal interfaces and automated nodes exchanging XTXP streams. Whether it names the [WebSocket binding](/spec/wire/#bindings) directly or resolves to it through a [`muppet` disco](/spec/disco/) is [still open](/discussion/open-questions/).
+Used by native desktop clients, terminal interfaces and automated nodes exchanging XTXP streams. Whether it names the [WebSocket binding](/spec/wire/#bindings) directly or resolves to it through a [muppet disco](/spec/disco/) is [still open](/discussion/open-questions/).
 
-## `https://` — served by the hosting `muppet`
+## `https://` — served by the hosting muppet
 
 ```
 https://{host}/{path}@{ref}
 ```
 
-A `muppet` that hosts a session serves it to ordinary browsers itself, through its server-side `muppet`. This is all the MVP needs.
+A muppet that hosts a session serves it to ordinary browsers itself, through its server-side muppet. This is all the MVP needs.
 
-## `https://xtxp.link/` — a `muppet` disco
+## `https://xtxp.link/` — a muppet disco
 
 ```
 https://xtxp.link/{host}/{path}@{ref}
@@ -32,11 +32,11 @@ https://xtxp.link/{host}/{path}@{ref}
 
 <span class="status status--sketch">sketch</span> · a future milestone
 
-xtxp.link doesn't host or serve documents. It is a [`muppet` disco](/spec/disco/): it finds the `muppet`s hosting the sessions behind an address, and only those the asking key may see, then hands the client on to them. Anyone can run a disco; xtxp.link is one.
+xtxp.link doesn't host or serve documents. It is a [muppet disco](/spec/disco/): it finds the muppets hosting the sessions behind an address, and only those the asking key may see, then hands the client on to them. Anyone can run a disco; xtxp.link is one.
 
 ## One address form
 
-`{host}` can be a `muppet` hosting native documents, or an **ordinary website**. There is no separate proxy mode. A website is simply a document whose [upstream peer](/spec/web-overlay/#the-origin-site-is-a-peer) is the origin site, and everything else about it is branching.
+`{host}` can be a muppet hosting native documents, or an **ordinary website**. There is no separate proxy mode. A website is simply a document whose [upstream peer](/spec/web-overlay/#the-origin-site-is-a-peer) is the origin site, and everything else about it is branching.
 
 The `@{ref}` suffix says which version you mean:
 
@@ -78,8 +78,8 @@ xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 
 | Request | Response |
 | --- | --- |
-| WebSocket upgrade | The live XTXP stream of Yrs updates, for `muppet`s and automated nodes ([The Wire](/spec/wire/#one-wire-format-to-start)). |
-| `Accept: text/html` | The current state rendered as HTML, with forms that POST edits. Served by the host's server-side `muppet`. |
+| WebSocket upgrade | The live XTXP stream of Yrs updates, for muppets and automated nodes ([The Wire](/spec/wire/#one-wire-format-to-start)). |
+| `Accept: text/html` | The current state rendered as HTML, with forms that POST edits. Served by the host's server-side muppet. |
 | A person who wants their native client | A plain link to `xtxp://{host}/{path}@{ref}`. |
 
 <Aside type="caution" title="Native hand-off">
@@ -108,7 +108,7 @@ What a document may contain, scripts included, isn't the protocol's business. Ho
 ## Deep links and short links
 
 - **Snapshots**: `@{snapshot}` names a document at an exact point in history, so a historical state can be shared exactly. How the snapshot hash is written in a URL is <span class="status status--open">open</span>.
-- **Discovery**: a [`muppet` disco](/spec/disco/) resolves an address to the `muppet` currently hosting the session.
+- **Discovery**: a [muppet disco](/spec/disco/) resolves an address to the muppet currently hosting the session.
 - **Short links**: short, low-density URLs that make easily scanned QR codes, for bridging paper and screens.
 
 ## Media types

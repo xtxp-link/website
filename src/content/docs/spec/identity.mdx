@@ -14,7 +14,7 @@ XTXP identifies a user by a **public key** and authenticates them by proof that 
 
 **Getting the key onto a device.** People shouldn't have to manage key files. Signing in with an account they already have (Google, Apple or Mozilla) fetches their private key from **their own storage**. XTXP never holds it. The sign-in provider is just a way to get to the user's key, not the identity itself.
 
-**No-JS browsers.** A browser without JavaScript can't hold a key. For now, the [server-side `muppet`](/overview/architecture/#the-split-that-matters) acting for that user generates an **ephemeral key tied to their HTTP session**, perhaps kept across visits by a cookie, and the document's owner grants that key access ([decision 23](/discussion/decisions/#23-the-m2-contracts-inkscape-no-js-editing-rendering-safety)). The server never holds the user's own key. Linking a device key to the user's key comes later.
+**No-JS browsers.** A browser without JavaScript can't hold a key. For now, the [server-side muppet](/overview/architecture/#the-split-that-matters) acting for that user generates an **ephemeral key tied to their HTTP session**, perhaps kept across visits by a cookie, and the document's owner grants that key access ([decision 23](/discussion/decisions/#23-the-m2-contracts-inkscape-no-js-editing-rendering-safety)). The server never holds the user's own key. Linking a device key to the user's key comes later.
 
 ## Signing only at identity steps
 

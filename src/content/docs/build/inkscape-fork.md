@@ -9,7 +9,7 @@ Inkscape's mainstream extension system runs scripts per action, with no live acc
 
 ## Where edits are captured
 
-Inkscape already groups every user action into a transaction of XML change events and commits it as one undo step ([prior art](/discussion/prior-art/#inkscapes-undo-stack)). The fork's `muppet` adapter hooks that commit, so each Inkscape action becomes one batch of XTXP operations, with the same grouping as Inkscape's own undo. Incoming operations are applied to the XML tree outside the local undo stack, so Ctrl+Z only ever undoes the user's own actions.
+Inkscape already groups every user action into a transaction of XML change events and commits it as one undo step ([prior art](/discussion/prior-art/#inkscapes-undo-stack)). The fork's muppet adapter hooks that commit, so each Inkscape action becomes one batch of XTXP operations, with the same grouping as Inkscape's own undo. Incoming operations are applied to the XML tree outside the local undo stack, so Ctrl+Z only ever undoes the user's own actions.
 
 ## The adapter contract
 

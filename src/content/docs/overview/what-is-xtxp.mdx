@@ -9,7 +9,7 @@ XTXP (XML to XML Protocol) lets many people edit the same XML document at the sa
 
 <XtxpHeroAnimation />
 
-The first document type is **SVG**, so the first application is a shared vector canvas with spatial chat and comments. It isn't a separate layer: the canvas, chat and comments are views that [`muppet`](/overview/architecture/) provides wherever it runs. The engine is not SVG-specific, though. Any XML tree works, and an HTML page parsed into a tree is close enough, which is what makes [live web branching](/spec/web-overlay/) possible.
+The first document type is **SVG**, so the first application is a shared vector canvas with spatial chat and comments. It isn't a separate layer: the canvas, chat and comments are views that [muppet](/overview/architecture/) provides wherever it runs. The engine is not SVG-specific, though. Any XML tree works, and an HTML page parsed into a tree is close enough, which is what makes [live web branching](/spec/web-overlay/) possible.
 
 ## The problem
 
@@ -24,7 +24,7 @@ Collaborative design tools today mostly share three traits:
 - **Identity as a public key**, fetched to a device through a sign-in people already have, so no central account owns anyone.
 - **A CRDT engine (Xmesh)** that merges concurrent edits without a central authority. Every client runs it, so desktop clients keep working offline.
 - **Sessions as history.** Going back to an earlier version, proposing an edit and previewing it are all the same thing: a session forked from a point in history. Ctrl+Z still undoes just your own recent actions.
-- **Plain HTML as a first-class client.** A server-side `muppet` does the CRDT work for a browser that only submits forms and follows links.
+- **Plain HTML as a first-class client.** A server-side muppet does the CRDT work for a browser that only submits forms and follows links.
 
 ## Status
 

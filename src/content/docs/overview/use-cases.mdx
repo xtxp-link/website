@@ -23,7 +23,7 @@ A traditional comments section, highlights in the style of Kindle's, or answers 
 
 <span class="status status--sketch">sketch</span>
 
-A user interacting with an XTXP site creates their own state: a [personal session](/spec/sessions/#one-mechanism-for-undo-proposals-and-previews), held in a client-side `muppet`, on a server, or both. It does what a session token such as a JWT does today, and could even be identified by one if needed.
+A user interacting with an XTXP site creates their own state: a [personal session](/spec/sessions/#one-mechanism-for-undo-proposals-and-previews), held in a client-side muppet, on a server, or both. It does what a session token such as a JWT does today, and could even be identified by one if needed.
 
 That covers a shopping cart, a scratch editor, or simply the state of browsing through a site's tree of links. This needs refining towards a draft.
 
@@ -39,13 +39,13 @@ That retraces an old arc. Text adventures led to MUDs, and MUDs to MUSHes and MO
 
 The best-defined case. Google Docs defined the category, and others are following, among them cDox and Euro-Office. Cloud or offline is still a choice there.
 
-In XTXP, a first-class local editor and a cloud editor collaborate on the same XML document, each with its own fast `muppet`, on the machine or in the browser. That's a strength of the design, and the shared drawing in M2 is the first instance of it.
+In XTXP, a first-class local editor and a cloud editor collaborate on the same XML document, each with its own fast muppet, on the machine or in the browser. That's a strength of the design, and the shared drawing in M2 is the first instance of it.
 
 ## Chat
 
 Chat between users is a document with many sessions, where by default each message is appended at the end, and visibility, discoverability, reading and editing go by public key.
 
-On top of that, people can edit their own messages or suggest edits to others', within whatever transforms the chat's rules permit. Chat can run strictly peer to peer, `muppet` to `muppet`, without a server-side `muppet`, for privacy. Or a `muppet` can serve history, caching each user's sessions.
+On top of that, people can edit their own messages or suggest edits to others', within whatever transforms the chat's rules permit. Chat can run strictly peer to peer, muppet to muppet, without a server-side muppet, for privacy. Or a muppet can serve history, caching each user's sessions.
 
 ## LLM conversations
 

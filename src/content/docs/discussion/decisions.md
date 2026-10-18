@@ -7,12 +7,12 @@ The decisions currently in force. Numbers stay stable so links keep working.
 
 ## 1. Relays and peers
 
-**Hosting `muppet`s** admit, route and store operations. Every `muppet`, hosting or not, runs the same engine.
+**Hosting muppets** admit, route and store operations. Every muppet, hosting or not, runs the same engine.
 
 
 ## 2. The no-JS client is a puppet
 
-A plain HTML browser drives a **server-side `muppet`**, which turns form POSTs into real CRDT operations and acts for that one user. Because it can be one of the user's own devices, end-to-end encrypted rooms stay possible.
+A plain HTML browser drives a **server-side muppet**, which turns form POSTs into real CRDT operations and acts for that one user. Because it can be one of the user's own devices, end-to-end encrypted rooms stay possible.
 
 ## 5. Inkscape: a maintained fork
 
@@ -24,10 +24,10 @@ A y-sweet review → M1 headless convergence → M2 Inkscape plus no-JS → M3 I
 
 ## 7. Peer model with hosted sessions
 
-- **`muppet` is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are `muppet` views, wherever a `muppet` runs.
+- **A muppet is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are muppet views, wherever a muppet runs.
 - **XTXP is node to node.**
-- **A session is hosted by exactly one `muppet`**; any number of `muppet`s may hold copies. A session is a fork of the document's history.
-- **Server-side rendering is a server-side `muppet`.** Hosts hold sessions; every `muppet` executes, and those with a user render.
+- **A session is hosted by exactly one muppet**; any number of muppets may hold copies. A session is a fork of the document's history.
+- **Server-side rendering is a server-side muppet.** Hosts hold sessions; every muppet executes, and those with a user render.
 
 
 ## 9. One address form: `{host}/{path}@{ref}`
@@ -37,7 +37,7 @@ Every document, native or an ordinary website, is addressed as `xtxp.link/{host}
 
 ## 11. Transport: WebSocket first, XMPP as a bridge
 
-XTXP's wire is a small sync protocol that doesn't care about transport: operations need only arrive eventually, at least once, in any order, and reconnecting is a state-vector exchange built into XTXP. Its bindings are **WebSocket** (primary, for raw speed), **HTTP** (no-JS browsers, through a server-side `muppet`) and an **XMPP bridge** for mobile and chat clients from M4. Cursors and presence travel as separate, never-archived messages. See [The Wire](/spec/wire/).
+XTXP's wire is a small sync protocol that doesn't care about transport: operations need only arrive eventually, at least once, in any order, and reconnecting is a state-vector exchange built into XTXP. Its bindings are **WebSocket** (primary, for raw speed), **HTTP** (no-JS browsers, through a server-side muppet) and an **XMPP bridge** for mobile and chat clients from M4. Cursors and presence travel as separate, never-archived messages. See [The Wire](/spec/wire/).
 
 
 ## 12. Identity is a public key; access is granted by key
@@ -47,7 +47,7 @@ A user is a public key, authenticated by signing a challenge. Signing in with an
 
 ## 13. Xmesh v1 is a thin layer on Yrs
 
-The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. Yrs supplies YATA ordering, maps, text, state vectors, a binary update format, snapshots and a sync protocol. Xmesh adds the mapping of XML onto Yrs (see decision 20), XML Patch translation and canonical XML output. It stays a pure core, reached through a C interface (Inkscape), Wasm (browser) and Rust directly (server `muppet` and hosts). A native C++ engine becomes a later spike, held to the same vectors.
+The first Xmesh is a thin, pure Rust layer on **Yrs** rather than a new engine. Yrs supplies YATA ordering, maps, text, state vectors, a binary update format, snapshots and a sync protocol. Xmesh adds the mapping of XML onto Yrs (see decision 20), XML Patch translation and canonical XML output. It stays a pure core, reached through a C interface (Inkscape), Wasm (browser) and Rust directly (server muppet and hosts). A native C++ engine becomes a later spike, held to the same vectors.
 
 
 ## 14. Toolchain first: ledger and keyframes go on the roadmap
@@ -57,20 +57,20 @@ Sessions persist the way the Yrs toolchain already does: a full state encoded as
 
 ## 15. Hosting runs as a small Rust server
 
-With Xmesh in Rust, hosting `muppet`s run as a small Rust server: one async actor per session, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side `muppet` in the same binary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation.
+With Xmesh in Rust, hosting muppets run as a small Rust server: one async actor per session, a WebSocket endpoint, admission and grants, and append-then-compact storage, with the server-side muppet in the same binary. **y-sweet**, a Rust server for Yjs documents, is reviewed for reuse before implementation.
 
 
-## 16. Any `muppet` can host sessions; sessions are named by where they live
+## 16. Any muppet can host sessions; sessions are named by where they live
 
-There is one kind of node, the `muppet`. Any `muppet` can host sessions: it admits, routes and stores them, usually headless on a server, with no views and no user of its own. A session is identified by its address, `{host}/{path}@{name}`, with no generated IDs; it lives on exactly one host, and only that host admits edits to it. The creator names it: asking for an existing name opens that session (subject to grants), and creating a fork on a taken name is rejected. **Trust between sessions drives automatic merges**, one way or both, which is how sessions on different hosts keep each other up to date. See [Sessions and history](/spec/sessions/#sessions-on-other-hosts-and-trust-between-them).
+There is one kind of node, the muppet. Any muppet can host sessions: it admits, routes and stores them, usually headless on a server, with no views and no user of its own. A session is identified by its address, `{host}/{path}@{name}`, with no generated IDs; it lives on exactly one host, and only that host admits edits to it. The creator names it: asking for an existing name opens that session (subject to grants), and creating a fork on a taken name is rejected. **Trust between sessions drives automatic merges**, one way or both, which is how sessions on different hosts keep each other up to date. See [Sessions and history](/spec/sessions/#sessions-on-other-hosts-and-trust-between-them).
 
 ## 17. Sessions
 
-A line of a document's history is a **session**: lightweight enough to make one per person, per proposal or per visit. That includes a single user's private state, which may never leave that user's own `muppet`. Everything decision 16 says of branches holds for sessions. See [Sessions and history](/spec/sessions/).
+A line of a document's history is a **session**: lightweight enough to make one per person, per proposal or per visit. That includes a single user's private state, which may never leave that user's own muppet. Everything decision 16 says of branches holds for sessions. See [Sessions and history](/spec/sessions/).
 
-## 18. xtxp.link is a `muppet` disco, not a host
+## 18. xtxp.link is a muppet disco, not a host
 
-XTXP doesn't aim to host everyone's sessions, which cost server resources. xtxp.link is a **`muppet` disco**: it finds the `muppet`s hosting the sessions a signed query may see, and can start a session on an instance, including one on the user's own machine, but hosts nothing itself. Anyone can run a disco. A domain owner can claim its `@origin` by key with a DNS TXT record, and decide through the **bouncer** which forks are listed and what's officially relayed. Federation follows Mastodon's model on ActivityPub in spirit; its rules are still to be defined. Until then, a host serves its own sessions directly. The disco is a future milestone, deliberately deferred. See [The `muppet` disco](/spec/disco/).
+XTXP doesn't aim to host everyone's sessions, which cost server resources. xtxp.link is a **muppet disco**: it finds the muppets hosting the sessions a signed query may see, and can start a session on an instance, including one on the user's own machine, but hosts nothing itself. Anyone can run a disco. A domain owner can claim its `@origin` by key with a DNS TXT record, and decide through the **bouncer** which forks are listed and what's officially relayed. Federation follows Mastodon's model on ActivityPub in spirit; its rules are still to be defined. Until then, a host serves its own sessions directly. The disco is a future milestone, deliberately deferred. See [The muppet disco](/spec/disco/).
 
 ## 19. Snapshots, admission by session, fresh client IDs
 
@@ -105,12 +105,12 @@ Xmesh v1 builds on Yrs's XML fragment, element and text types: a stable, open im
 
 ## 24. North star: the read-write web, with XTXP in the browser
 
-The long-term goal is XTXP as a first-class web standard, built into browsers: a browser that runs its own `muppet` and opens `xtxp://` links. Backwards compatibility is part of it: a Wasm `muppet` polyfills browsers with JavaScript, and the no-JS client keeps every other browser a full participant, so XTXP works everywhere. "Does this still work with no JS?" stays the design test. See [North star](/overview/north-star/).
+The long-term goal is XTXP as a first-class web standard, built into browsers: a browser that runs its own muppet and opens `xtxp://` links. Backwards compatibility is part of it: a Wasm muppet polyfills browsers with JavaScript, and the no-JS client keeps every other browser a full participant, so XTXP works everywhere. "Does this still work with no JS?" stays the design test. See [North star](/overview/north-star/).
 
 ## Naming
 
-- **XTXP** for the protocol, **Xmesh** for the engine, **`muppet`** for the executor, the application layer and hosting, **session** for a line of history, **`muppet` disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.
-- **`muppet` is always lowercase, and set as code in prose.** It's a keyword in the protocol, not a brand: never `MUPPET` or `Muppet`, never the product's name, never paired with puppet imagery. XTXP is the public name. See [Names and marks](/brand/names/#the-muppet-advisory), which also records the name checks (*Xmesh* collides with Thinkbox XMesh; no clash found for *XTXP*).
+- **XTXP** for the protocol, **Xmesh** for the engine, **muppet** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.
+- **The word muppet is always lowercase, as plain text.** It's an ordinary word of the protocol, not a brand: never `MUPPET` or `Muppet`, never the product's name, never paired with puppet imagery. XTXP is the public name. See [Names and marks](/brand/names/#the-muppet-advisory), which also records the name checks (*Xmesh* collides with Thinkbox XMesh; no clash found for *XTXP*).
 
 ## Conventions
 
