@@ -15,7 +15,7 @@ The first browser (1990) was also an editor, though only for local files, since 
 
 ### David Campey's 2005 JEP
 
-An experimental Jabber Enhancement Proposal for message and document updates over XMPP, aimed at replacing HTTP, discussed with people in the Jabber community such as Peter Saint-Andre. See [North star](/overview/north-star/#roots). The original text is still being tracked down.
+An experimental Jabber proposal for streaming document updates over XMPP, aimed at replacing HTTP, developed in conversation with Jabber folk such as Peter Saint-Andre. Part of the line XTXP comes from; see [North star](/overview/north-star/#roots).
 
 ### Local-first software
 
