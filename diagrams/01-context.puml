@@ -5,7 +5,7 @@ title System context: who talks to the XTXP mesh
 left to right direction
 
 actor "Designer\n(Inkscape fork)" as designer
-actor "Browser user\n(Wasm client)" as wasm
+actor "Browser user\n(Wasm polyfill)" as wasm
 actor "Browser user\n(XTXP-compliant browser)" as native
 actor "Browser user\n(no JavaScript)" as nojs
 actor "Mobile / chat user\n(XMPP client)" as mobile
@@ -45,7 +45,8 @@ note top of native
 end note
 
 note top of nojs
-  Until then: the no-JS browser is
-  a full participant, not a fallback.
+  Compatible everywhere: the Wasm
+  polyfill, and no-JS browsers as
+  full participants, not a fallback.
 end note
 @enduml
