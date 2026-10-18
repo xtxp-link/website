@@ -98,18 +98,18 @@ vectors/              generated and hand-written JSON vectors
 ### Scope
 
 - **Xmesh C interface**, linked into an Inkscape fork. The fork's build needs a Rust toolchain.
-- **Inkscape adapter:** start from Inkboard's code (`src/jabber_whiteboard/` in Inkscape 0.46). Capture edits at Inkscape's undo transaction commit, so each action becomes one batch of operations. Apply incoming operations outside the local undo stack. Follow the adapter contract on the Inkscape fork page (decision 23): side-table node mapping, echo suppression, Ctrl+Z as a Yrs undo of the user's own session, never rewriting `id`s. Test the known Inkboard pitfalls: automatically named gradients and patterns, `defs` and metadata, and new windows.
-- **Server-side MUPPET:** renders the drawing as HTML and SVG, accepts edits as form POSTs, redirects, and serves `ETag`/`304` for meta-refresh polling (see the no-JS edit diagram on the Addressing page). The forms, sanitising, `script-src 'none'`, a separate content origin and CSRF tokens are on the Addressing page (decision 23).
-- **No-JS identity:** a server-generated device key per sign-in, granted by the drawing's owner.
+- **Inkscape adapter:** start from Inkboard's code (`src/jabber_whiteboard/` in Inkscape 0.46). Capture edits at Inkscape's undo transaction commit, so each action becomes one batch of operations. Apply incoming operations outside the local undo stack. Follow the adapter contract on the Inkscape fork page (decision 23): side-table node mapping, echo suppression, every XML node kind mapped (comments, processing instructions and CDATA included), never rewriting `id`s. Take undo and other whiteboard semantics from Inkboard for the first implementation; they get deliberated later against tldraw and Miro. Test the known Inkboard pitfalls: automatically named gradients and patterns, `defs` and metadata, and new windows.
+- **Server-side MUPPET:** renders the drawing as HTML and SVG, accepts edits as form POSTs, redirects, and serves `ETag`/`304` for meta-refresh polling (see the no-JS edit diagram on the Addressing page). Forms can be rich HTML and CSS, but every edit is a form POST carrying its node ID, the snapshot hash it was rendered from and a CSRF token (Addressing page, decision 23). Don't sanitise or block scripts in M2: rendering safety is a note to revisit.
+- **No-JS identity:** an ephemeral key tied to the HTTP session (a cookie may keep it), granted access by the drawing's owner.
 - **Duplicate ids:** detect and flag them after a merge. The resolution algorithm is open.
 - **Addressing:** the host serves its own sessions at `https://{host}/{path}@{ref}`, with bare URLs redirecting to `@main`. No muppet disco: xtxp.link doesn't serve documents.
 
 ### Done when
 
 1. Inkscape and a browser with JavaScript disabled edit the same drawing, and both see each other's changes.
-2. One Inkscape action becomes one batch of operations, and Ctrl+Z in Inkscape undoes only that user's own actions.
+2. One Inkscape action becomes one batch of operations, and Ctrl+Z in Inkscape undoes only that user's own actions (the starting semantics).
 3. Unchanged polls return `304 Not Modified`.
-4. A drawing containing a script renders with the script stripped, under `script-src 'none'`.
+4. Comments, processing instructions and CDATA written by one Inkscape arrive intact in the other.
 5. Two sessions creating the same `id` merge, converge, and the duplicate is flagged.
 
 ## 7. Open points to settle at the start

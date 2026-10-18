@@ -43,7 +43,7 @@ And the tree rules ([decision 20](/discussion/decisions/#20-the-tree-schema-and-
 - **Deletion:** edits inside a deleted node merge, stay hidden, and come back on undelete; a move into a deleted node is hidden with it.
 - **Signatures:** a challenge answer, binding or grant is rejected on a different host, for a different session, or under the wrong domain tag.
 - **Duplicate ids:** two sessions creating the same `id` merge, converge, and flag the duplicate.
-- **Mixed content and namespaces:** `<text>` with interleaved `<tspan>`s, and `inkscape:` and `sodipodi:` attributes, round-trip.
+- **Mixed content, namespaces and every node kind:** `<text>` with interleaved `<tspan>`s, `inkscape:` and `sodipodi:` attributes, comments, processing instructions and CDATA all round-trip.
 
 
 ## The fuzzer

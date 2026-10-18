@@ -53,20 +53,20 @@ Signing only a random challenge lets a malicious host relay it and log in elsewh
 
 ## B. Blocking M2
 
-**B1. Inkscape adapter contract** [3.2.1, high] — **decided, with a change** (decision 23): no automatic id suffixes. The document is exactly the user's version; duplicate ids after a merge are a conflict to resolve, possibly with a person deciding. Partitioned ids are a future experiment.
+**B1. Inkscape adapter contract** [3.2.1, high] — **decided, with changes** (decision 23): no automatic id suffixes: the document is exactly the user's version, and duplicate ids after a merge are a conflict to resolve, possibly with a person deciding; partitioned ids are a future experiment. Every XML node kind is mapped, not dropped. Undo and whiteboard behaviour start from Inkboard's semantics, then get deliberated against tldraw and Miro.
 - mapping between node IDs and Inkscape's XML nodes
 - suppressing echoes, so remote changes aren't recaptured as local edits
 - how Ctrl+Z works: the reviewer recommends a Yrs undo manager scoped to the local user, bypassing Inkscape's own undo stack for shared documents
 - collisions in Inkscape's auto-generated `id`s, which break `url(#…)` references
 - unsupported node kinds
 
-**B2. The no-JS editing model** [3.2.3, high] — **decided** (decision 23).
+**B2. The no-JS editing model** [3.2.3, high] — **decided** (decision 23): forms can be rich HTML and CSS, but each edit is a form POST.
 Which forms exist (select, edit attribute, recolour, move, delete, add a basic shape), and how a POST names its target.
 
-**B3. Rendering safety** [2.15, high] — **decided** (decision 23).
+**B3. Rendering safety** [2.15, high] — **not adopted** (decision 23): scripts aren't the protocol's business; a note to revisit before hosting others' documents in earnest. CSRF tokens on forms stay.
 User SVG can carry scripts. Sanitise it, apply a strict CSP, and serve user content from a separate origin. Edit forms need CSRF protection.
 
-**B4. Keys for no-JS users** [2.13, 3.2.4, medium] — **decided** (decision 23).
+**B4. Keys for no-JS users** [2.13, 3.2.4, medium] — **decided** (decision 23): an ephemeral key tied to the HTTP session, perhaps kept by a cookie.
 *Recommendation:* a server-generated device key per sign-in, granted by the owner, rather than the server holding a user's root key.
 
 **B5. Website scope for M2** [3.2.7, medium] — **decided** (decision 23): native documents only.

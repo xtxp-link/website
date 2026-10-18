@@ -82,7 +82,7 @@ See [The Math](/spec/math/#snapshots-name-points-in-history), [Sessions and hist
 
 ## 20. The tree schema and a deterministic move algorithm
 
-Each node is keyed by the ID of the operation that created it, and holds its kind (element or text), its expanded name, its edges (parent → counter and position), its attributes, a `deleted` tombstone, and text content for text nodes. Position travels with the edge. Fractional keys end with the client ID. Namespaces are stored expanded, and genesis is one fixed update. Deletion hides a subtree without losing what happens inside it. Reading the tree follows a numbered algorithm that roots cycle-caught nodes in ascending node ID order. `yrs_tree` is spiked against it and adopted only if it gives the same trees. See [The Math](/spec/math/#data-model).
+Each node is keyed by the ID of the operation that created it, and holds its kind (any XML node kind: element, text, CDATA, comment or processing instruction), its expanded name, its edges (parent → counter and position), its attributes, a `deleted` tombstone, and text content for text nodes. Position travels with the edge. Fractional keys end with the client ID. Namespaces are stored expanded, and genesis is one fixed update. Deletion hides a subtree without losing what happens inside it. Reading the tree follows a numbered algorithm that roots cycle-caught nodes in ascending node ID order. `yrs_tree` is spiked against it and adopted only if it gives the same trees. See [The Math](/spec/math/#data-model).
 
 ## 21. Canonical form v0, and one wire format to start
 
@@ -96,10 +96,11 @@ Each node is keyed by the ID of the operation that created it, and holds its kin
 
 ## 23. The M2 contracts: Inkscape, no-JS editing, rendering safety
 
-- **The Inkscape adapter** maps node IDs in a side table, suppresses echoes while applying remote edits, and makes Ctrl+Z a Yrs undo of the user's own session, grouped by Inkscape's transactions. It never rewrites `id`s: the document is exactly the user's version. See [The Inkscape fork](/build/inkscape-fork/#the-adapter-contract).
+- **The Inkscape adapter** maps node IDs in a side table, suppresses echoes while applying remote edits, and maps every kind of XML node Inkscape writes. It never rewrites `id`s: the document is exactly the user's version. Undo and other whiteboard behaviour start from Inkboard's semantics, then get deliberated against tldraw and Miro. See [The Inkscape fork](/build/inkscape-fork/#the-adapter-contract).
 - **Duplicate `id`s after a merge are a conflict above the CRDT**, flagged for resolution, possibly by a person. Partitioned ids are a future experiment. See [Sessions and history](/spec/sessions/#conflicts-above-the-crdt).
-- **No-JS editing** has a small set of forms; each POST names its node and the snapshot it was rendered from, and carries a CSRF token. User SVG is sanitised, served with `script-src 'none'`, from a separate origin. See [Addressing](/spec/addressing/#forms).
-- **No-JS users get a device key per sign-in**, granted by the owner; the server never holds a user's own key.
+- **No-JS editing is form posts.** The forms can be rich HTML and CSS; each POST names its node and the snapshot it was rendered from, and carries a CSRF token. See [Addressing](/spec/addressing/#forms).
+- **Scripts in documents aren't the protocol's business.** Rendering safety is a note to revisit, not a rule.
+- **No-JS users get an ephemeral key tied to their HTTP session**, perhaps kept by a cookie, and granted access by the owner; the server never holds a user's own key.
 - **M2 serves native documents only.**
 
 ## Naming

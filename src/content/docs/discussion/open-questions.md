@@ -68,6 +68,14 @@ A future milestone; see [its own list](/spec/disco/#still-open): federation rule
 
 The [use cases](/overview/use-cases/) are sketches. Each needs its rules for accepted and bounced edits worked out before it informs the protocol: user sessions especially, and how a personal session relates to an ordinary web session token.
 
+## Inkscape and whiteboard behaviour
+
+- **Undo, selection and presence** in a shared whiteboard: start from Inkboard's semantics, then compare with [tldraw and Miro](/discussion/prior-art/#tldraw-and-miro).
+
+## Hosting safety
+
+- **Rendering user documents:** sanitising, CSP and a separate origin for user content. Not the protocol's business, but every host serving other people's documents will need an answer. See [Addressing](/spec/addressing/#rendering-safety).
+
 ## Views
 
 - **Onion skin semantics:** live in-flight edits from others, explicit suggestions to accept, or both?

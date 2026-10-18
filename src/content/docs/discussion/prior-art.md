@@ -133,6 +133,10 @@ Inkscape undoes at the level of its XML tree, which makes it directly relevant t
 
 Yjs and Yrs have an undo manager that can be scoped to the local user's own changes: it undoes them by applying inverse operations, and leaves collaborators' edits alone. That is the model for an individual's Ctrl+Z in a shared XTXP document, as distinct from branching the document's history.
 
+### tldraw and Miro
+
+Modern shared whiteboards: tldraw, an open-source canvas with multiplayer sync, and Miro. How they handle undo with several people editing, selection, and seeing each other's work are the questions to check against before settling XTXP's whiteboard behaviour in Inkscape ([the adapter contract](/build/inkscape-fork/#the-adapter-contract)).
+
 ## Addressing and branching
 
 ### Git

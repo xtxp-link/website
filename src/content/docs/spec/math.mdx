@@ -38,12 +38,12 @@ The document is a **map of nodes, keyed by node ID**, not a nested Yrs XML fragm
 
 | Field | Yrs type | Purpose |
 | --- | --- | --- |
-| `kind` | string | `element` or `text`. Text nodes give SVG's `<text>` and `<tspan>` their mixed content. |
-| `name` | string | Elements only: the expanded name, namespace URI plus local name, such as `{http://www.w3.org/2000/svg}circle` |
+| `kind` | string | `element`, `text`, `cdata`, `comment` or `processing-instruction`: every kind of node an XML document can hold, so Inkscape's XML maps across in full. Text nodes give SVG's `<text>` and `<tspan>` their mixed content. |
+| `name` | string | Elements: the expanded name; processing instructions: the target. For elements, namespace URI plus local name, such as `{http://www.w3.org/2000/svg}circle` |
 | `edges` | map: parent ID → (counter, position) | Every parent the node has had, each with the position it was given there. The highest counter is its current parent and position (see moves, below). |
 | `attrs` | map | Elements only: attributes by expanded name, such as `fill` or `{http://www.inkscape.org/namespaces/inkscape}label` |
 | `deleted` | boolean | A tombstone. See deletion, below. |
-| `content` | text | Text nodes only: the characters |
+| `content` | text | Text, CDATA, comment and processing-instruction nodes: the characters |
 
 - **Node IDs need no coordination.** A node's ID is the Yrs ID of the operation that created it: client ID plus counter. Client IDs are [fresh per session and connection](/spec/identity/#signing-only-at-identity-steps), so IDs never collide.
 - **Namespaces are stored expanded.** Prefixes such as `inkscape:`, `sodipodi:` and `xlink:` are chosen only when writing XML out, by the canonical form.
@@ -138,7 +138,7 @@ Convergence is checked by comparing the SHA-256 of each peer's XML, so every imp
 - **Deleted nodes left out**, with everything under them.
 - **Attributes sorted** by expanded name: namespace URI, then local name.
 - **Fixed prefixes** for known namespaces: SVG as the default namespace, and `inkscape:`, `sodipodi:` and `xlink:`. Any other namespace gets `ns1`, `ns2` and so on, in order of first use.
-- **No whitespace** except what's inside text nodes.
+- **No whitespace** except what's inside text, CDATA, comment and processing-instruction nodes, which are written as they are.
 - **Minimal escaping**: `&` and `<` in text; `&`, `<` and `"` in attribute values, which are always double-quoted.
 
 The version is part of the form, so a later change never leaves doubt about which rules produced a hash.

@@ -17,9 +17,9 @@ Inkscape already groups every user action into a transaction of XML change event
 
 - **Node mapping.** A side table inside the adapter maps Xmesh node IDs to Inkscape's XML nodes. Nothing extra is written into the document.
 - **No echoes.** A flag stays set while remote edits are applied, so they aren't captured again as local edits.
-- **Ctrl+Z.** Inkscape's undo transactions decide what one step is. Yrs's undo manager carries it out, undoing only this user's own edits in their own session. In shared documents it replaces Inkscape's own undo stack.
+- **Undo and other shared-whiteboard behaviour start from Inkboard.** XTXP in Inkscape is a shared whiteboard, and Inkboard thought its semantics through. Lean on them for a working first implementation, then deliberate, with [tldraw and Miro](/discussion/prior-art/#tldraw-and-miro) as modern prior art.
 - **The document is exactly your version.** The adapter never rewrites `id`s. If two sessions each create the same `id`, say `path123`, merging them still converges, but leaves a [duplicate id](/spec/sessions/#conflicts-above-the-crdt) to resolve.
-- **Unsupported node kinds.** Comments and processing instructions are dropped in M2, with a warning. CDATA becomes text.
+- **Every node kind maps.** Comments, processing instructions and CDATA are [node kinds](/spec/math/#data-model) like elements and text, so Inkscape-to-Inkscape sessions carry the XML in full. The adapter warns only if Inkscape writes something that isn't well-formed XML.
 
 ## The Inkboard warning
 
