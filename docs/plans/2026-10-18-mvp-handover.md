@@ -4,12 +4,12 @@
 
 ## 1. Repositories
 
-Three repositories under the `xtxp-link` GitHub organisation, each with one job:
+Three repositories under the `xtxp-link` GitHub organisation, each with one job. All are public by default, and the layout is set for the first milestones; expect it to be tidied later. The home page of xtxp.link maps them under "Contribute".
 
 | Repository | What it holds | Status |
 | --- | --- | --- |
 | `xtxp-link/website` | **The spec** and its public site, https://xtxp.link (Astro Starlight, deployed by Cloudflare on push to `main`), plus **plans and handovers** in `docs/plans/`, including this file. | Exists |
-| `xtxp-link/xtxp-rs` | **The Rust reference implementation**: Xmesh, the wire crate, the host, CLI peers, the fuzzer, feature files and test vectors. | David creates it, empty, before M1 |
+| `xtxp-link/xtxp-rs` | **The Rust reference implementation**: Xmesh, the wire crate, the host, CLI peers, the fuzzer, feature files and test vectors. | David creates it, public and empty, before M1 |
 | `xtxp-link/inkscape` | **The Inkscape fork**, with `xtxp-rs` vendored as a submodule and linked through Xmesh's C interface. | Forked for M2 |
 
 Behaviour (the spec, decisions, feature-level intent) changes in `website`; code changes in `xtxp-rs` and `inkscape`. A piece of work that changes both lands in both.
