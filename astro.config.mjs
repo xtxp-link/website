@@ -27,11 +27,11 @@ export default defineConfig({
       head: [
         { tag: 'script', attrs: { type: 'module', src: '/scripts/sidebar-reveal.js' } },
         // Link previews (Slack, social sites, chat apps): one site-wide image, rendered by scripts/social/render.mjs.
-        { tag: 'meta', attrs: { property: 'og:image', content: 'https://xtxp.link/social-card.png?v=3' } },
+        { tag: 'meta', attrs: { property: 'og:image', content: 'https://xtxp.link/social-card.png?v=4' } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
         { tag: 'meta', attrs: { property: 'og:image:alt', content: 'XTXP, the XML to XML Protocol: many people editing one XML document at once, with branchable history.' } },
-        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://xtxp.link/social-card.png?v=3' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://xtxp.link/social-card.png?v=4' } },
       ],
       sidebar: [
         {
