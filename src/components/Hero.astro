@@ -10,10 +10,15 @@ import DraftContentNotice from 'virtual:starlight/components/DraftContentNotice'
 import { LinkButton } from '@astrojs/starlight/components';
 import Logo from './Logo.astro';
 import Chevron from './Chevron.astro';
-import { TF, TOTAL, HOLD, R0, HERO_DELAY } from '../brand/logo.mjs';
+import { TF, TOTAL, HOLD, R0, HERO_DELAY, HERO_VIEWBOX } from '../brand/logo.mjs';
 
 const { data } = Astro.locals.starlightRoute.entry;
 const { title = data.title, tagline, actions = [] } = data.hero || {};
+
+// The slider starts at the left edge of the first x (its tip is 14 units from the glyph origin, plus 3 for the round cap),
+// so with the box widened to centre the + it reads as an underline of the wordmark.
+const [vbX, , vbW] = HERO_VIEWBOX.split(' ').map(Number);
+const underlineStart = `${(((-17 - vbX) / vbW) * 100).toFixed(2)}%`;
 
 const showControlAt = +(HERO_DELAY + TF + 0.3).toFixed(2); // seconds after load
 // With no JavaScript there is no control, so the loop plays the build once and stops on the full logo.
@@ -23,7 +28,7 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
 <div class="hero">
   <div class="sl-flex stack">
     <div class="sl-flex copy">
-      <div class="logo-block" data-total={TOTAL} data-build={TF} data-reverse={R0} data-delay={HERO_DELAY} style={`--ctl-delay:${showControlAt}s;--hero-delay:${HERO_DELAY}s`}>
+      <div class="logo-block" data-total={TOTAL} data-build={TF} data-reverse={R0} data-delay={HERO_DELAY} style={`--ctl-delay:${showControlAt}s;--hero-delay:${HERO_DELAY}s;--underline-start:${underlineStart}`}>
         <h1 id="_top" data-page-title>
           <Logo mode="loop" centre="plus" class="xtxp-hero-logo" />
           <span class="sr-only" set:html={title} />
@@ -252,8 +257,8 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
     align-items: center;
     justify-content: flex-end;
     gap: 0.75rem;
-    /* The button takes 1.75rem + the gap on the right; leave the same on the left so the slider is centred on the logo. */
-    padding-left: calc(1.75rem + 0.75rem);
+    /* The slider starts under the first x and runs to the button, like an underline of the wordmark. */
+    padding-left: var(--underline-start);
     box-sizing: border-box;
     animation: xtxp-ctl-in 0.5s ease-out var(--ctl-delay) both;
   }
