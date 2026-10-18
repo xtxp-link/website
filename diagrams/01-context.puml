@@ -6,6 +6,7 @@ left to right direction
 
 actor "Designer\n(Inkscape fork)" as designer
 actor "Browser user\n(Wasm client)" as wasm
+actor "Browser user\n(XTXP-compliant browser)" as native
 actor "Browser user\n(no JavaScript)" as nojs
 actor "Mobile / chat user\n(XMPP client)" as mobile
 
@@ -22,6 +23,7 @@ rectangle "Sign-in provider\n(Google, Apple, Mozilla)\n+ user's own storage" as 
 
 designer --> peers : edits SVG natively
 wasm --> peers : edits in browser
+native --> peers : built-in MUPPET,\nopens xtxp:// links
 nojs --> server : HTML forms,\nlinks, HTTP caching
 mobile --> bridge : chat, comments,\npush when asleep
 server --> hosts : in process
@@ -31,9 +33,10 @@ hosts ..> origin : genesis fetch\n(no cookies forwarded)
 peers ..> sso : fetch own private key\nafter sign-in
 peers ..> disco : signed query:\nwhich sessions may I see?
 
-' Keep the actors in reading order, top to bottom: designer, Wasm, no-JS, mobile.
+' Keep the actors in reading order, top to bottom: designer, Wasm, XTXP browser, no-JS, mobile.
 designer -[hidden]right- wasm
-wasm -[hidden]right- nojs
+wasm -[hidden]right- native
+native -[hidden]right- nojs
 nojs -[hidden]right- mobile
 
 note top of nojs
