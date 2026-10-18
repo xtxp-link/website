@@ -20,6 +20,7 @@ export default defineConfig({
       components: {
         Hero: './src/components/Hero.astro',
         SiteTitle: './src/components/SiteTitle.astro',
+        Pagination: './src/components/Pagination.astro',
       },
       customCss: ['./src/styles/theme.css', './src/styles/logo.generated.css', './src/styles/custom.css'],
       lastUpdated: false,

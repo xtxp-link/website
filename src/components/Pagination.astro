@@ -1,0 +1,66 @@
+---
+// Starlight's Previous/Next links, with the logo's chevrons in place of the default arrows:
+// Next uses the hero control's > (play), Previous its < (reverse), each with the accented tip.
+const { dir, pagination } = Astro.locals.starlightRoute;
+const { prev, next } = pagination;
+const isRtl = dir === 'rtl';
+const fwd = 'M7 3.8L14.2 10L7 16.2';
+const rev = 'M13 3.8L5.8 10L13 16.2';
+---
+
+<div class="pagination-links print:hidden" dir={dir}>
+  {
+    prev && (
+      <a href={prev.href} rel="prev">
+        <svg class="xtxp-chev" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="xtxp-pag-prev" gradientUnits="userSpaceOnUse" x1={isRtl ? 5 : 15} y1="0" x2={isRtl ? 15 : 5} y2="0">
+              <stop offset="0" stop-color="var(--sl-color-white)" />
+              <stop offset="0.55" stop-color="var(--sl-color-white)" />
+              <stop offset="1" stop-color="#ff5436" />
+            </linearGradient>
+          </defs>
+          <path d={isRtl ? fwd : rev} stroke="url(#xtxp-pag-prev)" />
+        </svg>
+        <span>
+          {Astro.locals.t('page.previousLink')}
+          <br />
+          <span class="link-title">{prev.label}</span>
+        </span>
+      </a>
+    )
+  }
+  {
+    next && (
+      <a href={next.href} rel="next">
+        <span>
+          {Astro.locals.t('page.nextLink')}
+          <br />
+          <span class="link-title">{next.label}</span>
+        </span>
+        <svg class="xtxp-chev" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="xtxp-pag-next" gradientUnits="userSpaceOnUse" x1={isRtl ? 15 : 5} y1="0" x2={isRtl ? 5 : 15} y2="0">
+              <stop offset="0" stop-color="var(--sl-color-white)" />
+              <stop offset="0.55" stop-color="var(--sl-color-white)" />
+              <stop offset="1" stop-color="#ff5436" />
+            </linearGradient>
+          </defs>
+          <path d={isRtl ? rev : fwd} stroke="url(#xtxp-pag-next)" />
+        </svg>
+      </a>
+    )
+  }
+</div>
+
+<style>
+  .xtxp-chev {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: none;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>
