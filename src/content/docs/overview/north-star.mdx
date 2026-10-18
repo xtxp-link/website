@@ -1,21 +1,25 @@
 ---
-title: 'North star: XTXP in the browser'
-description: XTXP as a first-class web standard built into browsers, compatible with every browser today through a Wasm polyfill and a no-JS client, and where the idea comes from.
+title: 'North star: the read-write web'
+description: The web as Tim Berners-Lee first built it, readable and writable, with XTXP supported natively in browsers and compatible everywhere today. And where the idea comes from.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
 <span class="status status--decided">decided</span>
 
+The web began as a medium you could write as well as read. XTXP aims to finish that job: any document on the web, live, editable by many people at once, forkable into sessions and mergeable, in an ordinary browser.
+
+## The goal: XTXP in the browser
+
 **XTXP as a first-class web standard, built into the browser.** A browser that speaks XTXP runs its own MUPPET, opens `xtxp://` links, and treats any page as a live document that many people can edit, fork into sessions and merge, with no JavaScript on the page and no app to install. Collaboration becomes part of the web itself, the way links and forms are.
 
-## Compatible everywhere
+### Compatible everywhere
 
 Backwards compatibility is part of the standard, so XTXP works in every browser, not only those that speak it:
 
 | Browser | How it takes part |
 | --- | --- |
-| **Speaks XTXP** | Runs its own MUPPET natively. The north star. |
+| **Speaks XTXP** | Runs its own MUPPET natively. The goal. |
 | **Runs JavaScript** | A **Wasm MUPPET** polyfills the same engine into the page. |
 | **No JavaScript** | **Plain forms, links and HTTP caching**, with a server-side MUPPET doing the CRDT work on the browser's behalf. A full participant, not a fallback. |
 
@@ -36,10 +40,26 @@ Some consequences:
 
 ## Roots
 
+### Tim Berners-Lee's read-write web
+
+The first browser, WorldWideWeb (1990), was also an editor. It could edit only local files, because HTTP `PUT` wasn't implemented yet, and as the web spread, reading won and writing became the job of separate tools and, later, of each site's own JavaScript. The read-write web is the idea XTXP comes back to.
+
+### Many people's work since
+
+Many people have chased that idea since: wikis, WebDAV, shared editors and more. One thread runs through XMPP.
+
 <Aside>
-Around 2005, David Campey wrote an experimental JEP (Jabber Enhancement Proposal, the name for XMPP extensions before the 2006 rename to XEP) for message and document updates over XMPP, with the aim of replacing HTTP.
+Around 2005, David Campey wrote an experimental JEP (Jabber Enhancement Proposal, the name for XMPP extensions before the 2006 rename to XEP) for message and document updates over XMPP, with the aim of replacing HTTP, worked through in conversation with people in the Jabber community such as Peter Saint-Andre (stpeter).
 </Aside>
 
-XTXP is that idea's second run. This time HTTP stays: it's the no-JS edge every browser already speaks, one of the layers that make XTXP compatible everywhere. Underneath it runs a lean streaming protocol for documents, over WebSocket, with XMPP kept as a bridge for the mobile and chat clients it serves well.
-
 The original JEP text hasn't been located yet. It isn't in the XSF's `xeps` repository, whose history starts with the October 2006 import, so the 2005 standards mailing list archives are the next place to look.
+
+### Local-first software
+
+Ink & Switch's work on local-first software argued that collaborative apps should keep working offline, keep data on the user's own devices, and sync through CRDTs rather than a central server. XTXP's peers, sessions and pure engine follow that line ([prior art](/discussion/prior-art/#local-first-software)).
+
+### "Surprise, it's server rendering"
+
+Schalk Venter's talk at PyCon ZA, [*Surprise, it's server rendering*](https://za.pycon.org/talks/4-suprise-its-server-rendering/), stacked up the browser features that let server-rendered sites feel live without a JavaScript framework: **CSS View Transitions**, the **Popover API**, **Speculation Rules** and **declarative partial updates**. It started a debate: could we, and should we, stream a site's content into the browser without JavaScript polyfills at all?
+
+That debate led to XTXP. This time HTTP stays: it's the no-JS edge every browser already speaks, one of the layers that make XTXP compatible everywhere, alongside a lean streaming protocol for documents over WebSocket, with XMPP kept as a bridge for the mobile and chat clients it serves well.

@@ -103,7 +103,7 @@ Each node is keyed by the ID of the operation that created it, and holds its kin
 - **No-JS users get an ephemeral key tied to their HTTP session**, perhaps kept by a cookie, and granted access by the owner; the server never holds a user's own key.
 - **M2 serves native documents only.**
 
-## 24. North star: XTXP in the browser
+## 24. North star: the read-write web, with XTXP in the browser
 
 The long-term goal is XTXP as a first-class web standard, built into browsers: a browser that runs its own MUPPET and opens `xtxp://` links. Backwards compatibility is part of it: a Wasm MUPPET polyfills browsers with JavaScript, and the no-JS client keeps every other browser a full participant, so XTXP works everywhere. "Does this still work with no JS?" stays the design test. See [North star](/overview/north-star/).
 

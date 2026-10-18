@@ -7,9 +7,28 @@ XTXP borrows from more than twenty years of work on collaborative editing, messa
 
 ## Where XTXP comes from
 
+### Tim Berners-Lee's WorldWideWeb
+
+The first browser (1990) was also an editor, though only for local files, since HTTP `PUT` wasn't implemented yet. The read-write web XTXP aims for. See [North star](/overview/north-star/#roots).
+
+- [W3C: The WorldWideWeb browser](https://www.w3.org/People/Berners-Lee/WorldWideWeb.html)
+
 ### David Campey's 2005 JEP
 
-An experimental Jabber Enhancement Proposal for message and document updates over XMPP, aimed at replacing HTTP. XTXP is its second run. See [North star](/overview/north-star/#roots). The original text is still being tracked down.
+An experimental Jabber Enhancement Proposal for message and document updates over XMPP, aimed at replacing HTTP, discussed with people in the Jabber community such as Peter Saint-Andre. See [North star](/overview/north-star/#roots). The original text is still being tracked down.
+
+### Local-first software
+
+Ink & Switch's case for collaborative software that works offline, keeps data on the user's own devices and syncs through CRDTs instead of a central server. XTXP's peers, sessions and pure engine follow it.
+
+- [Ink & Switch: Local-first software](https://www.inkandswitch.com/local-first/)
+
+### "Surprise, it's server rendering" and declarative partial updates
+
+Schalk Venter's PyCon ZA talk on browser features that make server-rendered sites feel live without a JavaScript framework: CSS View Transitions, the Popover API, Speculation Rules and declarative partial updates, which let HTML stream into the page out of order and fill marked placeholders later, with no script. The debate it started, about streaming site content without JavaScript polyfills, led to XTXP.
+
+- [PyCon ZA: Surprise, it's server rendering](https://za.pycon.org/talks/4-suprise-its-server-rendering/)
+- [Chrome for Developers: Declarative partial updates](https://developer.chrome.com/docs/web-platform/declarative-partial-updates)
 
 ### Inkboard and Pedro
 
