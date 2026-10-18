@@ -4,7 +4,7 @@
 // logo's red + sits on. The paragraph is a centred block with left-aligned text.
 //
 // A small control sits under the logo's right edge: a pause/play button whose icon shows the current state (> while playing, || while paused) (WCAG 2.2.2: the loop would otherwise run
-// forever) and, on hover or focus, a speed slider. The button is in the page and keyboard-focusable from the start,
+// forever) and, on hover or focus, a seek slider spanning the logo's full width. The button is in the page and keyboard-focusable from the start,
 // and fades in once the first build has finished, about 2.7 seconds in, inside the five seconds the criterion allows.
 import DraftContentNotice from 'virtual:starlight/components/DraftContentNotice';
 import { LinkButton } from '@astrojs/starlight/components';
@@ -22,15 +22,14 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
 <div class="hero">
   <div class="sl-flex stack">
     <div class="sl-flex copy">
-      <div class="logo-block" style={`--ctl-delay:${showControlAt}s;--hero-delay:${HERO_DELAY}s`}>
+      <div class="logo-block" data-total={TOTAL} data-delay={HERO_DELAY} style={`--ctl-delay:${showControlAt}s;--hero-delay:${HERO_DELAY}s`}>
         <h1 id="_top" data-page-title>
           <Logo mode="loop" centre="plus" class="xtxp-hero-logo" />
           <span class="sr-only" set:html={title} />
         </h1>
         <div class="xtxp-ctl">
-          <label class="sr-only" for="xtxp-rate">Logo animation speed</label>
-          <input id="xtxp-rate" type="range" min="-2" max="2" step="0.01" value="0" aria-valuetext="1x" />
-          <output id="xtxp-rate-read" for="xtxp-rate">1x</output>
+          <label class="sr-only" for="xtxp-seek">Seek through the logo animation</label>
+          <input id="xtxp-seek" type="range" min="0" max={TOTAL} step="0.01" value="0" aria-valuetext="0 of {TOTAL} seconds" />
           <button type="button" class="xtxp-play" aria-label="Pause logo animation" aria-pressed="false">
             <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
               <defs>
@@ -81,38 +80,80 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
   const block = document.querySelector<HTMLElement>('.logo-block');
   const logo = block?.querySelector<SVGElement>('.xtxp-logo');
   const button = block?.querySelector<HTMLButtonElement>('.xtxp-play');
-  const range = block?.querySelector<HTMLInputElement>('#xtxp-rate');
-  const read = block?.querySelector<HTMLOutputElement>('#xtxp-rate-read');
+  const seek = block?.querySelector<HTMLInputElement>('#xtxp-seek');
 
-  if (block && logo && button && range && read) {
-    let rate = 1;
+  if (block && logo && button && seek) {
+    const total = parseFloat(block.dataset.total ?? '0');
+    const delay = parseFloat(block.dataset.delay ?? '0'); // the loop's first iteration waits for the fade-in
     let userPaused = false;
     let onScreen = true;
+    let showing = false;
+    let frame = 0;
+
+    const anims = () => logo.getAnimations({ subtree: true });
 
     const apply = () => {
       const paused = userPaused || !onScreen;
-      logo.getAnimations({ subtree: true }).forEach((a) => {
-        a.updatePlaybackRate(rate);
-        if (paused) a.pause();
-        else a.play();
-      });
+      anims().forEach((a) => (paused ? a.pause() : a.play()));
     };
 
-    button.addEventListener('click', () => {
-      userPaused = !userPaused;
-      button.dataset.paused = String(userPaused);
-      button.setAttribute('aria-pressed', String(userPaused));
-      button.setAttribute('aria-label', userPaused ? 'Play logo animation' : 'Pause logo animation');
+    const setPaused = (paused: boolean) => {
+      userPaused = paused;
+      button.dataset.paused = String(paused);
+      button.setAttribute('aria-pressed', String(paused));
+      button.setAttribute('aria-label', paused ? 'Play logo animation' : 'Pause logo animation');
       apply();
+    };
+
+    // Where the loop is now, in seconds from the start of the first build.
+    const position = () => {
+      const t = anims()[0]?.currentTime;
+      if (typeof t !== 'number') return 0;
+      return Math.max(0, (t / 1000 - delay) % total);
+    };
+
+    const describe = (s: number) => seek.setAttribute('aria-valuetext', `${s.toFixed(1)} of ${total.toFixed(1)} seconds`);
+
+    // Keep the thumb on the animation while the slider is on show.
+    const follow = () => {
+      if (!showing) return;
+      if (document.activeElement !== seek || !seek.matches(':active')) {
+        const s = position();
+        seek.value = String(s);
+        describe(s);
+      }
+      frame = requestAnimationFrame(follow);
+    };
+    const startFollowing = () => {
+      if (showing) return;
+      showing = true;
+      frame = requestAnimationFrame(follow);
+    };
+    const stopFollowing = () => {
+      showing = false;
+      cancelAnimationFrame(frame);
+    };
+    const ctl = block.querySelector('.xtxp-ctl');
+    ctl?.addEventListener('pointerenter', startFollowing);
+    ctl?.addEventListener('focusin', startFollowing);
+    ctl?.addEventListener('pointerleave', () => {
+      if (!ctl.matches(':focus-within')) stopFollowing();
+    });
+    ctl?.addEventListener('focusout', () => {
+      if (!ctl.matches(':hover')) stopFollowing();
     });
 
-    // Logarithmic: 0.25x to 4x, with 1x in the middle.
-    range.addEventListener('input', () => {
-      rate = 2 ** parseFloat(range.value);
-      const text = `${Math.round(rate * 100) / 100}x`;
-      read.textContent = text;
-      range.setAttribute('aria-valuetext', text);
-      apply();
+    button.addEventListener('click', () => setPaused(!userPaused));
+
+    // Dragging the slider scrubs the logo and pauses it; press play to carry on from there.
+    seek.addEventListener('input', () => {
+      const s = parseFloat(seek.value);
+      if (!userPaused) setPaused(true);
+      anims().forEach((a) => {
+        a.pause();
+        a.currentTime = (s + delay) * 1000;
+      });
+      describe(s);
     });
 
     // Don't spend battery on a logo nobody can see.
@@ -172,15 +213,17 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
     animation-delay: var(--hero-delay);
   }
 
-  /* Pause / speed control */
+  /* Pause / seek control: a strip under the logo. The button sits at the right; the slider fills the rest of the row. */
   .xtxp-ctl {
     position: absolute;
+    left: 0;
     right: 0;
     bottom: 0;
     height: 1.75rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: flex-end;
+    gap: 0.75rem;
     animation: xtxp-ctl-in 0.5s ease-out var(--ctl-delay) both;
   }
   .xtxp-ctl:focus-within {
@@ -188,27 +231,20 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
     opacity: 1;
   }
   .xtxp-ctl input[type='range'] {
-    width: 0;
-    opacity: 0;
+    flex: 1;
+    min-width: 0;
+    height: 1.75rem;
     margin: 0;
+    opacity: 0;
     accent-color: var(--sl-color-accent);
-    transition: width 0.25s ease, opacity 0.2s ease;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
   }
-  .xtxp-ctl output {
-    display: none;
-    min-width: 3.2ch;
-    font: 0.75rem var(--sl-font-mono);
-    color: var(--sl-color-gray-4);
-    text-align: end;
-  }
+  /* Shown on hover or focus, and whenever the logo is paused so it can be scrubbed. */
   .xtxp-ctl:hover input[type='range'],
-  .xtxp-ctl:focus-within input[type='range'] {
-    width: 7rem;
+  .xtxp-ctl:focus-within input[type='range'],
+  .xtxp-ctl:has(.xtxp-play[data-paused='true']) input[type='range'] {
     opacity: 1;
-  }
-  .xtxp-ctl:hover output,
-  .xtxp-ctl:focus-within output {
-    display: block;
   }
   .xtxp-play {
     display: grid;
@@ -245,7 +281,6 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
   .xtxp-play[data-paused='true'] .icon-play {
     display: none;
   }
-  /* No hover on touch: show the slider while the control has focus (after a tap). */
   @media (prefers-reduced-motion: reduce) {
     .xtxp-ctl {
       display: none;
