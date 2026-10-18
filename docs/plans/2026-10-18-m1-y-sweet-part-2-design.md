@@ -191,7 +191,7 @@ delete-text <path> <offset> <len>
 ### 8.1 End-to-end tests
 
 `crates/xtxp-muppet/tests/`. Each test:
-- starts y-sweet on a free port, storing into a temporary folder;
+- starts y-sweet on a free port, storing into a temporary folder, with `--skip-gc` (GC off everywhere, as decision 19 needs; without it a late joiner's snapshot wouldn't match the peers') and `--checkpoint-freq-seconds 1` (so the restart test has something on disk);
 - puts the chaos proxy in front of it;
 - runs `xtxp-muppet` as separate processes.
 
@@ -231,7 +231,7 @@ cargo install --git https://github.com/jamsocket/y-sweet --rev 4f1909b2c3390ced5
 
 1. Checks that `cargo` is installed, and if not, says how to install Rust.
 2. Builds y-sweet into `.tools` if it isn't there yet (once, a few minutes), and `xtxp-muppet` in release.
-3. Starts y-sweet on `localhost:8080`, with data in `.ysweet-data`.
+3. Starts y-sweet on `localhost:8080`, with data in `.ysweet-data`, with `--skip-gc --checkpoint-freq-seconds 1`.
 4. Runs `init` with `crates/xmesh/tests/fixtures/inkscape-blank.svg` as the document `demo`, unless `demo` already exists.
 5. Prints the command to paste into two more terminals: `target/release/xtxp-muppet open demo`.
 6. Keeps y-sweet in the foreground. Ctrl-C stops it, and the data stays for next time.
