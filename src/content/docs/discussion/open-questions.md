@@ -32,7 +32,8 @@ M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live
 - **`xtxp://` binding:** does it name the WebSocket binding directly, or resolve to it through a muppet disco?
 - **Message framing:** how XTXP's own messages (identity, grants) sit alongside the Yjs sync messages and Yrs updates.
 - **XMPP bridge envelope:** namespace, transit-safe encoding and fallback body for chat clients (from M4).
-- **Media types:** reuse `application/xml-patch+xml` for patches; register a vendor type for the stream.
+- **Media types:** reuse `application/xml-patch+xml` for patches; whether the stream needs a type of its own.
+- **The wire format:** [decision 21](/discussion/decisions/#21-canonical-form-v0-and-one-wire-format-to-start) is a starting point; it needs further work.
 - **How the XMPP bridge is built:** for example as a component plugged into an existing XMPP server, speaking XTXP to a host.
 
 ## Engine
@@ -41,7 +42,6 @@ M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live
 - **History and memory:** snapshots need Yrs's garbage collection off. How fast do documents grow, and when is the [roadmap](/build/milestones/#roadmap) ledger worth building?
 - **Reusing y-sweet:** how much of hosting it can provide. Decided by the [y-sweet review](/build/milestones/#before-m1-review-y-sweet) before implementation.
 - **Hosting:** a single self-hosted Rust binary, or Cloudflare Workers with one Durable Object per session? Keeping each hosted session a pure actor with storage behind an interface allows both.
-- **Canonical form:** the exact XML canonicalisation used before hashing.
 
 ## Identity and access
 

@@ -10,9 +10,9 @@ c -> gw : GET https://xtxp.link/{host}/{path}@{ref}\n(+ query signed by the clie
 gw -> gw : which MUPPETs host sessions\nof {host}/{path} that this key may see?
 gw --> c : 303 → the hosting MUPPET\n(or a list of visible sessions)
 
-alt Accept: application/xtxp+xml
-  c -> node : open patch stream
-  node --> c : raw XTXP patch stream
+alt WebSocket upgrade
+  c -> node : upgrade to WebSocket
+  node --> c : XTXP stream:\nYrs v1 updates in XTXP frames
 else Accept: text/html
   c -> node : GET
   node --> c : rendered current state as HTML\n+ forms that POST edits\n+ link "open in native client" → xtxp://{host}/{path}@{ref}

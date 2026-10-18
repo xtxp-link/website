@@ -37,10 +37,10 @@ The order in which nodes caught in a cycle are reattached isn't pinned, so two i
 - *Genesis:* the root is created by one shared initial update.
 - *Node IDs:* generated without coordination.
 
-**A6. Canonical form for hashing** [3.1.3, high]
+**A6. Canonical form for hashing** [3.1.3, high] — **decided** (decision 21): Xmesh canonical form v0, on the Math page.
 *Recommendation:* skip full W3C C14N and define "Xmesh canonical form v0": sorted attributes, fixed namespace prefixes, UTF-8, no insignificant whitespace, defined escaping.
 
-**A7. One wire format** [1.6, 1.7, high]
+**A7. One wire format** [1.6, 1.7, high] — **decided as a starting point** (decision 21): Yrs v1 updates in XTXP frames, XML Patch for import and export only, the stream as a WebSocket upgrade. David: needs further work.
 The spec currently implies three: binary Yrs updates, an `application/xtxp+xml` "patch stream" over HTTP, and XML Patch.
 *Recommendation:* on the wire, XTXP carries Yrs updates in one encoding (v1 or v2) inside XTXP frames. XML Patch is only an import and export format for edits. Either drop the HTTP "raw patch stream" from content negotiation, or make it an upgrade to the WebSocket binding.
 

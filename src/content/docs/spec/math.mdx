@@ -128,9 +128,24 @@ A point in history is therefore named by a **snapshot**: a state vector plus a d
 Per-client counters stamp operations, and state vectors describe what a peer has seen. Neither is a vector clock in the usual sense.
 </Aside>
 
+## Canonical form v0
+
+<span class="status status--decided">decided</span> as a starting point ([decision 21](/discussion/decisions/#21-canonical-form-v0-and-one-wire-format-to-start))
+
+Convergence is checked by comparing the SHA-256 of each peer's XML, so every implementation must write exactly the same bytes. Full W3C Canonical XML is built for XML signatures and is more than this needs. **Xmesh canonical form v0** is:
+
+- **UTF-8**, with no XML declaration.
+- **Deleted nodes left out**, with everything under them.
+- **Attributes sorted** by expanded name: namespace URI, then local name.
+- **Fixed prefixes** for known namespaces: SVG as the default namespace, and `inkscape:`, `sodipodi:` and `xlink:`. Any other namespace gets `ns1`, `ns2` and so on, in order of first use.
+- **No whitespace** except what's inside text nodes.
+- **Minimal escaping**: `&` and `<` in text; `&`, `<` and `"` in attribute values, which are always double-quoted.
+
+The version is part of the form, so a later change never leaves doubt about which rules produced a hash.
+
 ## The patch language
 
-UI actions are expressed as **XML Patch** operations (RFC 5261: `add`, `replace`, `remove`, addressed by XPath) before they reach the engine. Xmesh translates each patch into Yrs operations that refer to node IDs, not positions, because XPath positions shift under concurrent edits.
+UI actions are expressed as **XML Patch** operations, an import and export format only, never sent between peers, (RFC 5261: `add`, `replace`, `remove`, addressed by XPath) before they reach the engine. Xmesh translates each patch into Yrs operations that refer to node IDs, not positions, because XPath positions shift under concurrent edits.
 
 RFC 7351 registers the `application/xml-patch+xml` media type for these documents. The patch operations themselves are defined in RFC 5261.
 
@@ -138,7 +153,6 @@ RFC 7351 registers the `application/xml-patch+xml` media type for these document
 
 - **History and garbage collection.** Garbage collection stays off, so deleted content is kept. How much history to keep is part of the [roadmap](/build/milestones/#roadmap).
 - **Snapshot hashes:** which hash, how short it can safely be, and how it's written after `@`.
-- **Canonicalisation** before hashing, for example W3C Canonical XML.
 - **Provenance beyond the host:** whether clients should occasionally sign a hash chain of their own operations (see [Identity and access](/spec/identity/#still-open)).
 
 See [open questions](/discussion/open-questions/).

@@ -22,12 +22,20 @@ Recovering from a dropped connection is part of XTXP itself, not something borro
 
 <span class="status status--draft">draft</span>
 
-The sync messages follow the [Yjs sync protocol](/discussion/prior-art/#the-yjs-sync-protocol), and operations travel in Yrs's binary update format. XTXP adds its own messages for identity and access alongside them.
+The sync messages follow the [Yjs sync protocol](/discussion/prior-art/#the-yjs-sync-protocol). XTXP adds its own messages for identity and access alongside them.
+
+### One wire format, to start
+
+<span class="status status--draft">draft</span> · enough to build M1 on; needs further work ([decision 21](/discussion/decisions/#21-canonical-form-v0-and-one-wire-format-to-start))
+
+- **Peers exchange Yrs binary updates**, in Yrs's v1 encoding, inside XTXP frames. v1 is Yrs's default, and what the Yjs sync protocol and y-sweet speak. The more compact v2 encoding is a later optimisation.
+- **XML Patch never travels between peers.** It's how edits come in from a UI or go out to a tool (see [The Math](/spec/math/#the-patch-language)).
+- **HTTP is for browsers.** A client that wants the live stream asks for a WebSocket upgrade on the same address.
 
 | Message | Purpose | Stored? |
 | --- | --- | --- |
 | `hello` / `challenge` / `prove` | Authenticate a connection by public key. See [Identity and access](/spec/identity/). | No |
-| `bind` | Signed: "public key P owns client ID 7 on this document." | Yes |
+| `bind` | Signed: "public key P owns client ID 7 on this session." | Yes |
 | `sync-1` | "Here is my state vector." | No |
 | `sync-2` | "Here are the operations you're missing." | Yes, as operations |
 | `update` | New operations, as they happen. | Yes |
@@ -64,6 +72,7 @@ Every binding runs over TLS. A session can also be end-to-end encrypted, so that
 ## Still open
 
 - How XTXP's own messages (identity, grants) are framed alongside the Yjs sync messages.
+- The wire format as a whole: decision 21 is a starting point to build on, not the final word.
 - Whether `xtxp://` names the WebSocket binding directly, or resolves to it through a muppet disco.
 - How the XMPP bridge is built: for example as a component plugged into an existing XMPP server, speaking XTXP to a host.
 
