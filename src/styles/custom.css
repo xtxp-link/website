@@ -97,3 +97,8 @@
     pointer-events: auto;
   }
 }
+
+/* Keep "Next" in the right-hand column even when there's no "Previous". */
+.pagination-links a[rel='next'] {
+  grid-column: 2;
+}
