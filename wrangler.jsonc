@@ -11,6 +11,10 @@
   // Requires the xtxp.link zone to be on the same Cloudflare account.
   // Remove this block to deploy to a *.workers.dev URL first.
   "routes": [{ "pattern": "xtxp.link", "custom_domain": true }],
+  // With a custom domain in `routes`, Wrangler turns the workers.dev address off unless told otherwise, and preview
+  // URLs depend on it. Turn both on so each branch and pull request gets a preview URL.
+  "workers_dev": true,
+  "preview_urls": true,
   // Lets Cloudflare build preview deployments for branches and pull requests (`wrangler preview`).
   "previews": {}
 }
