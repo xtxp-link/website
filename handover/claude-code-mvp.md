@@ -70,9 +70,9 @@ vectors/              generated and hand-written JSON vectors
 
 ### Scope
 
-- **Document model:** elements, attributes and element moves. Text content only if it's cheap; otherwise defer.
+- **Document model:** the schema on the Math page: elements and text nodes, expanded names, attributes, moves, deletion (decision 20).
 - **XML Patch:** the `add`, `replace` and `remove` subset needed by the vectors.
-- **Moves:** Wallace's algorithm. Decide first whether to adopt `yrs_tree` or write a small layer of our own.
+- **Moves:** the numbered algorithm on the Math page. Spike `yrs_tree` against it first; adopt it only if it gives the same trees on every vector.
 - **Canonical XML:** pick one deterministic serialisation for hashing and document it on the Math page.
 - **Wire:** Yjs sync step 1 and 2 plus updates; `hello`, `challenge`, `prove`, `bind`; `grant` and `revoke` for write access.
 - **Identity:** Ed25519 keys loaded from files. Sign-in to fetch keys is out of scope for M1.
@@ -110,14 +110,14 @@ vectors/              generated and hand-written JSON vectors
 
 From the [open questions](https://xtxp.link/discussion/open-questions/) page:
 
-- Adopt `yrs_tree`, or write our own move layer on Wallace's algorithm.
+- Spike `yrs_tree` against the decided move algorithm (adopt only if it matches).
 - How XTXP's own messages are framed alongside the Yjs sync messages.
 - Hosting: a self-hosted binary or Durable Objects (from the y-sweet review).
 
 From the spec review (`handover/review-decisions.md`, section A for M1 and B for M2), *pending review*:
 
-- **Decided** (decision 19): snapshots name points in history, with a short hash in URLs and ETags (A1); hosts admit or refuse whole sessions, and every connection edits in its own session (A2); a fresh client ID per session per connection (A3).
-- **M1, pending:** the move algorithm as numbered pseudocode (A4); tree schema details, including position on the edge, deletion, text nodes and namespaces (A5); canonical form v0 (A6); one wire format (A7); handshake domain separation (A8); the smallest M1 (A9).
+- **Decided** (decisions 19 and 20): snapshots name points in history, with a short hash in URLs and ETags (A1); hosts admit or refuse whole sessions, and every connection edits in its own session (A2); a fresh client ID per session per connection (A3); the move algorithm (A4) and tree schema (A5), both on the Math page.
+- **M1, pending:** canonical form v0 (A6); one wire format (A7); handshake domain separation (A8); the smallest M1 (A9).
 - **M2:** the Inkscape adapter contract (B1); the no-JS editing model (B2); SVG sanitising, CSP, a separate content origin and CSRF (B3); device keys for no-JS users (B4); native documents only (B5).
 
 Everything else can wait until after M2.

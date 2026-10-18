@@ -80,6 +80,10 @@ XTXP doesn't aim to host everyone's sessions, which cost server resources. xtxp.
 
 See [The Math](/spec/math/#snapshots-name-points-in-history), [Sessions and history](/spec/sessions/#admission-is-by-session) and [Identity and access](/spec/identity/).
 
+## 20. The tree schema and a deterministic move algorithm
+
+Each node is keyed by the ID of the operation that created it, and holds its kind (element or text), its expanded name, its edges (parent → counter and position), its attributes, a `deleted` tombstone, and text content for text nodes. Position travels with the edge. Fractional keys end with the client ID. Namespaces are stored expanded, and genesis is one fixed update. Deletion hides a subtree without losing what happens inside it. Reading the tree follows a numbered algorithm that roots cycle-caught nodes in ascending node ID order. `yrs_tree` is spiked against it and adopted only if it gives the same trees. See [The Math](/spec/math/#data-model).
+
 ## Naming
 
 - **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.

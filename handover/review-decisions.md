@@ -24,11 +24,11 @@ Yrs needs each client's updates to be contiguous, so refusing one update leaves 
 Reusing a client ID on a session and its fork makes merges silently drop edits.
 *Recommendation:* make it a rule. Bindings are scoped to a session address (drop the undefined "DocId"), and the first binding for a client ID wins.
 
-**A4. Deterministic move algorithm** [2.5, high]
+**A4. Deterministic move algorithm** [2.5, high] — **decided** (decision 20): numbered algorithm on the Math page; cycle-caught nodes rooted in ascending node ID order; `yrs_tree` spiked against it.
 The order in which nodes caught in a cycle are reattached isn't pinned, so two implementations can build different trees. Also undefined: a cycle with no rooted parent, a deleted parent, and the tie-break key.
 *Recommendation:* write the read algorithm as numbered pseudocode, then spike `yrs_tree` against it before choosing adopt or write-our-own.
 
-**A5. Tree schema details** [2.6, 2.7, 2.8, high]
+**A5. Tree schema details** [2.6, 2.7, 2.8, high] — **decided** (decision 20), all as recommended: position on the edge, client-ID suffix on keys, tombstones, text nodes, expanded names, fixed genesis, op-ID node IDs.
 - *Position travels with the parent:* store each child's position on its edge to the parent, so a concurrent move can't end up with one person's parent and another's position.
 - *Fractional key collisions:* define key generation with a tie-breaker.
 - *Deletion:* tombstone or removal, and what happens to edits inside a deleted node.

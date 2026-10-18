@@ -35,6 +35,14 @@ Vectors also pin down the session rules ([decision 19](/discussion/decisions/#19
 - **Held dependencies:** a session built on an unadmitted one is held back with it, with a defined error.
 - **Client ID reuse:** a binding for a client ID already in the session's history is rejected.
 
+And the tree rules ([decision 20](/discussion/decisions/#20-the-tree-schema-and-a-deterministic-move-algorithm)):
+
+- **Cycles:** concurrent moves forming cycles of two, three and more nodes, including nested cycles, give the same tree in every delivery order.
+- **Move versus reorder:** a concurrent move and reorder of one node never mixes one person's parent with the other's position.
+- **Same-spot inserts:** two peers inserting at the same place get distinct, consistently ordered positions.
+- **Deletion:** edits inside a deleted node merge, stay hidden, and come back on undelete; a move into a deleted node is hidden with it.
+- **Mixed content and namespaces:** `<text>` with interleaved `<tspan>`s, and `inkscape:` and `sodipodi:` attributes, round-trip.
+
 
 ## The fuzzer
 

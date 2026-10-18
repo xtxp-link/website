@@ -4,28 +4,29 @@ title Cycle-safe tree moves (after Evan Wallace)
 
 partition "Writing a move" {
   start
-  :move(node, new_parent);
+  :move(node, new_parent, position);
   :c = highest counter in node.edges;
-  :node.edges[new_parent] = c + 1\n(a plain map write; old edges stay);
+  :node.edges[new_parent] = (c + 1, position)\n(a plain map write; old edges stay);
   stop
 }
 
 partition "Reading the tree (every peer, same rule)" {
   start
-  :for each node, parent = edge with\nthe highest counter (ID breaks ties);
-  :nodes that reach the root\nform the tree;
-  while (any nodes not rooted?\n(they are in a cycle)) is (yes)
-    :pick the next node and an edge to an\nalready-rooted parent: highest counter,\nIDs break ties;
-    :reattach it there\n(view only: stored data unchanged);
+  :best edge = highest counter,\nthen lowest parent node ID;
+  :follow each node's best edge;\nnodes that reach the root are rooted;
+  while (any nodes not rooted?\n(they are in cycles)) is (yes)
+    :in ascending node ID order (client, counter):\nroot each at its best edge\nwhose parent is now rooted;
+    :then root nodes whose best edge\nleads to a newly rooted node;
   endwhile (no)
-  :order siblings by fractional index;
+  :order children by the position\non their chosen edge;
+  :hide deleted nodes\nand everything under them;
   stop
 }
 
 note right
-  The same converged maps and the
-  same rule give the same tree on
-  every peer.
+  Always ends: every node's first edge,
+  from when it was created, points to a
+  parent that existed before it.
   Nothing is rewritten, so peers
   never fight over the fix.
 end note

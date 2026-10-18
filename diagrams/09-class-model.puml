@@ -6,15 +6,17 @@ hide empty methods
 
 class "Xmesh document" as Doc <<Yrs Doc>> {
   nodes : Map<NodeId, Node>
-  root : NodeId
+  root : NodeId (from genesis)
 }
 
 class Node <<Yrs Map>> {
-  tag : string
-  edges : Map<NodeId, counter>
-  position : fractional index
-  attrs : Map<string, string>
-  text : Text (optional)
+  id = ID of the creating op
+  kind : element | text
+  name : {namespace}local (elements)
+  edges : Map<NodeId, (counter, position)>
+  attrs : Map<{ns}name, string> (elements)
+  deleted : bool (tombstone)
+  content : Text (text nodes)
 }
 
 class "ID (Yrs)" as ID <<value>> {

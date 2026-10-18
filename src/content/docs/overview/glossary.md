@@ -28,7 +28,7 @@ description: Terms used across the XTXP specification.
 : The ref for an ordinary website's authoritative version: the stream of changes from the origin server, as the upstream peer sees it. Read-only. Not to be confused with genesis (vector 0), the start of a document's history.
 
 **Genesis (vector 0)**
-: The first state of a document. For live web branching, it is the fetched origin page.
+: The first state of a document: one fixed update that creates the root, identical everywhere. For live web branching, it is the fetched origin page.
 
 **Host**
 : A MUPPET hosting sessions: it admits operations to its own sessions against their grants, routes them and stores them, usually headless on a server.
@@ -47,6 +47,9 @@ description: Terms used across the XTXP specification.
 
 **Muppet disco**
 : *Future milestone.* A discovery service that helps a client find the MUPPETs hosting the sessions it may see, from a query signed with its key. A disco doesn't host sessions itself, and anyone can run one. xtxp.link is one.
+
+**Node ID**
+: The ID of the Yrs operation that created a node: client ID plus counter. Needs no coordination, and survives moves and edits.
 
 **Onion skin**
 : A translucent overlay of another state (a session, a paused queue, another connection's session that hasn't been merged yet) drawn over the current one.

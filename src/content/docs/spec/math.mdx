@@ -30,23 +30,40 @@ Xmesh stays a pure core: no networking, no files, no clocks. See [decision 13](/
 
 ## Data model
 
-<Diagram name="09-class-model" alt="Class diagram: an Xmesh document is a Yrs document holding a map of nodes by stable ID; each node has a tag, an edge map of parent counters, a fractional index for its position, an attribute map and optional text; client IDs are bound to authors' public keys; a session has a parent and a fork state vector." />
+<Diagram name="09-class-model" alt="Class diagram: an Xmesh document is a Yrs document holding a map of nodes keyed by the ID of the operation that created them; each node has a kind, a namespaced name, an edge map from parent to counter and position, an attribute map, a deleted flag, and text content for text nodes; client IDs are bound to authors' public keys; a session has a parent and a fork snapshot." />
 
-The document is a **map of nodes, keyed by a stable node ID**, not a nested Yrs XML fragment. Each node holds:
+<span class="status status--decided">decided</span> ([decision 20](/discussion/decisions/#20-the-tree-schema-and-a-deterministic-move-algorithm))
+
+The document is a **map of nodes, keyed by node ID**, not a nested Yrs XML fragment. Each node holds:
 
 | Field | Yrs type | Purpose |
 | --- | --- | --- |
-| `tag` | string | The element name, such as `circle` or `g` |
-| `edges` | map: parent ID → counter | Every parent the node has had; the highest counter is its current parent (see moves, below) |
-| `position` | fractional index | The node's order among its siblings |
-| `attrs` | map | Attributes: `@fill`, `@d`, `@transform` and so on |
-| `text` | text | Character content, where the element has any |
+| `kind` | string | `element` or `text`. Text nodes give SVG's `<text>` and `<tspan>` their mixed content. |
+| `name` | string | Elements only: the expanded name, namespace URI plus local name, such as `{http://www.w3.org/2000/svg}circle` |
+| `edges` | map: parent ID → (counter, position) | Every parent the node has had, each with the position it was given there. The highest counter is its current parent and position (see moves, below). |
+| `attrs` | map | Elements only: attributes by expanded name, such as `fill` or `{http://www.inkscape.org/namespaces/inkscape}label` |
+| `deleted` | boolean | A tombstone. See deletion, below. |
+| `content` | text | Text nodes only: the characters |
+
+- **Node IDs need no coordination.** A node's ID is the Yrs ID of the operation that created it: client ID plus counter. Client IDs are [fresh per session and connection](/spec/identity/#signing-only-at-identity-steps), so IDs never collide.
+- **Namespaces are stored expanded.** Prefixes such as `inkscape:`, `sodipodi:` and `xlink:` are chosen only when writing XML out, by the canonical form.
+- **Genesis is one fixed update.** Every document starts from the same initial update that creates the root, identical byte for byte everywhere, so two peers can never create two different roots.
+
+### Deletion
+
+Deleting a node sets its `deleted` flag. The node and everything under it disappear from the materialised tree, but stay in the document:
+
+- **Edits inside a deleted node still merge.** They are hidden with it.
+- **Undeleting clears the flag**, and the node comes back with everything that was done inside it meanwhile. Undo relies on this.
+- **A move into a deleted node** is hidden too, until the node is undeleted.
 
 ## Ordering
 
 Within text, Yrs orders concurrent insertions with **YATA** (Yet Another Transformation Approach). Each insertion remembers the neighbours it went between, and ties are broken by client ID. Deleted characters become tombstones, so later insertions can still find their place.
 
-Among siblings, order comes from each node's **fractional index**: a sortable key that can always fit a new key between two others. Moving a node to a new position is just giving it a new key.
+Among siblings, order comes from each node's **fractional index**: a sortable key that can always fit a new key between two others. The position lives on the node's current edge, so its parent and its place among that parent's children always come from the same move. Reordering within the same parent is a move to the same parent with a new position.
+
+Two people inserting at the same spot at the same time could generate the same key, so **every key ends with the client ID of the peer that made it**. Keys are then always distinct, and ties break the same way everywhere.
 
 ## Immortal parents
 
@@ -65,13 +82,27 @@ Yrs has XML element and fragment types, but in them a move is a delete plus an i
 
 Moving an element changes its parent. If Alice moves group A into group B while Bob moves B into A, a naive merge creates a cycle. Xmesh uses **Evan Wallace's mutable tree algorithm** ([prior art](/discussion/prior-art/#cycle-safe-tree-moves)):
 
-<Diagram name="10-activity-move" alt="Activity: to move a node, set the new parent's counter in its edge map one above its current maximum. To read the tree, each node's parent is the edge with the highest counter; nodes that can reach the root form the tree; nodes caught in a cycle are reattached one at a time to an already-rooted parent, preferring the highest counter, with IDs breaking ties." />
+<Diagram name="10-activity-move" alt="Activity: to move a node, write the new parent into its edge map with a counter one above its current maximum and the new position. To read the tree, each node's best edge is the highest counter, then the lowest parent ID; nodes that reach the root are rooted; nodes caught in cycles are rooted in ascending node ID order at their best edge to an already-rooted parent; children are ordered by position and deleted nodes are hidden." />
 
-- **A move is a map write.** The node's edge map gets the new parent, with a counter one higher than any it already has. Old entries stay.
-- **Reading the tree resolves cycles deterministically.** Each node's parent is its highest-counter edge. Nodes that reach the root form the tree. Any nodes caught in a cycle are reattached one by one to an already-rooted parent, choosing the highest counter and breaking ties by ID.
+- **A move is a map write.** The node's edge map gets the new parent, with a counter one higher than any it already has, and the position it's given there. Old entries stay.
+- **Reading the tree resolves cycles deterministically**, by the algorithm below.
 - **Every peer agrees**, because they all apply the same rule to the same converged maps. Stored data is never rewritten, so peers never fight over it.
 
-The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements this algorithm on Yrs. Adopting it or writing our own layer is [open](/discussion/open-questions/#engine).
+### Reading the tree
+
+<span class="status status--decided">decided</span>
+
+Node IDs compare by client ID, then counter. Edges compare by counter, highest first, then by parent node ID, lowest first.
+
+1. The root (from genesis) is **rooted**.
+2. Give every other node its **preferred edge**: its best edge by the order above.
+3. Follow preferred edges. Every node whose chain reaches the root is **rooted**, at its preferred edge.
+4. Take the nodes that aren't rooted. They are caught in cycles. Go through them in **ascending node ID order**. For each one, take its best edge whose parent is now rooted. If it has one, it is rooted there; then root any nodes whose preferred edge leads to it.
+5. Repeat step 4 until every node is rooted. This always ends, because every node's first edge, from when it was created, points to a parent that existed before it, so those edges lead back to the root.
+6. Within each parent, order children by the position on their chosen edge.
+7. Hide deleted nodes and everything under them.
+
+The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements Wallace's algorithm on Yrs. It will be spiked against this algorithm and the test vectors, and adopted only if it gives exactly the same trees.
 
 ## Clocks and state vectors
 
