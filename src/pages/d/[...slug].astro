@@ -28,7 +28,7 @@ export function getStaticPaths() {
 const { name, title, theme } = Astro.props as { name: string; title: string; theme?: 'light' | 'dark' };
 const light = `/diagrams/light/${name}.svg`;
 const dark = `/diagrams/dark/${name}.svg`;
-const source = `/diagrams/src/${name}.puml`;
+const source = `https://github.com/xtxp-link/website/blob/main/diagrams/${name}.puml`;
 ---
 
 <!doctype html>
