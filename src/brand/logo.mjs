@@ -170,6 +170,40 @@ export function logoCss(root = '.xtxp-logo', { animate = true } = {}) {
   return base + frames + loop + run + still;
 }
 
+/**
+ * The hero's play button shows which way the logo is going: > while it builds, < while it reverses.
+ * Both are locked to the same timeline as the logo (same duration, same delay), so pausing and seeking carry them along.
+ * At the start of the reverse the > shrinks to a central dot and the < grows out of it; as the reverse arrives back at
+ * the x, the < shrinks to the dot and the > grows back.
+ * Parts: .chev-fwd (>), .chev-rev (<), .chev-dot. Each point is [seconds, fwd scale, rev scale, dot opacity].
+ */
+export function controlCss(scope = '.xtxp-play') {
+  const END = r(R0 + TF); // the reverse arrives back at the x
+  const pts = [
+    [0, 1, 0, 0],
+    [R0, 1, 0, 0],
+    [r(R0 + 0.18), 0, 0, 1],
+    [r(R0 + 0.2), 0, 0, 1],
+    [r(R0 + 0.38), 0, 1, 0],
+    [r(END - 0.3), 0, 1, 0],
+    [r(END - 0.18), 0, 0, 1],
+    [r(END - 0.16), 0, 0, 1],
+    [END, 1, 0, 0],
+    [TOTAL, 1, 0, 0],
+  ];
+  const frames = (name, col, prop) =>
+    `@keyframes xl-ctl-${name}{${pts.map((p) => `${pct(p[0])}{${prop(p[col])}}`).join('')}}`;
+  const scale = (v) => `transform:scale(${v})`;
+  const anim = (name) => `animation:xl-ctl-${name} ${TOTAL}s ${EASE} var(--hero-delay,0s) infinite both`;
+  return (
+    frames('fwd', 1, scale) + frames('rev', 2, scale) + frames('dot', 3, (v) => `opacity:${v}`) +
+    `${scope} .chev{transform-origin:10px 10px;transform-box:view-box}` +
+    `${scope} .chev-fwd{${anim('fwd')}}${scope} .chev-rev{transform:scale(0);${anim('rev')}}` +
+    `${scope} .chev-dot{opacity:0;${anim('dot')}}` +
+    `@media (prefers-reduced-motion:reduce){${scope} .chev,${scope} .chev-dot{animation:none!important}${scope} .chev-fwd{transform:none}}`
+  );
+}
+
 /** The glyphs. Origin is the centre of the first x; the + sits at x=32, the second x at 64, the p at 92. */
 export function glyphs({ withP = true } = {}) {
   return (

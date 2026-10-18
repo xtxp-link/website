@@ -3,7 +3,7 @@
 // and search engines) and there is no image column. Everything is centred on the page's centre line, which the
 // logo's red + sits on. The paragraph is a centred block with left-aligned text.
 //
-// A small control sits under the logo's right edge: a pause/play button whose icon shows the current state (> while playing, || while paused) (WCAG 2.2.2: the loop would otherwise run
+// A small control sits under the logo's right edge: a pause/play button whose icon shows the current state (> while the logo builds, < while it reverses, || while paused) (WCAG 2.2.2: the loop would otherwise run
 // forever) and, on hover or focus, a seek slider spanning the logo's full width. The button is in the page and keyboard-focusable from the start,
 // and fades in once the first build has finished, about 2.7 seconds in, inside the five seconds the criterion allows.
 import DraftContentNotice from 'virtual:starlight/components/DraftContentNotice';
@@ -38,14 +38,24 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
                   <stop offset="0.55" stop-color="var(--sl-color-white)"></stop>
                   <stop offset="1" stop-color="#ff5436"></stop>
                 </linearGradient>
+                <linearGradient id="xtxp-edge-rev" gradientUnits="userSpaceOnUse" x1="15" y1="0" x2="5" y2="0">
+                  <stop offset="0" stop-color="var(--sl-color-white)"></stop>
+                  <stop offset="0.55" stop-color="var(--sl-color-white)"></stop>
+                  <stop offset="1" stop-color="#ff5436"></stop>
+                </linearGradient>
               </defs>
-              <!-- The icon shows the current state. Playing: the logo's > chevron, its right edge accented.
-                   Paused: two bars in one colour. The label and aria-pressed describe the action and state in words. -->
+              <!-- The icon shows the current state. While the logo builds it is the logo's > chevron, tip accented;
+                   while the logo reverses it is a < (the > shrinks to a dot and the < grows out of it, and back again),
+                   all driven by the same timeline as the logo. Paused: two bars in one colour. -->
+              <g class="icon-play" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path class="chev chev-fwd" d="M7 3.8L14.2 10L7 16.2" stroke="url(#xtxp-edge)"></path>
+                <path class="chev chev-rev" d="M13 3.8L5.8 10L13 16.2" stroke="url(#xtxp-edge-rev)"></path>
+                <circle class="chev-dot" cx="10" cy="10" r="1.5" fill="var(--sl-color-white)" stroke="none"></circle>
+              </g>
               <g class="icon-pause" fill="none" stroke-width="2.6" stroke-linecap="round">
                 <path d="M7 4.5V15.5" stroke="var(--sl-color-white)"></path>
                 <path d="M13 4.5V15.5" stroke="var(--sl-color-white)"></path>
               </g>
-              <path class="icon-play" d="M7 3.8L14.2 10L7 16.2" fill="none" stroke="url(#xtxp-edge)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
           </button>
         </div>
@@ -90,7 +100,8 @@ const noJsIterations = +((TF + HOLD / 2) / TOTAL).toFixed(4);
     let showing = false;
     let frame = 0;
 
-    const anims = () => logo.getAnimations({ subtree: true });
+    // The logo's animations, then the button icon's (same timeline, so one pause/seek moves both).
+    const anims = () => [...logo.getAnimations({ subtree: true }), ...button.getAnimations({ subtree: true })];
 
     const apply = () => {
       const paused = userPaused || !onScreen;
