@@ -26,10 +26,16 @@ class StateVector <<Yrs>> {
   clocks : map<client, clock>
 }
 
+class Snapshot <<Yrs>> {
+  state : StateVector
+  deleted : DeleteSet
+  hash : used in @{snapshot}, ETag
+}
+
 class Session {
   address : host/path@name
   parent : address
-  fork_at : StateVector
+  fork_at : Snapshot
 }
 
 class Trust {
@@ -39,7 +45,8 @@ class Trust {
 
 class ClientBinding <<signed>> {
   client
-  document : DocId
+  session : address
+  fresh per session + connection
   key : PublicKey
 }
 
@@ -49,7 +56,8 @@ class Author {
 
 Doc *-- "many" Node
 Node ..> Node : edges point to\nparents by NodeId
-Session --> StateVector
+Session --> Snapshot
+Snapshot --> StateVector
 Trust --> Session : changes merge\nautomatically
 ID ..> ClientBinding : client
 ClientBinding --> Author : signed by

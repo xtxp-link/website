@@ -76,7 +76,7 @@ vectors/              generated and hand-written JSON vectors
 - **Canonical XML:** pick one deterministic serialisation for hashing and document it on the Math page.
 - **Wire:** Yjs sync step 1 and 2 plus updates; `hello`, `challenge`, `prove`, `bind`; `grant` and `revoke` for write access.
 - **Identity:** Ed25519 keys loaded from files. Sign-in to fetch keys is out of scope for M1.
-- **Sessions:** a single session, `@main`. Fork, merge and trust come later.
+- **Sessions:** one shared session, `@main`. Each peer connection edits in its own session with a fresh client ID, and the host admits it into `@main` by merging (decision 19). Named forks, previews and trust come later.
 - **Storage:** append updates, compact periodically.
 
 ### Done when
@@ -84,9 +84,10 @@ vectors/              generated and hand-written JSON vectors
 1. Every vector converges under many shuffled delivery orders: same SHA-256 of canonical XML, no cycles, idempotent re-delivery.
 2. Two CLI peers and a late joiner, connected to one host over WebSocket with connections dropped on purpose, end with identical hashes.
 3. A late joiner loads the full state in one update.
-4. A key without a write grant has its edits refused.
-5. After a revocation reaches the host, that key's new edits are not admitted.
-6. All of the above runs in CI.
+4. A key without a write grant has its session refused: never merged into `@main`, and the other peers keep converging.
+5. After a revocation reaches the host, that key's session stops being merged.
+6. A fork rebuilt from its snapshot keeps content deleted after the fork, and deleting a shape changes the ETag hash.
+7. All of the above runs in CI.
 
 ## 6. M2: Inkscape plus a browser with no JavaScript
 
@@ -115,7 +116,8 @@ From the [open questions](https://xtxp.link/discussion/open-questions/) page:
 
 From the spec review (`handover/review-decisions.md`, section A for M1 and B for M2), *pending review*:
 
-- **M1:** snapshots rather than state vectors to name points in history (A1); refusing whole client IDs, with previews in separate documents (A2); a fresh client ID per session per connection (A3); the move algorithm as numbered pseudocode (A4); tree schema details, including position on the edge, deletion, text nodes and namespaces (A5); canonical form v0 (A6); one wire format (A7); handshake domain separation (A8); the smallest M1 (A9).
+- **Decided** (decision 19): snapshots name points in history, with a short hash in URLs and ETags (A1); hosts admit or refuse whole sessions, and every connection edits in its own session (A2); a fresh client ID per session per connection (A3).
+- **M1, pending:** the move algorithm as numbered pseudocode (A4); tree schema details, including position on the edge, deletion, text nodes and namespaces (A5); canonical form v0 (A6); one wire format (A7); handshake domain separation (A8); the smallest M1 (A9).
 - **M2:** the Inkscape adapter contract (B1); the no-JS editing model (B2); SVG sanitising, CSP, a separate content origin and CSRF (B3); device keys for no-JS users (B4); native documents only (B5).
 
 Everything else can wait until after M2.

@@ -27,7 +27,7 @@ M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live
 ## Wire and addressing
 
 - **Ref names:** whether `@main` or `@latest` names the shared session.
-- **State vectors in URLs:** a compact, readable way to write one after `@`.
+- **Snapshot hashes in URLs:** which hash, how short, and how it's written after `@`.
 - **Native or website?** How a disco or client tells that `{host}` is a MUPPET rather than an ordinary site, for example a `/.well-known/` file or a DNS record.
 - **`xtxp://` binding:** does it name the WebSocket binding directly, or resolve to it through a muppet disco?
 - **Message framing:** how XTXP's own messages (identity, grants) sit alongside the Yjs sync messages and Yrs updates.

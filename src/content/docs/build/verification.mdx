@@ -27,6 +27,14 @@ The pass conditions are **invariants**, checked on every run:
 - **No cycles:** the materialised tree is always a tree.
 - **Idempotence:** delivering an operation twice changes nothing.
 
+Vectors also pin down the session rules ([decision 19](/discussion/decisions/#19-snapshots-admission-by-session-fresh-client-ids)):
+
+- **Fork after a deletion:** a fork rebuilt from its snapshot still holds content deleted after the fork.
+- **ETag on delete:** deleting a shape changes the snapshot hash.
+- **Refusal doesn't stall:** a refused session is never merged, and every admitted session keeps converging.
+- **Held dependencies:** a session built on an unadmitted one is held back with it, with a defined error.
+- **Client ID reuse:** a binding for a client ID already in the session's history is rejected.
+
 
 ## The fuzzer
 

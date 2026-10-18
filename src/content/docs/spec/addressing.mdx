@@ -45,7 +45,7 @@ The `@{ref}` suffix says which version you mean:
 | `@origin` | The website's authoritative version, as served by its origin server: the upstream peer's session. Websites only, read-only. |
 | `@main` | The shared collaborative session. The default for native documents. |
 | `@{session}` | A named session on this host: a proposed edit, an undo fork, someone's overlay. A session on another host is addressed through that host: `xtxp.link/{other-host}/{path}@{session}`. |
-| `@{state vector}` | An exact point in history. *Syntax open.* |
+| `@{snapshot}` | An exact point in history: a short hash of a [snapshot](/spec/math/#snapshots-name-points-in-history). *Syntax open.* |
 
 Examples:
 
@@ -72,7 +72,7 @@ xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 
 `@origin` means unedited. Any other ref means a session that may contain other people's edits, and the page frame says so, with links to `@origin` and to the original site. The ref travels with every shared link, so a reader can tell what they're looking at before they click. That supports the [overlay safety requirements](/spec/web-overlay/#safety-requirements).
 
-<Diagram name="11-seq-negotiation" alt="Sequence: a client asks the xtxp.link disco for an address, and the disco finds the MUPPET hosting the session and redirects there; with Accept application/xtxp+xml the host opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client. The ref after the last @ picks @origin, @main, another session or a state vector." />
+<Diagram name="11-seq-negotiation" alt="Sequence: a client asks the xtxp.link disco for an address, and the disco finds the MUPPET hosting the session and redirects there; with Accept application/xtxp+xml the host opens a raw patch stream, with Accept text/html it returns rendered HTML with edit forms and a link to the native client. The ref after the last @ picks @origin, @main, another session or a snapshot." />
 
 ## Content negotiation
 
@@ -92,7 +92,7 @@ The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp:
 
 ## Deep links and short links
 
-- **Vector snapshots**: `@{state vector}` names a document at an exact point in history, so a historical state can be shared exactly. How a state vector is written in a URL is <span class="status status--open">open</span>.
+- **Snapshots**: `@{snapshot}` names a document at an exact point in history, so a historical state can be shared exactly. How the snapshot hash is written in a URL is <span class="status status--open">open</span>.
 - **Discovery**: a [muppet disco](/spec/disco/) resolves an address to the MUPPET currently hosting the session.
 - **Short links**: short, low-density URLs that make easily scanned QR codes, for bridging paper and screens.
 

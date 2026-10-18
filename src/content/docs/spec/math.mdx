@@ -1,6 +1,6 @@
 ---
 title: The Math
-description: How Xmesh merges concurrent edits to an XML tree. Built on Yrs, with immortal parents, cycle-safe tree moves, state vectors and the patch language.
+description: How Xmesh merges concurrent edits to an XML tree. Built on Yrs, with immortal parents, cycle-safe tree moves, state vectors, snapshots and the patch language.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -79,7 +79,19 @@ The [`yrs_tree`](/discussion/prior-art/#cycle-safe-tree-moves) crate implements 
 - Every peer keeps a **state vector**: for each client, the highest counter it has integrated.
 - Two peers sync by exchanging state vectors. Each sends the operations the other is missing.
 
-Yrs provides all three. A state vector also describes how far a peer has got, which is how a [session](/spec/sessions/) records where it was forked. (Sessions themselves are identified by their address.)
+Yrs provides all three.
+
+### Snapshots name points in history
+
+<span class="status status--decided">decided</span>
+
+A state vector says how far a peer has got, but it doesn't pin a state. In Yrs, deleting something doesn't use a clock value: deletions are recorded in a separate **delete set**. So two peers with the same state vector can still differ by what they've deleted.
+
+A point in history is therefore named by a **snapshot**: a state vector plus a delete set, as Yrs defines it.
+
+- **A [session](/spec/sessions/) records the full snapshot it was forked at.** Rebuilding a fork from it gives exactly the state at the fork, even if content was deleted afterwards.
+- **Addresses and ETags carry a short hash of a snapshot.** `@{snapshot}` in a URL is that hash, and the host keeps the snapshot it stands for. Because the hash covers deletions, deleting a shape changes the ETag, so a no-JS browser polling with `If-None-Match` sees it.
+- **Snapshots need Yrs's garbage collection off**, so deleted content is kept. This is the rule from the start.
 
 <Aside type="note" title="Terminology">
 Per-client counters stamp operations, and state vectors describe what a peer has seen. Neither is a vector clock in the usual sense.
@@ -93,7 +105,8 @@ RFC 7351 registers the `application/xml-patch+xml` media type for these document
 
 ## Still open
 
-- **History and garbage collection.** Snapshots, and so `@{state vector}` and branching from the past, need Yrs's garbage collection turned off, so deleted content is kept. How much history to keep is part of the [roadmap](/build/milestones/#roadmap).
+- **History and garbage collection.** Garbage collection stays off, so deleted content is kept. How much history to keep is part of the [roadmap](/build/milestones/#roadmap).
+- **Snapshot hashes:** which hash, how short it can safely be, and how it's written after `@`.
 - **Canonicalisation** before hashing, for example W3C Canonical XML.
 - **Provenance beyond the host:** whether clients should occasionally sign a hash chain of their own operations (see [Identity and access](/spec/identity/#still-open)).
 

@@ -10,8 +10,8 @@ participant "Server MUPPET\n(views)" as sm
 actor "Reviewer" as rv
 
 au -> am : propose an edit\n(or undo to an earlier point)
-am -> main : fork at state vector SV
-main -> b1 ** : create @sketch\nparent=@main, fork=SV
+am -> main : fork at snapshot S
+main -> b1 ** : create @sketch\nparent=@main, fork=S
 b1 --> am : session @sketch ready
 am -> b1 : XTXP ops on @sketch
 rv -> sm : view @sketch
@@ -20,7 +20,7 @@ sm -> main : parent state
 sm --> rv : onion skin (@sketch over main)\nand redline (who changed what)
 rv -> sm : accept
 sm -> main : merge @sketch
-main -> b1 : request ops since SV
+main -> b1 : request ops since S
 b1 --> main : ops
 main -> main : replay into main\n(ops commute: mechanical)
 main -> main : fan out to all peers

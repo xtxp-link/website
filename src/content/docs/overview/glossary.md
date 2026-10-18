@@ -4,10 +4,10 @@ description: Terms used across the XTXP specification.
 ---
 
 **Admission**
-: A host's decision, in its own arrival order, that an operation counts on one of its sessions: the client ID is bound to a key that holds write access.
+: A host's decision, in its own arrival order, to merge a whole session into one of its own, because its client IDs are bound to keys that hold write access. Hosts never admit part of a session.
 
 **Binding** (identity)
-: A signed statement that a public key owns a client ID on a document. It is how operations get their author without being signed one by one.
+: A signed statement that a public key owns a client ID on one session. It is how operations get their author without being signed one by one.
 
 **Binding** (transport)
 : A way of carrying XTXP: WebSocket, HTTP, or the XMPP bridge.
@@ -15,11 +15,14 @@ description: Terms used across the XTXP specification.
 **Bouncer**
 : *Sketch.* A domain owner's control over its `@origin` session at a muppet disco: which forked sessions are listed, which edits are permitted where, and what is officially relayed. The domain is claimed by public key through a DNS TXT record.
 
+**Client ID**
+: The number Yrs stamps on every operation, with a per-client counter. Fresh for every session and every connection, and bound to a public key.
+
 **CRDT**
 : Conflict-free replicated data type. A data structure whose concurrent updates can be applied in any order and still converge to the same state.
 
 **`@{ref}`**
-: The suffix on every XTXP address that says which version is meant: `@origin` (a website as its origin server publishes it), `@main` (the shared session), a session name, or a state vector. The last `@` in a URL always starts the ref.
+: The suffix on every XTXP address that says which version is meant: `@origin` (a website as its origin server publishes it), `@main` (the shared session), a session name, or a snapshot hash. The last `@` in a URL always starts the ref.
 
 **`@origin`**
 : The ref for an ordinary website's authoritative version: the stream of changes from the origin server, as the upstream peer sees it. Read-only. Not to be confused with genesis (vector 0), the start of a document's history.
@@ -46,7 +49,7 @@ description: Terms used across the XTXP specification.
 : *Future milestone.* A discovery service that helps a client find the MUPPETs hosting the sessions it may see, from a query signed with its key. A disco doesn't host sessions itself, and anyone can run one. xtxp.link is one.
 
 **Onion skin**
-: A translucent overlay of another state (a session, a paused queue, a peer's in-flight edits) drawn over the current one.
+: A translucent overlay of another state (a session, a paused queue, another connection's session that hasn't been merged yet) drawn over the current one.
 
 **Paused queue**
 : A local session whose automatic merge is switched off, shown as a preview until it's released (merged).
@@ -60,8 +63,11 @@ description: Terms used across the XTXP specification.
 **Session**
 : A lightweight line of a document's history (a branch, in git's terms), identified by where it lives: `{host}/{path}@{name}`. It records its parent's address and the point where it was forked. A user's private state, history undo, proposed edits, previews and paused queues are all sessions. Each session lives on exactly one host.
 
+**Snapshot**
+: A state vector plus a delete set: what names an exact point in history. Sessions record the snapshot they were forked at; URLs and ETags carry a short hash of one.
+
 **State vector**
-: A map from each client to the highest clock value seen from it. Two peers exchange state vectors to work out which operations the other is missing.
+: A map from each client to the highest clock value seen from it. Two peers exchange state vectors to work out which operations the other is missing. It doesn't cover deletions, so it doesn't pin a state on its own: see Snapshot.
 
 **Trust** (between sessions)
 : A session trusting another session, so the other's changes merge into it automatically. Trust can run one way or both ways.

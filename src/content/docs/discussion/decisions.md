@@ -72,6 +72,14 @@ A line of a document's history is a **session**: lightweight enough to make one 
 
 XTXP doesn't aim to host everyone's sessions, which cost server resources. xtxp.link is a **muppet disco**: it finds the MUPPETs hosting the sessions a signed query may see, and can start a session on an instance, including one on the user's own machine, but hosts nothing itself. Anyone can run a disco. A domain owner can claim its `@origin` by key with a DNS TXT record, and decide through the **bouncer** which forks are listed and what's officially relayed. Federation follows Mastodon's model on ActivityPub in spirit; its rules are still to be defined. Until then, a host serves its own sessions directly. The disco is a future milestone, deliberately deferred. See [The muppet disco](/spec/disco/).
 
+## 19. Snapshots, admission by session, fresh client IDs
+
+- **A snapshot names a point in history**: a state vector plus a delete set. Sessions record the snapshot they forked at; `@{snapshot}` URLs and ETags carry a short hash of one. Yrs's garbage collection stays off.
+- **Hosts admit or refuse whole sessions, never single updates.** Every connection edits in its own session, which reaches a shared session by merging. A refused session isn't lost: it stays a session and shows as an onion skin, and if admitted later its merge carries on.
+- **A client ID is fresh for every session and every connection.** Bindings name a session address, and a host rejects a client ID already in the session's history.
+
+See [The Math](/spec/math/#snapshots-name-points-in-history), [Sessions and history](/spec/sessions/#admission-is-by-session) and [Identity and access](/spec/identity/).
+
 ## Naming
 
 - **XTXP** for the protocol, **Xmesh** for the engine, **MUPPET** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.

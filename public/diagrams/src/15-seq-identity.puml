@@ -18,7 +18,7 @@ d -> t : prove: signature over the nonce
 t -> t : P verified for this connection
 
 == binding: the one signature that gives authorship ==
-d -> t : bind (signed by P):\n"P owns client 7 on this document"
+d -> t : bind (signed by P):\n"P owns client 7 on @review"\n(client ID fresh for this\nsession and connection)
 t -> t : record binding;\nops from client 7 on this\nconnection are P's
 d -> t : update ops (7, …) — unsigned
 note right of t : authorship comes from the binding,\nnot from per-op signatures
@@ -33,8 +33,8 @@ t -> t : Q holds write: admit
 
 == revocation closes the door on arrival ==
 d -> t : revoke (signed by P): Q
-t -> t : from now, admit nothing new from Q
+t -> t : from now, stop merging\nQ's session into @review
 q -> t : update ops (9, …)\n(edited offline, claims earlier history)
-t -> t : arrived after the revocation:\nnot admitted to @review
-t --> q : ops kept on a fork owned by Q;\nnothing lost, nothing reaches @review
+t -> t : arrived after the revocation:\nnot merged into @review
+t --> q : Q's session stays Q's;\nnothing lost, nothing reaches @review
 @enduml

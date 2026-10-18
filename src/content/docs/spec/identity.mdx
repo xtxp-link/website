@@ -21,12 +21,12 @@ XTXP identifies a user by a **public key** and authenticates them by proof that 
 Signing every operation would be heavy, so XTXP signs only the steps that establish **who** is acting:
 
 1. **Connecting.** The host sends a random challenge and the peer signs it, proving it holds the key.
-2. **Binding a client ID.** Every Xmesh operation already carries a client ID. A peer signs one statement, *"public key P owns client 7 on this document,"* and from then on every operation from client 7 is attributed to P. The redline gets authorship with no per-operation cost.
+2. **Binding a client ID.** Every Xmesh operation already carries a client ID. A peer signs one statement, *"public key P owns client 7 on session `{host}/{path}@{name}`,"* and from then on every operation from client 7 is attributed to P. **A client ID is fresh for every session and every connection**: a fork shares item IDs with its parent, so one client ID used on two sessions would make two different items with the same ID, and a merge would silently drop one. A host rejects a binding for a client ID already anywhere in the session's history, including history it inherited from its parent. Yrs picks client IDs at random, so a fresh one costs nothing. The redline gets authorship with no per-operation cost.
 3. **Granting and revoking.** Changes to who may read or write are signed by the person making them, so anyone can check them.
 
 Operations themselves travel unsigned, over an authenticated connection.
 
-<Diagram name="15-seq-identity" alt="Sequence: the owner signs in through a provider and fetches their private key from their own storage, answers the host's challenge, binds client 7 to their key, sends unsigned operations, grants a collaborator write access, then revokes it; the collaborator's later operations are not admitted and are kept on a fork the collaborator owns." />
+<Diagram name="15-seq-identity" alt="Sequence: the owner signs in through a provider and fetches their private key from their own storage, answers the host's challenge, binds client 7 to their key, sends unsigned operations, grants a collaborator write access, then revokes it; the collaborator's later operations are not admitted: the collaborator's session stops being merged and stays theirs." />
 
 ## Access is granted by key
 
@@ -47,10 +47,10 @@ Each host closes the door on its own sessions. A revoked key's edits that were a
 
 The rule depends on *when the revocation arrives*, not on where an operation claims to sit in history. A revoked user could otherwise backdate edits by claiming an earlier state vector, and those would be indistinguishable from honest offline work.
 
-Edits that arrive too late aren't thrown away. They land on a **fork owned by the revoked user**, so nothing they wrote is lost and nothing reaches the protected session.
+Edits that arrive too late aren't thrown away. Since [admission is by session](/spec/sessions/#admission-is-by-session), the revoked user's session simply stops being merged. It stays theirs, so nothing they wrote is lost and nothing more reaches the protected session.
 
 <Aside type="note" title="Admission is the host's job">
-Merging is still pure maths that every peer does the same way. *Admission*, meaning whether an operation counts on a session at all, is decided by the session's own host, in its own arrival order. Edits from other sessions arrive by trusted merges. Operations a peer has seen but the host hasn't admitted are previews: exactly what the [onion skin](/spec/views/) is for.
+Merging is still pure maths that every peer does the same way. *Admission*, meaning whether an operation counts on a session at all, is decided by the session's own host, in its own arrival order. Edits from other sessions arrive by trusted merges. A session the host hasn't admitted is shown as a preview, drawn from that session and never mixed into the admitted one: exactly what the [onion skin](/spec/views/) is for.
 </Aside>
 
 ## Still open

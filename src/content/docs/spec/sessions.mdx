@@ -9,7 +9,7 @@ import Diagram from '../../../components/Diagram.astro';
 
 ## One mechanism for undo, proposals and previews
 
-A **session** is a fork of a document's history at a point given by a state vector: a branch, in git's terms. Sessions are meant to be cheap enough to make one per person, per proposal or per visit. That one idea covers several features:
+A **session** is a fork of a document's history at a point given by a [snapshot](/spec/math/#snapshots-name-points-in-history): a branch, in git's terms. Sessions are meant to be cheap enough to make one per person, per proposal or per visit. That one idea covers several features:
 
 - **A personal session** is one user's own state, which may never leave that user's own MUPPET: a private scratch copy, a draft, or the state an ordinary web session would keep today. See [use cases](/overview/use-cases/#user-sessions).
 - **Undo** forks a session from an earlier point, so history is never thrown away.
@@ -18,7 +18,7 @@ A **session** is a fork of a document's history at a point given by a state vect
 - **A paused queue** is a local session whose automatic merge is switched off. Releasing it is an ordinary merge.
 - **Infinite, branchable undo** falls out of keeping every session's operations. How that history is stored long-term is on the [roadmap](/build/milestones/#roadmap).
 
-A session is **identified by where it lives**: its address, `{host}/{path}@{name}`. There are no generated IDs. Each session also records its **parent** (another session's address) and the **state vector at the fork**.
+A session is **identified by where it lives**: its address, `{host}/{path}@{name}`. There are no generated IDs. Each session also records its **parent** (another session's address) and the **snapshot at the fork**.
 
 ### Naming a session
 
@@ -38,7 +38,7 @@ Nobody can overwrite or hijack a session by naming, and two people who pick the 
 Two kinds of undo meet here:
 
 - **Personal undo (Ctrl+Z)** reverses *your own* recent actions with inverse operations, leaving collaborators' edits alone. One step is one action, grouped the way [Inkscape groups an action into a transaction](/discussion/prior-art/#inkscapes-undo-stack), including merging small repeated steps such as a drag or a spin button.
-- **History undo** goes back to an earlier state of the whole document. That's a session from an earlier state vector.
+- **History undo** goes back to an earlier state of the whole document. That's a session forked from an earlier snapshot.
 
 Where they differ from Inkscape: in Inkscape, undoing and then making a new edit clears the redo stack, and the undone work is lost. In XTXP, the undone work is still in the document's history, so it can be reached again through a session from before the undo.
 
@@ -46,11 +46,22 @@ Where they differ from Inkscape: in Inkscape, undoing and then making a new edit
 
 Any MUPPET can **host** a session. A host holds the session's Xmesh document like any other MUPPET, and also:
 
-- **admits** operations against the session's [grants](/spec/identity/#access-is-granted-by-key), in arrival order
-- **routes** admitted operations to everyone subscribed to the session
+- **admits** whole sessions into it against its [grants](/spec/identity/#access-is-granted-by-key), in arrival order (see below)
+- **routes** admitted updates to everyone subscribed to the session
 - **persists** the session and hands new clients its full state (see below)
 
 On a server, each hosted session runs headless, with no views and no user of its own, as a lightweight actor: an async task that owns one session and talks to the rest only by messages. Actors are cheap enough to spawn one per proposed edit or undo fork, and a failure in one session stays contained.
+
+### Admission is by session
+
+<span class="status status--decided">decided</span>
+
+**Every connection edits in a session of its own**, with a [client ID that's fresh for that session](/spec/identity/#signing-only-at-identity-steps). Its edits reach a shared session such as `@main` by being merged. A host never accepts some of a client's updates and refuses others, because Yrs needs each client's updates without gaps, and one refused update would leave all of that client's later ones stuck.
+
+- **A host admits or refuses whole sessions.** For a writer's session, admission is an automatic merge as edits arrive. A refused session simply isn't merged.
+- **Nothing is lost by refusal.** A refused or not-yet-admitted session stays a session in its own right, and shows as an [onion skin](/spec/views/) over the one it would merge into. If it's admitted later, merging carries on from where it stopped.
+- **A host's copy of a session only ever holds what was admitted to it.** Previews are drawn from the other sessions, never mixed in.
+- **Dependencies merge together.** If one session builds on another that hasn't been admitted, merging it would bring that one in too. The host admits both or neither, and says why when it holds a merge back.
 
 ### Sessions on other hosts, and trust between them
 
@@ -82,7 +93,7 @@ XTXP starts with those, and [y-sweet](/discussion/prior-art/#y-sweet) already im
 
 **Merging is mechanical.** CRDT operations commute, so merging a session means applying its updates to the parent. Nobody has to resolve conflicts by hand, and the **redline** is exactly the set of operations being applied, grouped by author.
 
-On Yrs: a **fork** is a new document seeded with the parent's state at the fork's state vector (a snapshot, which needs Yrs's garbage collection off). A **merge** encodes the session's updates since that state vector and applies them to the parent.
+On Yrs: a **fork** is a new document seeded with the parent's state at the fork's snapshot (which needs Yrs's garbage collection off). A **merge** encodes the session's updates since the fork and applies them to the parent.
 
 ## Lifecycle
 

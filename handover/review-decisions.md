@@ -12,15 +12,15 @@ Each item below needs your call. The recommendation is the reviewer's, with mine
 
 ## A. Blocking M1
 
-**A1. Name history points by snapshot, not state vector** [2.1, high]
+**A1. Name history points by snapshot, not state vector** [2.1, high] — **decided** (decision 19): option (a), a short snapshot hash in URLs and ETags, the full snapshot recorded on the session.
 Yrs keeps deletions outside the state vector, so a state vector alone doesn't pin a state. Forks, `@{…}` history URLs and ETags all go wrong; for example, deleting a shape wouldn't change an ETag built from the state vector.
 *Recommendation:* use a snapshot (state vector plus delete set, or a hash of it) wherever a point in history is named, and keep Yrs garbage collection off from day one.
 
-**A2. Hosts refuse whole client IDs, never single updates** [2.2, high]
+**A2. Hosts refuse whole client IDs, never single updates** [2.2, high] — **decided, with a change** (decision 19): hosts admit or refuse whole *sessions*. Every connection edits in its own session; a refused session stays a session and shows as an onion skin. This also answers C6.
 Yrs needs each client's updates to be contiguous, so refusing one update leaves that client's later ones stuck forever. An admitted edit that depends on a refused one also gets stuck.
 *Recommendation:* a peer's copy of a session only ever contains admitted updates; previews live in separate local documents. A host refuses a whole client ID, with a defined error. A refused client starts again with a fresh client ID.
 
-**A3. Fresh client ID per session per connection** [2.3, high]
+**A3. Fresh client ID per session per connection** [2.3, high] — **decided** (decision 19).
 Reusing a client ID on a session and its fork makes merges silently drop edits.
 *Recommendation:* make it a rule. Bindings are scoped to a session address (drop the undefined "DocId"), and the first binding for a client ID wins.
 
@@ -79,7 +79,7 @@ User SVG can carry scripts. Sanitise it, apply a strict CSP, and serve user cont
 - **C3. Open versus fork on a taken name** [1.13]: define `open(name)` and `fork(parent, name)` as separate operations.
 - **C4. LAN hosts and TLS** [1.10]: `.lan` names can't get public certificates; how LAN hosts authenticate.
 - **C5. End-to-end encryption** [1.21]: a blind host can't answer sync, so mark E2E as out of scope until after M4, or design an envelope for it.
-- **C6. "Fork owned by the revoked user"** [2.12]: the reviewer suggests the client keeps refused edits locally instead of the host storing them.
+- **C6. "Fork owned by the revoked user"** [2.12] — **answered by A2**: the revoked user's session stops being merged and stays theirs.
 - **C7. Restoring an old version** [2.11]: merging a session from the past doesn't undo later changes; "restore" needs generated inverse operations.
 - **C8. SVG attribute granularity** [2.9]: `style`, `d` and `transform` are single values, so concurrent changes to different style properties clash.
 - **C9. Sign-in providers** [2.13]: the reviewer couldn't confirm that Mozilla accounts offer user storage to third parties; the key-custody threat needs stating.
