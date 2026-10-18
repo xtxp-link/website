@@ -23,6 +23,7 @@ export default defineConfig({
       },
       customCss: ['./src/styles/theme.css', './src/styles/logo.generated.css', './src/styles/custom.css'],
       lastUpdated: false,
+      head: [{ tag: 'script', attrs: { type: 'module', src: '/scripts/sidebar-reveal.js' } }],
       sidebar: [
         {
           label: 'Start here',
