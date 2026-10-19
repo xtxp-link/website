@@ -64,6 +64,7 @@ export default defineConfig({
           items: [
             { label: 'Verification', slug: 'build/verification' },
             { label: 'Milestones', slug: 'build/milestones' },
+            { label: 'Report: M1-y-sweet', slug: 'build/m1-y-sweet-report' },
             { label: 'Team model', slug: 'build/team' },
             { label: 'The Inkscape fork', slug: 'build/inkscape-fork' },
           ],

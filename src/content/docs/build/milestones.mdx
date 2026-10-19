@@ -15,7 +15,7 @@ import Diagram from '../../../components/Diagram.astro';
 
 Before XTXP's own host is built, M1 and M2 run on a stock, unmodified [y-sweet](/discussion/prior-art/#y-sweet) (v0.9.1), used its own way ([decision 25](/discussion/decisions/#25-run-m1-and-m2-on-a-stock-y-sweet-first)). The review of y-sweet recommends borrowing from it rather than extending it, and a self-hosted binary rather than Durable Objects; this spike tests how far it goes as it is.
 
-- **M1-y-sweet** is CLI only. Xmesh peers on Yrs 0.28 sync through y-sweet over WebSocket, through the chaos proxy, and a person can watch and edit a drawing from two terminals. Its first part, with no network, is built: Xmesh, the hand-written vectors, the fuzzer, and a probe that replays every vector on y-sweet's Yrs 0.19.2.
+- **M1-y-sweet** is CLI only. Xmesh peers on Yrs 0.28 sync through y-sweet over WebSocket, through the chaos proxy, and a person can watch and edit a drawing from two terminals. It is built, and the [report](/build/m1-y-sweet-report/) covers what it does and what testing it against y-sweet found.
 - **M2-y-sweet** adds the Inkscape fork and a browser with no JavaScript, served by a server-side muppet that is one more peer of the y-sweet document.
 
 What y-sweet can't express (key grants, refusing a session, the signed handshake) is recorded as a gap, not built. The spike answers whether y-sweet can hold "every connection edits in its own session" and how it behaves on a patchy network, and puts something in real people's hands. Then the full M1 and M2 are decided on what was learnt.
