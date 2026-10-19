@@ -32,7 +32,8 @@ This idea comes from Schalk Venter's talk [*Surprise, it's server rendering*](ht
 
 ```html
 <?start name="n7-12">
-  <rect id="sun" x="40" y="40" width="80" height="80" fill="gold"/>
+  <rect id="sun" x="40" y="40" width="80" height="80" fill="gold"
+        style="view-transition-name: sun; anchor-name: --n7-12"/>
 <?end>
 ```
 
@@ -41,7 +42,8 @@ When that node changes, whoever changed it, the muppet sends only its new render
 ```html
 <template for="n7-12">
   <?start name="n7-12">
-    <rect id="sun" x="48" y="40" width="80" height="80" fill="gold"/>
+    <rect id="sun" x="48" y="40" width="80" height="80" fill="gold"
+          style="view-transition-name: sun; anchor-name: --n7-12"/>
   <?end>
 </template>
 ```
@@ -98,7 +100,7 @@ On the baseline form, redirect and GET loop, cross-document view transitions (`@
 
 <span class="status status--draft">draft</span>
 
-To edit an element, a person needs handles on it: move, recolour, delete, edit an attribute. The [popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) with [CSS anchor positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning) gives every element its handles declaratively:
+To edit an element, a person needs handles on it: move, recolour, delete, edit an attribute. The [popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) with [CSS anchor positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning) gives every element its handles declaratively. The element names itself as an anchor (`anchor-name: --n7-12`, as in the patch above), and its handle attaches to it:
 
 ```html
 <button popovertarget="h-n7-12" class="select" style="position-anchor: --n7-12">
@@ -150,7 +152,7 @@ Handles work the same way: the plain forms are the baseline, and popovers with a
 
 ## Still open
 
-The platform is close. Each gap below is expected to need a small polyfill now, against the first-class browser support it points to, in the same spirit as the Wasm muppet polyfilling a browser that doesn't speak XTXP yet ([decision 24](/discussion/decisions/#24-north-star-the-read-write-web-with-xtxp-in-the-browser)). A polyfill is a few lines of script, never a framework, and it goes away as browsers catch up; pages without it still work on the baseline.
+The platform is close. The first three gaps below are browser gaps, each expected to need a small polyfill now, against the first-class browser support it points to, in the same spirit as the Wasm muppet polyfilling a browser that doesn't speak XTXP yet ([decision 24](/discussion/decisions/#24-north-star-the-read-write-web-with-xtxp-in-the-browser)). A polyfill is a few lines of script, never a framework, and it goes away as browsers catch up; pages without it still work on the baseline.
 
 - **Does a streamed patch start a view transition on its own?** Today a same-document view transition is started from script, with `document.startViewTransition()`. Whether a `<template for>` patch can trigger one declaratively, or whether that one call is the near-zero JavaScript this design needs, is the first thing to probe.
 - **SVG.** Whether markers survive the parser inside inline `<svg>`, whether SVG child elements can take a `view-transition-name` and act as anchors, and what to do where they can't: per-region patches, or an HTML layer over the drawing.
