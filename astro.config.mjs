@@ -53,6 +53,7 @@ export default defineConfig({
             { label: 'Identity and access', slug: 'spec/identity' },
             { label: 'Sessions and history', slug: 'spec/sessions' },
             { label: 'Views: onion skin and redline', slug: 'spec/views' },
+            { label: 'The browser as client', slug: 'spec/browser' },
             { label: 'Addressing and discovery', slug: 'spec/addressing' },
             { label: 'The muppet disco', slug: 'spec/disco' },
             { label: 'Live web branching', slug: 'spec/web-overlay' },

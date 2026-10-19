@@ -76,6 +76,14 @@ The [use cases](/overview/use-cases/) are sketches. Each needs its rules for acc
 
 - **Rendering user documents:** sanitising, CSP and a separate origin for user content. Not the protocol's business, but every host serving other people's documents will need an answer. See [Addressing](/spec/addressing/#rendering-safety).
 
+## The browser as client
+
+- **View transitions for streamed patches:** whether a `<template for>` patch can start one declaratively, or needs one call to `document.startViewTransition()`.
+- **SVG:** whether markers, `view-transition-name` and anchors work on elements inside inline `<svg>`, and the fallback where they don't.
+- **When to stream:** how a host knows, without script, that a browser supports declarative partial updates.
+
+See [The browser as client](/spec/browser/#still-open).
+
 ## Views
 
 - **Onion skin semantics:** live in-flight edits from others, explicit suggestions to accept, or both?

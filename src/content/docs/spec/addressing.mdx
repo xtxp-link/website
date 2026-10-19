@@ -79,7 +79,7 @@ xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 | Request | Response |
 | --- | --- |
 | WebSocket upgrade | The live XTXP stream of Yrs updates, for muppets and automated nodes ([The Wire](/spec/wire/#one-wire-format-to-start)). |
-| `Accept: text/html` | The current state rendered as HTML, with forms that POST edits. Served by the host's server-side muppet. |
+| `Accept: text/html` | The current state rendered as HTML, with forms that POST edits. Served by the host's server-side muppet. Where the browser supports it, the response stays open as a [patch stream](/spec/browser/#the-patch-stream). |
 | A person who wants their native client | A plain link to `xtxp://{host}/{path}@{ref}`. |
 
 <Aside type="caution" title="Native hand-off">
@@ -87,6 +87,8 @@ The first sketch used `<meta http-equiv="refresh">` to bounce browsers to `xtxp:
 </Aside>
 
 ## The no-JS edit loop
+
+This loop is the baseline, and it works in every browser, older ones included. Modern browsers that support declarative partial updates get the [patch stream](/spec/browser/#the-patch-stream) on top of it: a POST is answered with `204 No Content` and a [confirmation](/spec/browser/#the-answer-confirms-where-the-edit-landed) of where the edit landed arrives as a patch, with no polling.
 
 <Diagram name="04-seq-nojs-edit" alt="Sequence: the browser POSTs a form to the hosting instance, which hands it to its server muppet, which makes CRDT ops and sends them to the host; the host fans them out to Inkscape; the browser is redirected and GETs the new HTML; later meta-refresh polls get 304 Not Modified unless someone edited." />
 

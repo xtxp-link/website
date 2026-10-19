@@ -50,6 +50,7 @@ Cursors and presence travel separately from operations. A 60 Hz cursor stream sh
 | --- | --- | --- |
 | **WebSocket**, binary frames | Wasm muppets in the browser, the Inkscape fork, CLI peers | The primary binding, chosen for raw speed. Hosts serve it directly. |
 | **HTTP** forms and redirects | Browsers with no JavaScript, through a server-side muppet | See [Addressing](/spec/addressing/#the-no-js-edit-loop). |
+| **HTML patch stream** | Browsers that support declarative partial updates, through a server-side muppet | Rendered HTML patches (`<template for>`), not XTXP operations, streamed in the page's own response; edits still go in as form POSTs. See [The browser as client](/spec/browser/#the-patch-stream). |
 | **XMPP**, through a bridge | Mobile and chat clients such as Conversations, and federation | A bridge in front of a host, not the core transport. |
 
 <Diagram name="05-seq-convergence" alt="Sequence: two muppets connected to a host over WebSocket make concurrent edits; the host checks each client's grant, records the operations and fans them out; both peers integrate and reach the same state vector and hash." />

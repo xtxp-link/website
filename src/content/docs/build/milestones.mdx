@@ -35,7 +35,7 @@ Deliberately small ([decision 22](/discussion/decisions/#22-handshake-signatures
 
 ## M2 — Inkscape plus no-JS
 
-The Inkscape fork, linking Xmesh through its C interface, and a plain HTML browser served by a server-side muppet edit the same drawing. This is the first demo a person can see, and it tests the north star directly.
+The Inkscape fork, linking Xmesh through its C interface, and a plain HTML browser served by a server-side muppet edit the same drawing. This is the first demo a person can see, and it tests the north star directly. Where the browser supports declarative partial updates, the no-JS page is live: edits from Inkscape stream in as HTML patches and animate with view transitions, and each element's forms open as handles on it ([The browser as client](/spec/browser/)).
 
 ## M3 — Inkscape plus Wasm
 
