@@ -51,9 +51,42 @@ These are recorded as gaps, not built:
 - **Knowing an update was integrated.** Its acknowledgement can't tell "integrated" from "stuck waiting", as above.
 - **A current Yrs.** Its Yrs 0.19.2 is behind fixes that XTXP relies on: three of the findings above come from that version gap.
 
+## The browser: M2-y-sweet, part A
+
+*Added 19 October 2026.* The first half of M2-y-sweet puts the same document in a browser, watch-only for now ([design](https://github.com/xtxp-link/website/blob/main/docs/plans/2026-10-19-m2-y-sweet-browser-design.md)). `xtxp-muppet serve` is a server-side muppet: one more peer of the y-sweet document, which renders it as HTML with inline SVG and sends each change to every viewer as a [declarative partial update](/spec/browser/), in three ways:
+
+- **refresh:** the page reloads every second, and unchanged polls get `304 Not Modified`. No JavaScript.
+- **stream:** the page's response stays open, and each change arrives as a `<template for>` patch the browser applies itself. No JavaScript, Chrome and Edge 150 or later.
+- **WebSocket:** a small polyfill applies the same patches in any modern browser.
+
+### What the browsers did
+
+Probed automatically in Chromium 158 (a trunk snapshot, with native `<template for>`) and Chromium 141 (without), in [`tests/browser`](https://github.com/xtxp-link/xtxp-rs/tree/main/tests/browser):
+
+| Question | Answer |
+| --- | --- |
+| Can a page detect native `<template for>`? | Yes: parse a marker pair and a template with `Document.parseHTMLUnsafe` and check the result. |
+| Can a native patch replace one SVG element? | **No.** Patch content is parsed in an HTML context, so a `<rect>` comes out as an HTML element and never draws. Native streaming patches the whole `<svg>` instead; per-element SVG patches need the polyfill, which parses in the SVG's context. |
+| Does a streamed patch start a view transition by itself? | **No.** It applies instantly. Animating it needs one `document.startViewTransition()` call, which needs script. |
+| Do elements inside an SVG get their own view transition? | **No**, in either browser. Only the `<svg>` box takes part, so a change inside the drawing animates as a cross-fade of the whole drawing. |
+
+### How the modes compare
+
+In the build container, with the logo changing 5 times a second through a real y-sweet, measured from the edit leaving the editor to the change reaching each viewer:
+
+| Mode | Latency p50 | Bandwidth per viewer |
+| --- | ---: | ---: |
+| refresh (1 s poll) | about 500 ms | 2.5 KB/s |
+| stream, whole drawing | about 2 ms | 9.1 KB/s |
+| stream, changed elements | about 2 ms | 1.5 KB/s |
+| WebSocket, changed elements | about 2 ms | 1.5 KB/s |
+| WebSocket, whole drawing | about 2 ms | 9.0 KB/s |
+
+At 1 and 10 viewers the server used under 1% of a CPU and under 10 MB of memory. These are one machine's numbers, for comparing the modes with each other. The full matrix, up to 1,000 viewers, and a run in David's own Chrome follow the [checklist](https://github.com/xtxp-link/website/blob/main/docs/plans/2026-10-19-m2-y-sweet-browser-checklist.md) and will be added here.
+
 ## What's next
 
-- **M2-y-sweet:** someone watching or editing the same drawing from a browser, which brings in y-sweet's token auth.
+- **M2-y-sweet, the rest:** editing from the browser (forms and handles), sharing a link with someone else, which brings in y-sweet's token auth, and the Inkscape fork.
 - **Then the decision** this spike exists for: whether the full M1 and M2 keep y-sweet as the host, or build XTXP's own host borrowing from it. These findings, especially the version gap and the acknowledgement, are the evidence.
 
 To try it yourself, follow "Try it" in the [`xtxp-rs` README](https://github.com/xtxp-link/xtxp-rs#try-it).
