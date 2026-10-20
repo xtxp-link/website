@@ -16,7 +16,7 @@ else
   b -> t : update (2,5)
 end
 
-t -> t : client 1 is bound to P,\nclient 2 to Q; both hold write.\nAdmit and record both.
+t -> t : each peer edits in its own session;\nP and Q hold write, so both sessions\nare merged into main as edits arrive
 t -> b : update (1,8)
 b -> b : integrate (1,8)
 t -> a : update (2,5)

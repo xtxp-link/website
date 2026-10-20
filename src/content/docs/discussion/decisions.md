@@ -12,7 +12,7 @@ The decisions currently in force. Numbers stay stable so links keep working.
 
 ## 2. The no-JS client is a puppet
 
-A plain HTML browser drives a **server-side muppet**, which turns form POSTs into real CRDT operations and acts for that one user. Because it can be one of the user's own devices, end-to-end encrypted rooms stay possible.
+A plain HTML browser drives a **server-side muppet**, which turns form POSTs into real CRDT operations and acts for that one user. Because it can be one of the user's own devices, end-to-end encrypted sessions stay possible.
 
 ## 5. Inkscape: a maintained fork
 
@@ -32,7 +32,7 @@ M1-y-sweet and M2-y-sweet on a stock y-sweet ([decision 25](#25-run-m1-and-m2-on
 
 ## 9. One address form: `{host}/{path}@{ref}`
 
-Every document, native or an ordinary website, is addressed as `xtxp.link/{host}/{path}@{ref}`. There is no proxy marker: a website is a document whose upstream peer is the origin, and `@origin` is that peer's session. The last `@` always starts the ref, and generated links always carry one. A first path segment without a dot is a keyword for the disco's own pages. See [Addressing](/spec/addressing/).
+Every document, native or an ordinary website, is addressed as `{host}/{path}@{ref}`, served by the muppet that hosts it and found through a [muppet disco](#18-xtxplink-is-a-muppet-disco-not-a-host) such as xtxp.link. There is no proxy marker: a website is a document whose upstream peer is the origin, and `@origin` is that peer's session. The last `@` always starts the ref, and generated links always carry one. A first path segment without a dot is a keyword for the disco's own pages. See [Addressing](/spec/addressing/).
 
 
 ## 11. Transport: WebSocket first, XMPP as a bridge
@@ -42,7 +42,7 @@ XTXP's wire is a small sync protocol that doesn't care about transport: operatio
 
 ## 12. Identity is a public key; access is granted by key
 
-A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a session owns it and grants `read` or `write` to keys or to `*`. A host enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits land on a fork the revoked user owns. See [Identity and access](/spec/identity/).
+A user is a public key, authenticated by signing a challenge. Signing in with an existing account (Google, Apple, Mozilla) fetches the private key from the user's own storage. Signatures happen only at identity steps: connecting, binding a client ID to a key, and granting or revoking access. Whoever creates a session owns it and grants `read` or `write` to keys or to `*`. A host enforces grants on arrival, and **revocation closes the door to new edits on arrival**, because judging by claimed history position would let a revoked user backdate edits. Late edits aren't lost: the revoked user's session simply stops being merged ([decision 19](#19-snapshots-admission-by-session-fresh-client-ids)). See [Identity and access](/spec/identity/).
 
 
 ## 13. Xmesh v1 is a thin layer on Yrs
@@ -66,7 +66,7 @@ There is one kind of node, the muppet. Any muppet can host sessions: it admits, 
 
 ## 17. Sessions
 
-A line of a document's history is a **session**: lightweight enough to make one per person, per proposal or per visit. That includes a single user's private state, which may never leave that user's own muppet. Everything decision 16 says of branches holds for sessions. See [Sessions and history](/spec/sessions/).
+A line of a document's history is a **session**: lightweight enough to make one per person, per proposal or per visit. That includes a single user's private state, which may never leave that user's own muppet. See [Sessions and history](/spec/sessions/).
 
 ## 18. xtxp.link is a muppet disco, not a host
 

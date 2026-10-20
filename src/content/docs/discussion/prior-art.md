@@ -147,7 +147,7 @@ Inkscape undoes at the level of its XML tree, which makes it directly relevant t
 **What XTXP takes from it:**
 
 - **The capture point for the Inkscape fork.** Hooking the transaction commit turns each Inkscape action into one batch of XTXP operations, already grouped the way a user thinks of their edits ([The Inkscape fork](/build/inkscape-fork/)).
-- **What branches fix.** Where Inkscape clears redo, XTXP forks: undoing and then editing starts a [session](/spec/sessions/#undo-in-practice), and the undone work stays reachable.
+- **What sessions fix.** Where Inkscape clears redo, XTXP forks: undoing and then editing starts a [session](/spec/sessions/#undo-in-practice), and the undone work stays reachable.
 
 - [`document-undo.cpp` (current Inkscape source, code docs)](https://inkscape.gitlab.io/inkscape/doxygen/document-undo_8cpp_source.html)
 - `event-log.cpp` (Undo History model; Gustav Broberg, Jon A. Cruz; GPL-2.0-or-later): [code docs](https://inkscape.gitlab.io/inkscape/doxygen/event-log_8cpp_source.html)

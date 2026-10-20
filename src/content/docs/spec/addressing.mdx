@@ -62,7 +62,7 @@ xtxp.link/medium.com/@campey/post@origin            "@campey" stays in the path
 ## Parsing rules
 
 1. **The last `@` starts the ref.** Every other `@` belongs to the path, so origin paths like Medium's `/@user` need no escaping.
-2. **Generated links always carry a ref.** That includes every link it rewrites inside a page, so the last `@` is never ambiguous.
+2. **Generated links always carry a ref.** That includes every link rewritten inside a page, so the last `@` is never ambiguous.
 3. **Bare URLs** (typed or pasted from elsewhere):
    - with no `@` at all, redirect to the default ref (`@origin` for websites, `@main` for native documents)
    - with an `@` whose text doesn't resolve to a ref, as in `medium.com/@campey`, treat it as part of the path and redirect to `…/@campey@origin`

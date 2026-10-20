@@ -10,7 +10,7 @@ description: Terms used across the XTXP specification.
 : A signed statement that a public key owns a client ID on one session. It is how operations get their author without being signed one by one.
 
 **Binding** (transport)
-: A way of carrying XTXP: WebSocket, HTTP, or the XMPP bridge.
+: A way of carrying XTXP: WebSocket, HTTP, the HTML patch stream to browsers, or the XMPP bridge.
 
 **Bouncer**
 : *Sketch.* A domain owner's control over its `@origin` session at a muppet disco: which forked sessions are listed, which edits are permitted where, and what is officially relayed. The domain is claimed by public key through a DNS TXT record.
@@ -34,7 +34,7 @@ description: Terms used across the XTXP specification.
 : The first state of a document: one fixed update that creates the root, identical everywhere. For live web branching, it is the fetched origin page.
 
 **Host**
-: A muppet hosting sessions: it admits operations to its own sessions against their grants, routes them and stores them, usually headless on a server.
+: A muppet hosting sessions: it admits whole sessions into its own against their grants, routes them and stores them, usually headless on a server.
 
 **Immortal parent**
 : An element that edits never replace: attributes change one at a time and children are inserted alongside what's there, so concurrent edits to one element both survive. In v1, a move does replace it with a copy (see The Math).
@@ -52,7 +52,7 @@ description: Terms used across the XTXP specification.
 : *Future milestone.* A discovery service that helps a client find the muppets hosting the sessions it may see, from a query signed with its key. A disco doesn't host sessions itself, and anyone can run one. xtxp.link is one.
 
 **Node ID**
-: The ID of the Yrs operation that created a node: client ID plus counter. Needs no coordination, and survives moves and edits.
+: The ID of the Yrs operation that created a node: client ID plus counter. Needs no coordination, and survives edits. In v1 a move makes a copy, which gets a new node ID.
 
 **Onion skin**
 : A translucent overlay of another state (a session, a paused queue, another connection's session that hasn't been merged yet) drawn over the current one.
@@ -94,4 +94,4 @@ description: Terms used across the XTXP specification.
 : The Rust port of Yjs, and the base Xmesh is built on.
 
 **YATA**
-: Yet Another Transformation Approach. The sequence CRDT algorithm Yrs uses to order concurrent insertions in text.
+: Yet Another Transformation Approach. The sequence CRDT algorithm Yrs uses to order concurrent insertions, for an element's children and for text alike.

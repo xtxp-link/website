@@ -29,7 +29,7 @@ The creator names a session, and the name must be unique on its host. Because th
 
 Nobody can overwrite or hijack a session by naming, and two people who pick the same name for the same thing end up working in the same session.
 
-**Prior art:** cheap sessions, merges as replays and an authoritative upstream all come from git ([prior art](/discussion/prior-art/#git)). The undo side builds on Inkscape's transaction-based undo stack ([prior art](/discussion/prior-art/#inkscapes-undo-stack)). Access to sessions is covered in [Identity and access](/spec/identity/#access-is-granted-by-key).
+**Prior art:** cheap branches, merges as replays and an authoritative upstream all come from git ([prior art](/discussion/prior-art/#git)). The undo side builds on Inkscape's transaction-based undo stack ([prior art](/discussion/prior-art/#inkscapes-undo-stack)). Access to sessions is covered in [Identity and access](/spec/identity/#access-is-granted-by-key).
 
 ## Undo in practice
 
@@ -67,7 +67,7 @@ On a server, each hosted session runs headless, with no views and no user of its
 
 <span class="status status--draft">draft</span>
 
-Every host holds **its own sessions**. A session never lives on two hosts at once: a copy elsewhere is a different session, with its own address, in the way every git clone has its own sessions.
+Every host holds **its own sessions**. A session never lives on two hosts at once: a copy elsewhere is a different session, with its own address, in the way every git clone has its own branches.
 
 <Diagram name="16-session-trust" alt="Sessions on different hosts linked by trust: a session on an Inkscape instance on a local network and a session on an edge host both trust and are trusted by main on the server, so changes merge automatically in both directions; a paused session on the laptop has its automatic merge switched off." />
 
@@ -89,7 +89,7 @@ XTXP starts with those, and [y-sweet](/discussion/prior-art/#y-sweet) already im
 
 ## Fork, preview, merge
 
-<Diagram name="07-seq-session" alt="Sequence: an author forks main at a state vector, a host for the session is spawned, the author sends ops to it, a reviewer views onion skin and redline rendered by the server muppet, accepts, and main replays the session ops and fans them out." />
+<Diagram name="07-seq-session" alt="Sequence: an author forks main at a snapshot, a host for the session is spawned, the author sends ops to it, a reviewer views onion skin and redline rendered by the server muppet, accepts, and main replays the session ops and fans them out." />
 
 **Merging is mechanical.** CRDT operations commute, so merging a session means applying its updates to the parent. Nobody has to resolve conflicts by hand, and the **redline** is exactly the set of operations being applied, grouped by author.
 

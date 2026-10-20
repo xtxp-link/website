@@ -139,7 +139,7 @@ The version is part of the form, so a later change never leaves doubt about whic
 
 ## The patch language
 
-UI actions are expressed as **XML Patch** operations, an import and export format only, never sent between peers, (RFC 5261: `add`, `replace`, `remove`, addressed by XPath) before they reach the engine. Xmesh translates each patch into Yrs operations that refer to node IDs, not positions, because XPath positions shift under concurrent edits.
+UI actions are expressed as **XML Patch** operations (RFC 5261: `add`, `replace`, `remove`, addressed by XPath) before they reach the engine. XML Patch is an import and export format only, never sent between peers. Xmesh translates each patch into Yrs operations that refer to node IDs, not positions, because XPath positions shift under concurrent edits.
 
 RFC 7351 registers the `application/xml-patch+xml` media type for these documents. The patch operations themselves are defined in RFC 5261.
 
