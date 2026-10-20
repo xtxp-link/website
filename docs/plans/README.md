@@ -14,6 +14,7 @@ Files are named `YYYY-MM-DD-topic.md`.
 | [2026-10-19-m2-y-sweet-browser-design.md](2026-10-19-m2-y-sweet-browser-design.md) | Design for M2-y-sweet part A: the browser as a watch-only view of a y-sweet document, in three delivery modes (refresh, stream, WebSocket polyfill), with measurement. |
 | [2026-10-19-m2-y-sweet-browser-plan.md](2026-10-19-m2-y-sweet-browser-plan.md) | Implementation plan for M2-y-sweet part A, task by task. |
 | [2026-10-19-m2-y-sweet-browser-checklist.md](2026-10-19-m2-y-sweet-browser-checklist.md) | Checklist for a session on David's Mac to cross-test part A in his own Chrome and run the load matrix. |
+| [2026-10-20-muppet-apps-split-design.md](2026-10-20-muppet-apps-split-design.md) | Design for splitting the muppet from the applications that drive it: the in-process boundary, the `xtxp-tui`, `xtxp-serve` and `xtxp-orbit` applications, and how the physics engine works. |
 | [M1-y-sweet report](https://xtxp.link/build/m1-y-sweet-report/) | What M1-y-sweet built and what testing it against y-sweet found. Published on the site (`src/content/docs/build/m1-y-sweet-report.mdx`). |
 | [2026-10-18-review-decisions.md](2026-10-18-review-decisions.md) | The decisions raised by the spec review, with David's answers. |
 | [2026-10-18-spec-review.md](2026-10-18-spec-review.md) | The independent spec review itself. Predates the move to "session" and "muppet disco". |

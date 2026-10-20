@@ -118,9 +118,11 @@ To edit an element, a person needs handles on it: move, recolour, delete, edit a
 
 The select control is itself anchored over its element, sized to it with `anchor-size()`, so clicking a shape is clicking its button.
 
-## Where the browser stops and the muppet starts
+## Where the browser stops and the server-side muppet starts
 
-| | Browser | muppet |
+In M1 and M2, the muppet runs on a server. This table shows the split in that architecture:
+
+| | Browser | server-side muppet/application |
 | --- | --- | --- |
 | CRDT state, merging, grants | | ✓ |
 | Rendering nodes to HTML and SVG | | ✓ |
@@ -129,7 +131,7 @@ The select control is itself anchored over its element, sized to it with `anchor
 | Selection and handles | ✓ (popovers) | renders them |
 | Turning an edit into operations | sends a form | ✓ |
 
-The same split holds wherever the muppet runs:
+The same executor/application split holds wherever a muppet runs:
 
 - **Server-side, for a browser with no JavaScript:** the patches travel in the page's own HTTP response.
 - **In the page, as a Wasm muppet ([M3](/build/milestones/#m3--inkscape-plus-wasm)):** the muppet renders the same HTML patches and applies them with the browser's own HTML setters (`setHTML`, `streamHTML`), inside `document.startViewTransition()`. No virtual DOM or hand-written DOM code: both muppets share one renderer, and the no-JS view and the Wasm view can't drift apart.

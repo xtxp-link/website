@@ -24,6 +24,18 @@ M2's no-JS path is served by the host itself, so it doesn't need xtxp.link. Live
 
 *No current lean;* to discuss.
 
+## Q10. How does an engine merge several people's layers?
+
+[Decision 27](/discussion/decisions/#27-a-muppet-executes-applications-drive-it) lets an engine own a space: a physics engine moving a drawing's parts is the first, in `xtxp-rs`. With one person it is simple. With several, each person's edits arrive as their own session, shown as an [onion skin](/overview/glossary/), and the engine has to decide what the shared space looks like.
+
+1. **The engine merges.** Each person's layer is an input to the engine's step; it decides what holds, and writes the result into the shared session.
+2. **Rubber-banding.** The engine refuses an edit that would leave the space invalid (a piece placed inside another, say) and snaps the position back, with the refusal confirmed to the person as [decision 26](/discussion/decisions/#26-the-browser-is-the-muppets-client) describes.
+3. **No engine arbitration.** Layers merge like any sessions and the engine only reads the result.
+
+Open inside this: whether an engine's step takes people's inputs as edits or as a separate stream, and how a late joiner's layer is replayed through the same rules. The first engine's step has no inputs yet; this is what they would plug into.
+
+*No current lean;* to try with two people moving pieces of one drawing.
+
 ## Wire and addressing
 
 - **Ref names:** whether `@main` or `@latest` names the shared session.

@@ -6,6 +6,9 @@ description: Terms used across the XTXP specification.
 **Admission**
 : A host's decision, in its own arrival order, to merge a whole session into one of its own, because its client IDs are bound to keys that hold write access. Hosts never admit part of a session.
 
+**Application**
+: A process that drives a muppet and owns views. Examples: a terminal editor, a browser renderer, a game. Applications send commands (edits) to a muppet and receive screens (document state) from it. See [decision 27](#27-a-muppet-executes-applications-drive-it).
+
 **Binding** (identity)
 : A signed statement that a public key owns a client ID on one session. It is how operations get their author without being signed one by one.
 
@@ -30,6 +33,9 @@ description: Terms used across the XTXP specification.
 **Declarative partial updates**
 : A browser feature: processing-instruction markers name places in a page, and a later `<template for>` replaces what's there, applied by the browser's own parser. How a muppet changes a page in the browser. See [The browser as client](/spec/browser/).
 
+**Engine**
+: An application that owns a space (a document's geometry, physics, or other properties) and drives a muppet to express it. Examples: a vector canvas, a 3D physics engine. See [decision 27](#27-a-muppet-executes-applications-drive-it).
+
 **Genesis (vector 0)**
 : The first state of a document: one fixed update that creates the root, identical everywhere. For live web branching, it is the fetched origin page.
 
@@ -46,7 +52,7 @@ description: Terms used across the XTXP specification.
 : *Roadmap.* A chronological log of a session's patches in cold storage. Until then, sessions persist the usual Yjs way: append updates, then compact.
 
 **muppet**
-: Multi User Progressive Patch Execution Tree. The client-side embedding of Xmesh and the application layer: it owns all views, including the vector canvas and spatial chat and comments. Run headless, a muppet hosts sessions.
+: Multi User Progressive Patch Execution Tree. The executor: Xmesh embedding, sync, tree operations, and session hosting. Applications drive a muppet through a clean boundary: commands in (edits), screens out (the state). Run headless, a muppet hosts sessions with no views.
 
 **muppet disco**
 : *Future milestone.* A discovery service that helps a client find the muppets hosting the sessions it may see, from a query signed with its key. A disco doesn't host sessions itself, and anyone can run one. xtxp.link is one.
@@ -55,7 +61,7 @@ description: Terms used across the XTXP specification.
 : The ID of the Yrs operation that created a node: client ID plus counter. Needs no coordination, and survives edits. In v1 a move makes a copy, which gets a new node ID.
 
 **Onion skin**
-: A translucent overlay of another state (a session, a paused queue, another connection's session that hasn't been merged yet) drawn over the current one.
+: A translucent overlay of another state (a session, a paused queue, another connection's session that hasn't been merged yet) drawn over the current one. An application produces the layers from one or more muppet screens.
 
 **Paused queue**
 : A local session whose automatic merge is switched off, shown as a preview until it's released (merged).
