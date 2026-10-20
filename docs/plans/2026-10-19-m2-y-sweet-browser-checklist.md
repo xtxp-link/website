@@ -27,6 +27,7 @@ For each URL: `/?live=refresh`, `/?live=stream`, `/?live=ws`, then `/` with no p
 - [ ] **Does a streamed patch start a view transition by itself?** In `/?live=stream`, make a change and watch; record a short screen recording of the change.
 - [ ] **Do SVG elements take a `view-transition-name`?** In `/?live=ws&grain=node`, change the cross's colour and watch whether only the cross animates, or the whole drawing.
 - [ ] **JavaScript off:** in Chrome's settings for `localhost`, block JavaScript and open `/`. It should fall back to the refresh loop and still update.
+- [ ] **JavaScript off, left open:** leave that tab open for 5 minutes, making an edit every minute. Does every edit appear? (Headless Chromium sometimes stops the refresh loop; see `docs/reports/m2-y-sweet-browser-probes.md` in `xtxp-rs`.)
 
 ## 3. Client metrics
 
