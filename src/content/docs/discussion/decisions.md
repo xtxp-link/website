@@ -24,10 +24,10 @@ M1-y-sweet and M2-y-sweet on a stock y-sweet ([decision 25](#25-run-m1-and-m2-on
 
 ## 7. Peer model with hosted sessions
 
-- **Muppet is client-side Xmesh, and the application layer.** No server "finalises" state. The vector canvas, spatial chat and comments are muppet views, wherever a muppet runs.
+- **A muppet executes; applications own views.** No server "finalises" state. The executor is Xmesh sync, tree and ops. Applications drive the muppet (editor UIs, renderers, game engines) through a clean in-process boundary: commands in, screens out. See [decision 27](#27-a-muppet-executes-applications-drive-it).
 - **XTXP is node to node.**
 - **A session is hosted by exactly one muppet**; any number of muppets may hold copies. A session is a fork of the document's history.
-- **Server-side rendering is a server-side muppet.** Hosts hold sessions; every muppet executes, and those with a user render.
+- **Server-side rendering is an application on a server-side muppet.** Hosts hold sessions; every muppet executes, and those with an application render.
 
 
 ## 9. One address form: `{host}/{path}@{ref}`
@@ -120,9 +120,16 @@ See [Milestones](/build/milestones/#m1-y-sweet-and-m2-y-sweet).
 
 A browser takes part through three features it already has, not through a client-side framework. **Declarative partial updates** are how the muppet changes the document: it sends HTML patches (`<template for>`) aimed at named nodes, streamed in the page's own response, and the browser's parser applies them. **CSS view transitions** make every patch visible, so edits from other people and from agents can be watched and followed. **Popovers with anchor positioning** carry each element's control handles, which are the M2 forms. Edits still go in as form POSTs, and every POST is answered with a confirmation of where the edit landed, since the muppet may resolve it (a snap in an editor, a rule in a game world, a refusal): with a patch stream open, that's `204 No Content` and a confirmation patch on the stream. The Wasm muppet renders the same patches and applies them with the browser's HTML setters. These are progressive enhancements: the form, redirect and meta refresh loop stays the baseline for every browser, older ones included. See [The browser as client](/spec/browser/).
 
+## 27. A muppet executes; applications drive it
+
+- **The muppet is the executor:** Xmesh embedding, sync, tree operations, and session hosting. Applications—separate processes (or threads in a language that supports them) that drive a muppet and own its views—are the application layer. The boundary is in-process and narrow: commands in (edits and queries), screens out (the current state). This split keeps the muppet pure and lets applications be built independently.
+- **Any application can drive a muppet:** a terminal editor (xtxp-tui), a browser renderer (xtxp-serve), a game or physics engine that owns the space, a spatial chat or comments view, or any other UI. A server-side muppet runs headless, with no application and no views, and hosts sessions.
+- **An engine is an application that owns a space:** it decides geometry, physics, layout, timing, or other properties that span the document. It drives a muppet to reflect its decisions as `set-attr` commands on the document. Examples: a vector canvas engine, a 3D physics engine. Multiple applications can drive the same muppet (the renderer and an editor), and multiple muppets can run the same session (different machines, each with their own applications).
+- **Other language muppets are separate implementations** of the same specification, with their own applications. XTXP repositories hold one muppet (the Rust implementation here) and the applications that drive it for a given platform; the muppet library is the entry point.
+
 ## Naming
 
-- **XTXP** for the protocol, **Xmesh** for the engine, **muppet** for the executor, the application layer and hosting, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.
+- **XTXP** for the protocol, **Xmesh** for the CRDT engine, **muppet** for the executor, **application** for code that drives a muppet and owns views, **engine** for an application that owns a space, **session** for a line of history, **muppet disco** for discovery, **bouncer** for a domain owner's control of its `@origin`.
 - **Muppet is lowercase, as plain text.** It's an ordinary word of the protocol, not a brand: capitalised only to start a sentence, never `MUPPET`, never the product's name, never paired with puppet imagery. XTXP is the public name. See [Names and marks](/brand/names/#the-muppet-advisory), which also records the name checks (*Xmesh* collides with Thinkbox XMesh; no clash found for *XTXP*).
 
 ## Conventions
