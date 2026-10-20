@@ -122,10 +122,13 @@ A browser takes part through three features it already has, not through a client
 
 ## 27. A muppet executes; applications drive it
 
-- **The muppet is the executor:** Xmesh embedding, sync, tree operations, and session hosting. Applications—separate processes (or threads in a language that supports them) that drive a muppet and own its views—are the application layer. The boundary is in-process and narrow: commands in (edits and queries), screens out (the current state). This split keeps the muppet pure and lets applications be built independently.
-- **Any application can drive a muppet:** a terminal editor (xtxp-tui), a browser renderer (xtxp-serve), a game or physics engine that owns the space, a spatial chat or comments view, or any other UI. A server-side muppet runs headless, with no application and no views, and hosts sessions.
-- **An engine is an application that owns a space:** it decides geometry, physics, layout, timing, or other properties that span the document. It drives a muppet to reflect its decisions as `set-attr` commands on the document. Examples: a vector canvas engine, a 3D physics engine. Multiple applications can drive the same muppet (the renderer and an editor), and multiple muppets can run the same session (different machines, each with their own applications).
-- **Other language muppets are separate implementations** of the same specification, with their own applications. XTXP repositories hold one muppet (the Rust implementation here) and the applications that drive it for a given platform; the muppet library is the entry point.
+- **The muppet is the executor:** Xmesh, sync, tree operations and session hosting. An **application** drives a muppet and owns the views; run headless, a muppet has no application and hosts sessions. The boundary is narrow: commands in (edits aimed at nodes), screens out (the tree, what changed, and the connection state). In the Rust implementation an application embeds the muppet as a library, in its own process.
+- **Any application can drive a muppet:** a terminal editor, a browser renderer, a game or physics engine, a spatial chat or comments view.
+- **An engine is an application that owns a space:** it decides geometry, physics, layout or timing, and drives its muppet to reflect that as edits to the document. A physics engine that moves a drawing's parts is one; so could be a game world that rubber-bands invalid positions.
+- **Several applications can work on one session**, each with its own muppet.
+- **Other-language muppets are separate implementations** of the same specification, with their own applications.
+
+*Needs work: how Inkscape's adapter and a browser's Wasm muppet fit this split (an application on a muppet, or a muppet that updates the host's own document model) needs a proper diagram.*
 
 ## Naming
 
